@@ -55,9 +55,25 @@
       if (bossNode.style.top !== value) bossNode.style.top = value;
       bossPos.y = center / gameScreen.clientHeight * 100;
       bossNode.dataset.groundY = ground.toFixed(3);
+      const command=bossNode.querySelector('.boss-command'),hp=bossNode.querySelector('.boss-hp');
+      let tagGap=22;
+      if(command&&hp){
+        [command,hp].forEach(node=>{['top','bottom','width','min-width','max-width','white-space','overflow-wrap','margin-left'].forEach(key=>node.style.removeProperty(key))});
+        if(screen.width<=900){
+          Object.assign(command.style,{top:'auto',bottom:'calc(100% + 8px)',minWidth:'0',width:'max-content',maxWidth:`${screen.width-24}px`,whiteSpace:'normal',overflowWrap:'anywhere'});
+          const height=command.getBoundingClientRect().height;
+          Object.assign(hp.style,{top:'auto',bottom:`calc(100% + ${height+16}px)`,width:`${Math.min(260,screen.width-24)}px`});
+          tagGap=height+36;
+        }
+        [command,hp].forEach(node=>{
+          const r=node.getBoundingClientRect();
+          const dx=r.left<screen.left+12?screen.left+12-r.left:r.right>screen.right-12?screen.right-12-r.right:0;
+          node.style.marginLeft=dx+'px';
+        });
+      }
       const tag=bossNode.querySelector('.boss-tag');
       if(tag){
-        Object.assign(tag.style,{maxWidth:`${Math.min(400,screen.width-24)}px`,minWidth:'0',width:'max-content',whiteSpace:'normal',overflowWrap:'anywhere',top:'auto',bottom:'calc(100% + 22px)',marginLeft:'0px'});
+        Object.assign(tag.style,{maxWidth:`${Math.min(400,screen.width-24)}px`,minWidth:'0',width:'max-content',whiteSpace:'normal',overflowWrap:'anywhere',top:'auto',bottom:`calc(100% + ${tagGap}px)`,marginLeft:'0px'});
         const bounds=tag.getBoundingClientRect();
         const dx=bounds.left<screen.left+12?screen.left+12-bounds.left:bounds.right>screen.right-12?screen.right-12-bounds.right:0;
         tag.style.marginLeft=dx+'px';
