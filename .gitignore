@@ -5,6 +5,7 @@
 .env*
 .clasprc.json
 .clasp.json
+.deploy-gas/
 node_modules/
 tmp-clean-test/
 index.before-*.html
