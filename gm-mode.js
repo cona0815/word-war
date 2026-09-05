@@ -40,9 +40,15 @@
     hud();q('gmStatus').textContent='消耗品已補充；每關每種仍限用一次。';
   };
   const toggle = document.createElement('button'); toggle.id='gmToggle';toggle.textContent='GM 測試';toggle.hidden=true;document.body.append(toggle);
-  let resume = false;
-  function open(){resume=state.running;clearInterval(state.tick);panel.showModal()}
-  function close(){panel.close();if(resume&&state.running){clearInterval(state.tick);state.tick=setInterval(loop,120)}answerInput.focus()}
+  let resume = false,pausedAt=0,pausedGeneration=0;
+  function open(){resume=state.running;pausedAt=Date.now();pausedGeneration=battleVisualGeneration;clearInterval(state.tick);window.BossProjectile?.pause();panel.showModal()}
+  function close(){
+    panel.close();
+    if(pausedAt&&pausedGeneration===battleVisualGeneration&&state.bossMode)state.bossAttackAt+=Date.now()-pausedAt;
+    pausedAt=0;window.BossProjectile?.resume();
+    if(resume&&state.running){clearInterval(state.tick);state.tick=setInterval(loop,120)}
+    answerInput.focus();
+  }
   toggle.onclick=open;panel.addEventListener('cancel',e=>{e.preventDefault();if(active)close()});
   q('gmLogin').onsubmit=e=>{
     e.preventDefault();if(q('gmPassword').value!=='0088'){q('gmError').textContent='密碼錯誤';return}
