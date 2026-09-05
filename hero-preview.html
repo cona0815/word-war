@@ -101,6 +101,10 @@
     .sheet{margin-top:12px;border:1px solid rgba(101,239,255,.22);border-radius:9px;overflow:hidden;background:#07131f}
     .sheet img{display:block;width:100%;height:auto}
     @media(max-width:980px){.board{grid-template-columns:1fr}.stage{position:relative;height:auto}.grid{grid-template-columns:repeat(2,1fr)}.weapon-grid,.gear-grid{grid-template-columns:repeat(2,1fr)}}
+    .weapon.locked.active{opacity:1;filter:none}
+    .weapon.active small{color:#493d20}
+    .weapon.active .badge{color:#493d20;border-color:#947328}
+    @media(max-width:600px){.tier-plan{grid-template-columns:repeat(2,minmax(0,1fr))}}
     /* Integrated PNGs already contain the complete character and weapon. */
   </style>
 </head>
@@ -224,6 +228,7 @@
     if(mode==="cast"){modeCastBtn.classList.add("active");modeIdleBtn.classList.remove("active")}
     renderGrid();renderWeapons();renderGear();renderTierPlan();setHero();
   </script>
+<script src="hero-preview-clips.js"></script>
 </body>
 </html>
 
