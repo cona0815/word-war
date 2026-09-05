@@ -34,8 +34,13 @@
     if(screen.height&&panel){
       const height=parseFloat(getComputedStyle(hero).height)||0;
       const base=(state.bossMode?heroBoss.y:heroNormal.y)*screen.height/100;
-      const bottom=panel.getBoundingClientRect().top-screen.top-12;
-      const center=Math.max(height/2,Math.min(base,bottom-height/2));
+      const panelBounds=panel.getBoundingClientRect();
+      const bottom=panelBounds.top-screen.top-12;
+      const heroX=screen.left+screen.width/2;
+      const coversCenter=panelBounds.left<=heroX&&panelBounds.right>=heroX;
+      // A full-width control panel must leave a lower spawn lane, not just room for the hero.
+      const clearance=!state.bossMode&&coversCenter?Math.max(height/2,56+screen.height*.21):height/2;
+      const center=Math.max(height/2,Math.min(base,bottom-clearance));
       const position=(center/screen.height*100).toFixed(4)+'%';
       if(gameScreen.style.getPropertyValue('--hero-y')!==position)gameScreen.style.setProperty('--hero-y',position);
     }

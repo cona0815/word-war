@@ -21,7 +21,10 @@ try{
    return counts;
  });
  assert.ok(queue.every(n=>n===1),'Same-lane queue must show exactly one enemy at a time');
- const rows=await page.evaluate(async()=>{
+ const rows=[];
+ for(const viewport of [{width:1366,height:768},{width:800,height:900},{width:390,height:844},{width:320,height:740}]){
+ await page.setViewportSize(viewport);
+ const measured=await page.evaluate(async()=>{
    state.profile.gems=Array(8).fill(true);const rows=[];
    for(let i=0;i<8;i++){
      begin(i);mission.classList.add('hidden');await prepareBattleVisuals();await BattleGround.align();
@@ -38,6 +41,15 @@ try{
      }
    }return rows;
  });
+ rows.push(...measured.map(r=>({...r,viewport})));
+ await page.evaluate(async()=>{
+   begin(1);mission.classList.add('hidden');await prepareBattleVisuals();await BattleGround.align();
+   state.enemies=[{...pos(levels[1],'book',0),word:'book',order:0,alive:true,spawnAt:0}];render();
+   await Promise.all([...enemyLayer.querySelectorAll('img')].map(img=>img.decode()));EnemySafeArea.layout();
+ });
+ fs.mkdirSync('docs/qa-spawn-clearance',{recursive:true});
+ await page.screenshot({path:`docs/qa-spawn-clearance/${viewport.width}.png`});
+ }
  fs.mkdirSync('docs/qa-spawn-clearance',{recursive:true});fs.writeFileSync('docs/qa-spawn-clearance/results.json',JSON.stringify(rows,null,2));
  const unsafe=rows.filter(r=>r.after<8);console.log(JSON.stringify({checked:rows.length,unsafe},null,2));
  if(unsafe.length)process.exitCode=1;

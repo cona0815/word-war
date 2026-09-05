@@ -8,12 +8,14 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'C:/Users/cona0/.cache/c
 const base=process.argv[2]||'http://127.0.0.1:8767';
 const selected=process.argv[3]?Number(process.argv[3]):null;
 assert.ok(selected===null||(Number.isInteger(selected)&&selected>=1&&selected<=8),'stage must be 1..8');
+const viewport=process.argv[4]?{width:Number(process.argv[4]),height:Number(process.argv[5])}:{width:1366,height:768};
+assert.ok(Number.isInteger(viewport.width)&&viewport.width>=320&&Number.isInteger(viewport.height)&&viewport.height>=600,'viewport must be at least 320x600');
 const out=path.resolve('docs/qa-live-stages');fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const reports=[];
 const minimum=vm.runInNewContext('('+fs.readFileSync('gas_code.gs','utf8').match(/STAGE_MIN_CORRECT = Object.freeze\((\{[\s\S]*?\})\)/)[1]+')');
 async function run(stage){
-  const context=await browser.newContext({viewport:{width:1366,height:768}}),page=await context.newPage(),errors=[];
+  const context=await browser.newContext({viewport}),page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   const start=Date.now(),waves=new Set(),phases=new Set();
   try{
@@ -43,12 +45,12 @@ async function run(stage){
     const result=await page.evaluate(()=>({outcome:state.outcome,correct:state.correct,attempts:state.attempts,hp:state.hp,attacks:state.bossAttackCount,damageTrace:window.damageTrace}));
     assert.equal(result.outcome,'done');assert.equal(waves.size,4);assert.equal(phases.size,3);assert.deepEqual(errors,[]);
     assert.ok(result.correct>=minimum[stage],`Stage ${stage} cannot settle in GAS: ${result.correct} < ${minimum[stage]}`);
-    const report={stage,status:'passed',durationMs:Date.now()-start,waves:[...waves],phases:[...phases],...result};reports.push(report);console.log(JSON.stringify(report));
+    const report={stage,viewport,status:'passed',durationMs:Date.now()-start,waves:[...waves],phases:[...phases],...result};reports.push(report);console.log(JSON.stringify(report));
   }catch(error){
     const snapshot=await page.evaluate(()=>({hp:state.hp,correct:state.correct,attempts:state.attempts,wave:state.waveIndex,boss:state.bossMode,damageTrace:window.damageTrace})).catch(()=>null);
     reports.push({stage,status:'failed',error:String(error),errors,durationMs:Date.now()-start,snapshot});console.error(stage,String(error),JSON.stringify(snapshot));
   }
-  finally{await context.close();fs.writeFileSync(path.join(out,selected?`stage-${selected}-results.json`:'results.json'),JSON.stringify(reports,null,2))}
+  finally{await context.close();fs.writeFileSync(path.join(out,selected?`stage-${selected}-${viewport.width}-results.json`:'results.json'),JSON.stringify(reports,null,2))}
 }
 try{if(selected)await run(selected);else await Promise.all(Array.from({length:8},(_,i)=>run(i+1)))}finally{await browser.close()}
 if(reports.some(r=>r.status!=='passed'))process.exitCode=1;
