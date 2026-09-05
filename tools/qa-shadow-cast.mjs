@@ -1,0 +1,45 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const {chromium}=require('C:/Users/cona0/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const base=process.argv[2]||'http://127.0.0.1:8767';
+const gender=process.argv[3]||'male';
+const weapon=process.argv[4]||'shadow',level=Number(process.argv[5]||1);
+const browser=await chromium.launch({channel:'chrome',headless:true});
+fs.mkdirSync('docs/qa-shadow-cast',{recursive:true});
+try{
+ const page=await browser.newPage({viewport:{width:1366,height:768}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base+'/index.html?gm=1');await page.locator('#gmPassword').fill('0088');await page.locator('#gmLogin button').click();
+ await page.locator('#gmHero').selectOption(gender);
+ await page.locator('#gmLevel').fill(String(level));
+ await page.locator('#gmWeapon').selectOption(weapon);await page.locator('#gmBoss').click();await page.waitForFunction(()=>!document.querySelector('#gmPanel').open);
+ const result=await page.evaluate(async()=>{
+  clearInterval(state.tick);await prepareBattleVisuals();await BattleGround.align();
+  const image=new Image();image.src=activeHeroCastClip.url;await image.decode();
+  startHeroMotion();heroCastAnimation.pause();heroCastAnimation.currentTime=300;
+  return {width:image.width,height:image.height,url:activeHeroCastClip.url,poses:heroCastAnimation.effect.getKeyframes().length,renderHeight:hero.getBoundingClientRect().height};
+ });assert.equal(result.width,6912);assert.equal(result.height,648);assert.equal(result.poses,7);
+ assert.ok(result.url.includes(`hero-${gender}-${weapon}`));
+ await page.screenshot({path:'docs/qa-shadow-cast/battle.png'});
+ await page.goto(base+'/hero-preview.html?hero-motion=1');
+ await page.locator(`#${gender}Btn`).click();
+ await page.locator(`[data-lv="${level}"]`).click();
+ await page.locator(`[data-w="${weapon}"]`).click();await page.waitForFunction(w=>big.dataset.castClip?.includes(w),weapon);
+ await page.evaluate(()=>{const a=big.getAnimations()[0];a.pause();a.currentTime=300});
+ await page.screenshot({path:'docs/qa-shadow-cast/preview.png'});
+ const missing=await page.evaluate(g=>Array.from(document.querySelectorAll('[data-w]'),b=>b.dataset.w).flatMap(w=>Array.from({length:10},(_,i)=>({w,l:i+1}))).find(({w,l})=>!HeroCastClips[`${g}:${l}:${w}`]),gender);
+ assert.ok(missing,'Update fallback coverage once every weapon and level is complete');
+ await page.locator(`[data-w="${missing.w}"]`).click();
+ await page.locator(`[data-lv="${missing.l}"]`).click();await page.waitForTimeout(700);assert.equal(await page.evaluate(()=>!!big.dataset.castClip),false);
+ await page.locator(`[data-w="${missing.w}"]`).click();await page.waitForTimeout(700);assert.equal(await page.evaluate(()=>motionSprite.classList.contains('playing')),false);
+ await page.setViewportSize({width:390,height:844});
+ await page.locator(`[data-lv="${level}"]`).click();await page.locator(`[data-w="${weapon}"]`).click();
+ await page.waitForFunction(w=>big.dataset.castClip?.includes(w),weapon);
+ const mobile=await page.evaluate(()=>{const a=big.getAnimations()[0];a.pause();a.currentTime=300;const r=big.getBoundingClientRect();return {left:r.left,right:r.right,width:innerWidth,overflow:document.documentElement.scrollWidth>innerWidth}});
+ assert.equal(mobile.overflow,false);assert.ok(mobile.left>=0&&mobile.right<=mobile.width,JSON.stringify(mobile));
+ await page.locator('.preview').scrollIntoViewIfNeeded();
+ await page.screenshot({path:'docs/qa-shadow-cast/mobile.png'});
+ assert.deepEqual(errors,[]);fs.writeFileSync('docs/qa-shadow-cast/results.json',JSON.stringify({result,errors,wrongLevelClipBlocked:true},null,2));
+ console.log(`PASS ${gender} Lv.${level} ${weapon} six-frame battle and preview; wrong-level legacy body blocked`);
+}finally{await browser.close()}
