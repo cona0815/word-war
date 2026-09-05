@@ -41,12 +41,13 @@
         if(!sprite.isConnected)return;
         sprite.style.setProperty('--hero',`url("${url}")`);
         sprite.style.setProperty('--face','1');
-        sprite.style.backgroundSize='auto 100%';
+        sprite.style.width='100%';sprite.style.maxWidth='170px';
+        sprite.style.backgroundSize=`auto ${Math.min(143,sprite.clientWidth*648/768)}px`;
         sprite.dataset.clipIdle=url;
       }).catch(()=>{});
     });
   };
-  window.addEventListener('resize',()=>setHero());
+  window.addEventListener('resize',()=>{renderGrid();setHero()});
   renderGrid();
   setHero();
 })();

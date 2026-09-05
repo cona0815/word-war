@@ -25,10 +25,11 @@ try{
     const canvas=document.createElement('canvas');canvas.width=im.width;canvas.height=im.height;
     const ctx=canvas.getContext('2d');ctx.drawImage(im,0,0);const data=ctx.getImageData(0,0,im.width,im.height).data;
     let min=im.width,max=0;for(let i=3;i<data.length;i+=4)if(data[i]>128){const x=((i-3)/4)%im.width;min=Math.min(min,x);max=Math.max(max,x)}
-    const scale=el.clientHeight/im.height,offset=(el.clientWidth-im.width*scale)/2;
-    return {...r,face:el.style.getPropertyValue('--face'),left:offset+min*scale,right:offset+(max+1)*scale,width:el.clientWidth};
+    const scale=parseFloat(getComputedStyle(el).backgroundSize.split(' ')[1])/im.height,offset=(el.clientWidth-im.width*scale)/2;
+    const box=el.getBoundingClientRect(),card=c.getBoundingClientRect();
+    return {...r,face:el.style.getPropertyValue('--face'),left:offset+min*scale,right:offset+(max+1)*scale,width:el.clientWidth,cardLeft:box.left+offset+min*scale-card.left,cardRight:box.left+offset+(max+1)*scale-card.left,cardWidth:card.width};
    })),{gender,weapon});
-   for(const r of results){assert.equal(r.hasIdle,r.reviewed);if(r.reviewed){assert.equal(r.face,'1');assert.ok(r.left>=0&&r.right<=r.width,JSON.stringify(r))}checked++}
+   for(const r of results){assert.equal(r.hasIdle,r.reviewed);if(r.reviewed){assert.equal(r.face,'1');assert.ok(r.left>=0&&r.right<=r.width&&r.cardLeft>=0&&r.cardRight<=r.cardWidth,JSON.stringify(r))}checked++}
   }
  }
  assert.deepEqual(errors,[]);fs.mkdirSync('docs/qa-preview-grid',{recursive:true});
