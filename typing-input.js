@@ -10,7 +10,7 @@
     return physical?physical.toUpperCase():/^[A-Za-z0-9]$/.test(first)?first.toUpperCase():null;
   }};
   document.addEventListener('keydown', event => {
-    if(!state.running||!mission.classList.contains('hidden')||drawer.classList.contains('open')||event.isComposing||composing)return;
+    if(!state.running||!mission.classList.contains('hidden')||drawer.classList.contains('open')||document.querySelector('#gmPanel')?.open||event.isComposing||composing)return;
     if(isEditingTarget(event.target)&&event.target!==answerInput)return;
     const targets=state.bossMode?[state.current].filter(Boolean):state.enemies.filter(isActive);
     const words=targets.map(e=>String(e.word).trim());

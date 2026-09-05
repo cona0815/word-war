@@ -734,7 +734,7 @@
     let composing=false;
     function esc(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
     function isEditingTarget(el){return !!(el&&(el.isContentEditable||["INPUT","TEXTAREA","SELECT"].includes(el.tagName)))}
-    function shouldIgnoreGlobalKey(e){return drawer.classList.contains("open")||e.isComposing||composing||(isEditingTarget(e.target)&&e.target!==answerInput)}
+    function shouldIgnoreGlobalKey(e){return drawer.classList.contains("open")||document.querySelector('#gmPanel')?.open||e.isComposing||composing||(isEditingTarget(e.target)&&e.target!==answerInput)}
     function tagClass(v){const s=String(v);return s.length>12||/\s/.test(s)?"tag long":"tag"}
     function promptHTML(v){const s=String(v),m=s.match(/^([\u3105-\u3129])([ˊˇˋ˙])$/);return m?`<span class="zh-tone">${esc(m[1])}<span class="tone-mark">${esc(m[2])}</span></span>`:esc(s)}
     document.querySelectorAll("[data-login-tab]").forEach(b=>b.onclick=()=>tabLogin(b.dataset.loginTab));document.querySelectorAll("[data-hero]").forEach(b=>b.onclick=()=>{state.profile.hero=b.dataset.hero;document.querySelectorAll("[data-hero]").forEach(x=>x.classList.toggle("active",x===b));save(PROFILE,state.profile);queueProfileSync()});document.querySelectorAll("[data-menu-tab]").forEach(b=>b.onclick=()=>tabMenu(b.dataset.menuTab));

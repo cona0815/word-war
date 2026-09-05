@@ -41,7 +41,7 @@
   }
   meter.querySelectorAll('button').forEach((button,i)=>button.onclick=[charge,release,cancel][i]);
   document.addEventListener('keydown',event=>{
-    if(event.defaultPrevented||event.repeat||!event.ctrlKey||event.altKey||event.metaKey||event.isComposing||composing||!state.running||!mission.classList.contains('hidden')||drawer.classList.contains('open'))return;
+    if(event.defaultPrevented||event.repeat||!event.ctrlKey||event.altKey||event.metaKey||event.isComposing||composing||!state.running||!mission.classList.contains('hidden')||drawer.classList.contains('open')||document.querySelector('#gmPanel')?.open)return;
     if(isEditingTarget(event.target)&&event.target!==answerInput)return;
     const fn={c:charge,v:release,z:cancel}[event.key.toLowerCase()];
     if(fn){event.preventDefault();event.stopImmediatePropagation();fn()}
