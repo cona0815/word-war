@@ -1,0 +1,8 @@
+# female Level 2 Starlight Cast
+
+Built-in image generation, 2026-09-06. Reference: hero-weapons-normalized-v2/hero-female-lv2-starlight.png.
+Processed with tools/build-shadow-cast.py female starlight 2; six 1152x648 cells, shared scale, foot anchor (576,610).
+
+## Prompt
+
+Create six-frame continuous casting sprite sheet of the EXACT GIRL from attached reference, preserving her level-two identity and equipment, not a redesign. Equal TWO COLUMNS THREE ROWS grid, row-major order. Girl has brown high ponytail tied with gold-blue band, blue eyes, navy-and-gold long school mage coat, short pleated skirt, white shirt and cuffs, small blue neck brooch, navy knee boots with gold trim. Exact weapon: long dark shaft with GOLD CIRCULAR RING around a large luminous BLUE-VIOLET MULTIPOINT STAR, small gold star finials; not a diamond-prong staff. Physically hold same staff throughout. All frames face RIGHT three-quarter side angle. Six distinct real body poses: upright ready holding staff diagonal, crouch with both hands pulling staff close, lift staff above shoulder with torso twist, two-handed forward casting thrust right, low follow-through with bent front knee, recover upright to starting diagonal hold. Keep same head size and body scale, consistent ponytail length and clothing. Whole person and staff contained in central 65 percent of each cell, feet centered and consistent ground line. Very wide clear gutters, no crossing edges. Crisp refined project-native chibi RPG illustration matching reference, attractive expressive natural movement. Background pure flat #FF00FF. No emitted effects, particles, sparkles, haze, ground shadows, numbers, text, visible grid or extra weapons. Full-body body-action only.

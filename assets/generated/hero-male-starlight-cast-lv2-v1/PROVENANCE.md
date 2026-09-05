@@ -1,0 +1,8 @@
+# male Level 2 Starlight Cast
+
+Built-in image generation, 2026-09-06. Reference: hero-weapons-normalized-v2/hero-male-lv2-starlight.png.
+Processed with tools/build-shadow-cast.py male starlight 2; six 1152x648 cells, shared scale, foot anchor (576,610).
+
+## Prompt
+
+Production sprite animation for the exact BOY in the attached visual reference, not a redesign. Six full-body continuous casting poses in an equal TWO COLUMN by THREE ROW grid, reading row-major. Preserve short tousled brown hair, blue eyes, navy gold-trim long school-mage coat, shoulder cape, white shirt and blue necktie, navy trousers, tall navy gold-trim boots. Preserve exact long dark-blue staff: blue faceted diamond center inside a gold four-point star frame, gold finials and collars. All six poses face RIGHT at consistent three-quarter side angle. Poses: 1 upright ready holding staff upright, 2 bend knees pull staff close to chest with both hands, 3 torso twist raising staff diagonally above shoulder, 4 two-handed decisive forward thrust right, 5 bent front knee follow-through, 6 return upright staff near vertical. Real changes in knees, elbows, shoulders and coat, not six clones. Same head and body scale across all six. Full body and whole weapon remain safely inside central 65 percent of every equal cell, stable feet baseline, generous blank gutters, centered boots. Keep his level-two mature school adventurer proportions and costume exactly. High quality crisp clean chibi RPG art matching reference. Absolutely flat #FF00FF background. No glow, sparkles, particles, ground shadow, text, grid lines, extra people or detached weapons. Staff held naturally throughout. Body-only action, no magic effects.

@@ -245,6 +245,7 @@
   <audio id="academyAudio" src="assets/magic-academy-intro.wav" preload="auto"></audio>
   <script src="boss-motion.js"></script>
 
+  <script src="hero-cast-clips.js"></script>
   <script>
     const T = {
       subtitle:"\u9b54\u6cd5\u6253\u5b57\u5b78\u9662 | \u6821\u5712\u5b88\u9ede\u5f0f\u6253\u5b57\u5192\u96aa",
@@ -459,11 +460,7 @@
     const integratedWeaponSet=(hero,level)=>Object.fromEntries(["starlight","ice","fire","thunder","shadow"].map(weapon=>[weapon,`assets/generated/hero-weapons-normalized-v2/hero-${hero}-lv${level}-${weapon}.png`]));
     for(let level=1;level<=10;level++){integratedHeroAssets.male[level]=integratedWeaponSet("male",level);integratedHeroAssets.female[level]=integratedWeaponSet("female",level)}
     // Only use a pose sheet for its exact character, level and weapon combination.
-    const LV1_CAST_CLIP={url:"assets/generated/hero-cast-lv1-v1/cast-strip.png",duration:600,release:252};
-    const FEMALE_LV1_CAST_CLIP={url:"assets/generated/hero-female-cast-lv1-v1/cast-strip.png",duration:600,release:252};
-    const SHADOW_LV1_CAST_CLIP={url:"assets/generated/hero-male-shadow-cast-lv1-v1/cast-strip.png",duration:650,release:273,wide:true};
-    const FEMALE_SHADOW_LV1_CAST_CLIP={url:"assets/generated/hero-female-shadow-cast-lv1-v1/cast-strip.png",duration:650,release:273,wide:true};
-    const selectedHeroCastClip=()=>Number(state.profile.level)!==1?null:state.profile.weapon==="starlight"?(state.profile.hero==="female"?FEMALE_LV1_CAST_CLIP:LV1_CAST_CLIP):state.profile.weapon==="shadow"?(state.profile.hero==="female"?FEMALE_SHADOW_LV1_CAST_CLIP:SHADOW_LV1_CAST_CLIP):null;
+    const selectedHeroCastClip=()=>HeroCastClips[`${state.profile.hero}:${Number(state.profile.level)}:${state.profile.weapon}`]||null;
     let activeHeroCastClip=null;
     let heroCastAnimation=null,battleVisualGeneration=0,battleStartPending=false;
     const battleImageCache=new Map(),readyBattleImages=new Set();

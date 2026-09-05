@@ -1,11 +1,6 @@
 /* Use accepted level-specific clips, never a different level's body. */
 (() => {
-  const clips={
-    'male:1:starlight':{url:'assets/generated/hero-cast-lv1-v1/cast-strip.png',width:896},
-    'female:1:starlight':{url:'assets/generated/hero-female-cast-lv1-v1/cast-strip.png',width:896},
-    'male:1:shadow':{url:'assets/generated/hero-male-shadow-cast-lv1-v1/cast-strip.png',width:1152},
-    'female:1:shadow':{url:'assets/generated/hero-female-shadow-cast-lv1-v1/cast-strip.png',width:1152}
-  };
+  const clips=HeroCastClips;
   let request=0,animation=null;
   const previousStop=stopHeroMotion;
   stopHeroMotion=()=>{
@@ -24,7 +19,7 @@
       big.style.aspectRatio=`${clip.width}/648`;
       big.style.backgroundImage=`url("${clip.url}")`;big.style.backgroundSize='600% 100%';big.style.backgroundPosition='0% 0%';big.style.animation='none';big.style.setProperty('--face',face);
       big.dataset.castClip=clip.url;
-      animation=big.animate([0,1,2,3,4,5,0].map((n,i)=>({backgroundPosition:`${n*20}% 0`,offset:[0,.1,.25,.42,.65,.82,1][i],easing:'steps(1,end)'})),{duration:650,iterations:Infinity});
+      animation=big.animate([0,1,2,3,4,5,0].map((n,i)=>({backgroundPosition:`${n*20}% 0`,offset:[0,.1,.25,.42,.65,.82,1][i],easing:'steps(1,end)'})),{duration:clip.duration,iterations:Infinity});
     }catch{if(current===request)big.classList.add('cast')}
   };
   const previousSet=setHero;
