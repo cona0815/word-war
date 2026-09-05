@@ -34,7 +34,7 @@ try{
  }
  assert.deepEqual(errors,[]);fs.mkdirSync('docs/qa-preview-grid',{recursive:true});
  await page.locator('[data-w="starlight"]').click();
- await page.waitForFunction(()=>grid.querySelectorAll('[data-clip-idle]').length===6);
+ await page.waitForFunction(()=>grid.querySelectorAll('[data-clip-idle]').length===Object.keys(HeroCastClips).filter(k=>k.startsWith(`${hero}:`)&&k.endsWith(':starlight')).length);
  await page.locator('[data-lv="4"]').scrollIntoViewIfNeeded();
  await page.screenshot({path:'docs/qa-preview-grid/mobile.png'});
  console.log(`PASS ${checked} level cards: matching assets, canonical facing and no opaque clipping`);

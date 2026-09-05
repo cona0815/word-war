@@ -1,0 +1,12 @@
+{
+  "key": "female:7:starlight",
+  "folder": "hero-female-starlight-cast-lv7-v1",
+  "width": 1152,
+  "top": 141,
+  "bottom": 610,
+  "footx": 576.5,
+  "bodyHeight": 469,
+  "factor": 0.9808102345415778,
+  "targetBodyHeight": 460,
+  "output": "hero-female-starlight-cast-lv7-v1-body-v2"
+}
