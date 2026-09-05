@@ -1,0 +1,7 @@
+# male Level9 Starlight Cast
+
+Built-in generation 2026-09-06 using hero-weapons-normalized-v2/hero-male-lv9-starlight.png reference. Six complete right-facing body/weapon poses. Processed with tools/build-shadow-cast.py. Detached halo FX excluded from body sizing.
+
+## Prompt
+
+Production continuous six-pose casting sprite sheet EXACT LEVEL NINE BOY reference. Preserve tousled brown hair blue eyes, gold blue jewel forehead circlet, ornate wing-like white/gold shoulder armor with blue gems, navy gold long robe and cape with white inner panels, gold chain belt with blue diamond, dark gold boots. Same long dark staff LARGE BLUE FIVE-POINT STAR inside gold circular spiked frame with blue crystals. OMIT detached halo behind head and all sparkles: body and held staff only, no separate FX. Six FULL bodies, all RIGHT, equal two columns three rows: upright ready; crouch draw full staff close both hands; overhead diagonal windup; two-handed forward thrust RIGHT; low followthrough holding full staff forward; upright recover. FULL weapon head shaft and hands connected every cell, constant weapon/head/body scale and costume. Real joints move. Whole body and weapon central55% each cell, VERY WIDE EMPTY GUTTERS, stable centered feet baseline, no touching neighbors or edges. Crisp polished chibi RPG reference style, flat solid #FF00FF background, no glow shadows particles text grid or extra props.

@@ -1,0 +1,7 @@
+# female Level9 Starlight Cast
+
+Built-in generation 2026-09-06 using hero-weapons-normalized-v2/hero-female-lv9-starlight.png reference. Six complete right-facing body/weapon poses. Processed with tools/build-shadow-cast.py. Detached halo FX excluded from body sizing.
+
+## Prompt
+
+Six-frame production casting sheet of exact LEVEL NINE GIRL reference. Preserve long high brown ponytail with gold/blue butterfly-like hair ornament, purple eyes, ornate gold/blue shoulder armor, navy fitted gold-trim bodice, short navy skirt with white hem, long gold embroidered cape and navy gold boots, same dark staff with large BLUE-PURPLE FIVE POINT STAR in gold pointed frame with blue connector diamonds. OMIT all detached halo rings and magic trails from reference: body and held staff only. Six FULL BODY poses in equal two columns three rows all facing RIGHT: upright ready, crouch draw staff close both hands, overhead diagonal windup, two handed forward thrust RIGHT, forward bent knee follow through, upright recover. COMPLETE same-size staff head and full shaft held every frame, no missing weapons. Same character/head/body/weapon scale across frames, real joint movement. Full body and weapon central55% of each cell with VERY WIDE empty gutters, no neighboring touches, stable centered feet. Polished crisp chibi RPG reference style. Uniform flat #FF00FF background only, no glow shadow particles text or grids.
