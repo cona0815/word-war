@@ -64,7 +64,12 @@
       status.textContent=id==='hint'?`首鍵：${hintKey}`:`${playerItemCatalog[id].name}已使用`;
       hud();
     }catch(error){if(generation===epoch)status.textContent=error.message+'；可再次點擊重試'}
-    finally{if(generation===epoch){busy=false;paint();answerInput.focus()}}
+    finally{
+      if(generation===epoch){
+        busy=false;paint();
+        if(state.running&&mission.classList.contains('hidden')&&!drawer.classList.contains('open')&&!document.querySelector('#gmPanel')?.open)answerInput.focus();
+      }
+    }
   }
   const originalBegin=begin;
   begin=(...args)=>{reset();return originalBegin(...args)};
