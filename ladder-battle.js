@@ -35,7 +35,7 @@
   };
   const originalSubmit=submitLadder;
   submitLadder=async()=>{
-    if(pendingLadderRecord&&pendingLadderRecord.accuracy<85){ladderNameStatus.textContent='天梯成績需要至少 85% 正確率。';return}
+    if(pendingLadderRecord&&pendingLadderRecord.correct/Math.max(1,pendingLadderRecord.attempts)*100<85){ladderNameStatus.textContent='天梯成績需要至少 85% 正確率。';return}
     await originalSubmit();if(!pendingLadderRecord){ended=true;next.disabled=true}
   };
   // The original click handler was assigned before this module loaded.
