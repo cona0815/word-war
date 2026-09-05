@@ -10,7 +10,7 @@ root = Path(__file__).resolve().parents[1]
 entries = re.findall(r"\['([^']+)','([^']+)',(\d+),(\d+)\]", (root/'hero-cast-clips.js').read_text())
 out = root/'docs/qa-body-scale'
 out.mkdir(parents=True, exist_ok=True)
-sheet = Image.new('RGB', (280*4, 330*4), '#30464c')
+sheet = Image.new('RGB', (280*4, 330*((len(entries)+3)//4)), '#30464c')
 draw = ImageDraw.Draw(sheet)
 report = []
 for i,(key,folder,width,duration) in enumerate(entries):
