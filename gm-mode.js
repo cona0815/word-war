@@ -41,11 +41,11 @@
   };
   const toggle = document.createElement('button'); toggle.id='gmToggle';toggle.textContent='GM 測試';toggle.hidden=true;document.body.append(toggle);
   let resume = false,pausedAt=0,pausedGeneration=0;
-  function open(){resume=state.running;pausedAt=Date.now();pausedGeneration=battleVisualGeneration;clearInterval(state.tick);window.BossProjectile?.pause();panel.showModal()}
+  function open(){resume=state.running;pausedAt=Date.now();pausedGeneration=battleVisualGeneration;clearInterval(state.tick);window.BossProjectile?.pause();window.Consumables?.pause();window.UltimateBattle?.pause();panel.showModal()}
   function close(){
     panel.close();
     if(pausedAt&&pausedGeneration===battleVisualGeneration&&state.bossMode)state.bossAttackAt+=Date.now()-pausedAt;
-    pausedAt=0;window.BossProjectile?.resume();
+    pausedAt=0;window.BossProjectile?.resume();window.Consumables?.resume();window.UltimateBattle?.resume();
     if(resume&&state.running){clearInterval(state.tick);state.tick=setInterval(loop,120)}
     answerInput.focus();
   }

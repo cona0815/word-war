@@ -11,7 +11,9 @@
   let run=null,pendingRun=null,busy=false,shield=false,slowUntil=0,hintUntil=0,star=false,epoch=0;
   const cloud=()=>!!(state.config.gasUrl&&state.auth?.sessionToken);
   const uid=()=>crypto.randomUUID();
-  function reset(){epoch++;run=null;pendingRun=null;busy=false;shield=false;slowUntil=0;hintUntil=0;star=false;status.textContent='';paint()}
+  let pausedAt=null;
+  const effectNow=()=>pausedAt??Date.now();
+  function reset(){epoch++;pausedAt=null;run=null;pendingRun=null;busy=false;shield=false;slowUntil=0;hintUntil=0;star=false;status.textContent='';paint()}
   function paint(){
     panel.hidden=!state.running;
     if(!buttons.children.length){
@@ -58,8 +60,8 @@
       if(!state.running)return;
       if(id==='potion')state.hp=Math.min(100,state.hp+25);
       if(id==='shield')shield=true;
-      if(id==='hourglass')slowUntil=Date.now()+10000;
-      if(id==='hint')hintUntil=Date.now()+10000;
+      if(id==='hourglass')slowUntil=effectNow()+10000;
+      if(id==='hint')hintUntil=effectNow()+10000;
       if(id==='comboStar')star=true;
       status.textContent=id==='hint'?`首鍵：${hintKey}`:`${playerItemCatalog[id].name}已使用`;
       hud();
@@ -78,7 +80,7 @@
   const originalSwitch=switchAccount;
   switchAccount=(...args)=>{reset();return originalSwitch(...args)};
   const originalHud=hud;
-  hud=()=>{originalHud();paint();if(hintUntil&&Date.now()>hintUntil){hintUntil=0;status.textContent='提示結束'}};
+  hud=()=>{originalHud();paint();if(hintUntil&&effectNow()>hintUntil){hintUntil=0;status.textContent='提示結束'}};
   const originalGasPost=gasPost;
   gasPost=payload=>originalGasPost(payload.action==='finishStage'?{...payload,itemRunId:run?.id}:payload);
   const originalReward=grantLocalStageReward;
@@ -92,7 +94,9 @@
     if(playerItemCatalog[id]&&(state.profile.inventory?.items?.[id]||0)>=99){shopStatus.textContent='道具已達持有上限 99 個。';return}
     return originalBuy(id);
   };
-  window.Consumables={prepare,use,reset,slowFactor:()=>Date.now()<slowUntil?.5:1,
+  window.Consumables={prepare,use,reset,slowFactor:()=>effectNow()<slowUntil?.5:1,
+    pause:()=>{pausedAt??=Date.now()},
+    resume:()=>{if(pausedAt===null)return;const elapsed=Date.now()-pausedAt;if(slowUntil)slowUntil+=elapsed;if(hintUntil)hintUntil+=elapsed;pausedAt=null},
     mistake:()=>{if(shield){shield=false;status.textContent='護盾抵銷失誤';return 0}return 6},
     inspect:()=>({run:run?.id,used:{...run?.used},busy,shield,star,slowUntil})};
   paint();

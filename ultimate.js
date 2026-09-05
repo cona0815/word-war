@@ -5,7 +5,8 @@
   gameScreen.appendChild(meter);
   const progress=meter.querySelector('progress'),status=meter.querySelector('strong');
   const data={energy:0,armed:false,busy:false,freezeUntil:0,account:state.profile.account};
-  const ready=new Map();let epoch=0;
+  const ready=new Map();let epoch=0,pausedAt=null;
+  const effectNow=()=>pausedAt??Date.now();
   const tier=()=>state.profile.level>=8?3:state.profile.level>=4?2:1;
   const source=()=>`assets/generated/ultimate-v1/tier-${tier()}/cast-strip.png`;
   function preload(){const src=source();if(!ready.has(src)){const img=new Image();img.src=src;const job=img.decode().then(()=>src);ready.set(src,job);job.catch(()=>ready.delete(src))}return ready.get(src)}
@@ -24,7 +25,7 @@
       const src=await preload();
       if(generation!==epoch||!state.running)return;
       data.energy=0;data.armed=false;
-      const strength=tier();data.freezeUntil=Date.now()+2500+strength*500;
+      const strength=tier();data.freezeUntil=effectNow()+2500+strength*500;
       if(state.bossMode){
         const floor=Math.max(1,Math.floor(state.maxBossHp*bossPhaseFloor(levels[state.levelIndex].id,state.bossPhase)));
         state.bossHp=Math.max(floor,state.bossHp-Math.round(state.maxBossHp*(.06+strength*.02)));
@@ -48,9 +49,12 @@
   },true);
   const submitBefore=submit,beginBefore=begin,finishBefore=finish,loopBefore=loop;
   submit=raw=>{const correct=state.correct;submitBefore(raw);if(state.correct>correct){data.energy=Math.min(100,data.energy+10);paint()}};
-  begin=index=>{epoch++;data.busy=false;data.armed=false;data.freezeUntil=0;gameScreen.querySelectorAll('.ultimate-burst').forEach(n=>n.remove());if(data.account!==state.profile.account){data.energy=0;data.account=state.profile.account}beginBefore(index);paint()};
+  begin=index=>{epoch++;pausedAt=null;data.busy=false;data.armed=false;data.freezeUntil=0;gameScreen.querySelectorAll('.ultimate-burst').forEach(n=>n.remove());if(data.account!==state.profile.account){data.energy=0;data.account=state.profile.account}beginBefore(index);paint()};
   finish=win=>{epoch++;data.busy=false;data.armed=false;gameScreen.querySelectorAll('.ultimate-burst').forEach(n=>n.remove());finishBefore(win);paint()};
-  loop=()=>{if(Date.now()<data.freezeUntil){hud();return}loopBefore()};
-  window.UltimateBattle=Object.freeze({charge,cancel,release,preload,gmFill:()=>{if(window.GMMode?.active){data.energy=100;paint()}},snapshot:()=>({...data,tier:tier()})});
+  loop=()=>{if(effectNow()<data.freezeUntil){hud();return}loopBefore()};
+  window.UltimateBattle=Object.freeze({charge,cancel,release,preload,
+    pause:()=>{pausedAt??=Date.now()},
+    resume:()=>{if(pausedAt===null)return;if(data.freezeUntil)data.freezeUntil+=Date.now()-pausedAt;pausedAt=null},
+    gmFill:()=>{if(window.GMMode?.active){data.energy=100;paint()}},snapshot:()=>({...data,tier:tier()})});
   paint();
 })();
