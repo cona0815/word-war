@@ -4,7 +4,7 @@ const require=createRequire(import.meta.url);
 const {chromium}=require('C:/Users/cona0/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const browser=await chromium.launch({channel:'chrome',headless:true});
 try{
- for(const mode of ['failure','restart','late-start','late-use','account','retry','ladder-floor','settlement']){
+ for(const mode of ['failure','restart','late-start','late-use','account','retry','ladder-floor','ladder-failure','ladder-submit','settlement']){
   const page=await browser.newPage();
   await page.goto((process.argv[2]||'http://127.0.0.1:8767')+'/index.html'+(mode==='settlement'?'':'?gm=1'));
   if(mode==='settlement')await page.evaluate(async()=>{state.config={};state.auth=null;begin(0);await startBattle()});
@@ -47,6 +47,15 @@ try{
      Consumables.reset();await settle();await Consumables.prepare();await settle();
     }else if(mode==='ladder-floor'){
      state.levelIndex=8;finish(true);await settle();
+    }else if(mode==='ladder-failure'){
+     state.levelIndex=8;finish(true);document.querySelector('#ladderNextFloor').click();
+     clearInterval(state.tick);state.hp=0;finish(false);await settle();
+     if(pendingLadderRecord?.floor!==1)throw Error('Lost cleared floor after defeat');
+    }else if(mode==='ladder-submit'){
+     state.levelIndex=8;state.correct=100;state.attempts=100;finish(true);
+     state.ladderRun={runId:'isolated-ladder'};ladderNickname.value='測試勇者';
+     await submitLadder();await settle();
+     if(pendingLadderRecord||!LadderBattle.inspect().ended)throw Error('Submission not completed');
     }else if(mode==='settlement'){
      gasPost=bridge;
      window.fetch=async(url,options)=>{
