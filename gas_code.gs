@@ -213,6 +213,10 @@ function doPost(e) {
       const accountId = requireSession_(payload.sessionToken);
       return json_({ ok: true, profile: consumeItem_(accountId, payload) });
     }
+    if (action === "closeItemRun") {
+      const accountId = requireSession_(payload.sessionToken);
+      return json_({ ok: true, profile: closeItemRun_(accountId, payload) });
+    }
 
     if (action === "finishStage") {
       const accountId = requireSession_(payload.sessionToken);
@@ -517,6 +521,23 @@ function startItemRun_(accountId, payload) {
     if (stage > 1 && !gems[stage-2]) throw new Error("Complete the previous stage first.");
     if (stage === 9 && (gems.length < 8 || gems.some(function(gem) { return !gem; }))) throw new Error("Collect all eight gems first.");
     inventory.itemRun = {id:id,stage:stage,expiresAt:Date.now()+30*60*1000,used:{}};
+    current.inventory = inventory;current.version += 1;
+    current.updatedAt = new Date().toISOString();
+    return persistProfile_(accountId,current);
+  } finally { lock.releaseLock(); }
+}
+
+function closeItemRun_(accountId, payload) {
+  const id = String(payload.runId || "");
+  if (!/^[A-Za-z0-9-]{8,100}$/.test(id)) throw new Error("Invalid item run.");
+  const lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    const current = getProfile_(accountId), inventory = parseInventory_(current.inventory);
+    const run = inventory.itemRun;
+    // A delayed close may arrive after another battle has replaced this run.
+    if (!run || run.id !== id || run.closed) return current;
+    run.closed = true;
     current.inventory = inventory;current.version += 1;
     current.updatedAt = new Date().toISOString();
     return persistProfile_(accountId,current);
