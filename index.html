@@ -462,7 +462,8 @@
     const LV1_CAST_CLIP={url:"assets/generated/hero-cast-lv1-v1/cast-strip.png",duration:600,release:252};
     const FEMALE_LV1_CAST_CLIP={url:"assets/generated/hero-female-cast-lv1-v1/cast-strip.png",duration:600,release:252};
     const SHADOW_LV1_CAST_CLIP={url:"assets/generated/hero-male-shadow-cast-lv1-v1/cast-strip.png",duration:650,release:273,wide:true};
-    const selectedHeroCastClip=()=>Number(state.profile.level)!==1?null:state.profile.weapon==="starlight"?(state.profile.hero==="female"?FEMALE_LV1_CAST_CLIP:LV1_CAST_CLIP):state.profile.hero==="male"&&state.profile.weapon==="shadow"?SHADOW_LV1_CAST_CLIP:null;
+    const FEMALE_SHADOW_LV1_CAST_CLIP={url:"assets/generated/hero-female-shadow-cast-lv1-v1/cast-strip.png",duration:650,release:273,wide:true};
+    const selectedHeroCastClip=()=>Number(state.profile.level)!==1?null:state.profile.weapon==="starlight"?(state.profile.hero==="female"?FEMALE_LV1_CAST_CLIP:LV1_CAST_CLIP):state.profile.weapon==="shadow"?(state.profile.hero==="female"?FEMALE_SHADOW_LV1_CAST_CLIP:SHADOW_LV1_CAST_CLIP):null;
     let activeHeroCastClip=null;
     let heroCastAnimation=null,battleVisualGeneration=0,battleStartPending=false;
     const battleImageCache=new Map(),readyBattleImages=new Set();

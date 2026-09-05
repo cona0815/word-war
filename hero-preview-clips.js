@@ -3,7 +3,8 @@
   const clips={
     'male:1:starlight':{url:'assets/generated/hero-cast-lv1-v1/cast-strip.png',width:896},
     'female:1:starlight':{url:'assets/generated/hero-female-cast-lv1-v1/cast-strip.png',width:896},
-    'male:1:shadow':{url:'assets/generated/hero-male-shadow-cast-lv1-v1/cast-strip.png',width:1152}
+    'male:1:shadow':{url:'assets/generated/hero-male-shadow-cast-lv1-v1/cast-strip.png',width:1152},
+    'female:1:shadow':{url:'assets/generated/hero-female-shadow-cast-lv1-v1/cast-strip.png',width:1152}
   };
   let request=0,animation=null;
   const previousStop=stopHeroMotion;
