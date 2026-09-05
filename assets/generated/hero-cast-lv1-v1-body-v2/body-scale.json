@@ -1,0 +1,12 @@
+{
+  "key": "male:1:starlight",
+  "folder": "hero-cast-lv1-v1",
+  "width": 896,
+  "top": 118,
+  "bottom": 610,
+  "footx": 447.0,
+  "bodyHeight": 492,
+  "factor": 0.9349593495934959,
+  "targetBodyHeight": 460,
+  "output": "hero-cast-lv1-v1-body-v2"
+}

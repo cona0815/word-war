@@ -1,0 +1,12 @@
+{
+  "key": "female:3:starlight",
+  "folder": "hero-female-starlight-cast-lv3-v1",
+  "width": 1152,
+  "top": 169,
+  "bottom": 610,
+  "footx": 575.5,
+  "bodyHeight": 441,
+  "factor": 1.0430839002267573,
+  "targetBodyHeight": 460,
+  "output": "hero-female-starlight-cast-lv3-v1-body-v2"
+}

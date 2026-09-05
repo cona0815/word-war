@@ -1,0 +1,12 @@
+{
+  "key": "male:1:shadow",
+  "folder": "hero-male-shadow-cast-lv1-v1",
+  "width": 1152,
+  "top": 110,
+  "bottom": 608,
+  "footx": 575.0,
+  "bodyHeight": 498,
+  "factor": 0.9236947791164659,
+  "targetBodyHeight": 460,
+  "output": "hero-male-shadow-cast-lv1-v1-body-v2"
+}
