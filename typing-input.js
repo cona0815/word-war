@@ -15,7 +15,10 @@
     const targets=state.bossMode?[state.current].filter(Boolean):state.enemies.filter(isActive);
     const words=targets.map(e=>String(e.word).trim());
     const claim=()=>{event.preventDefault();event.stopImmediatePropagation()};
-    if(event.repeat){claim();return}
+    if(event.repeat){
+      if(event.key==='Backspace'||event.key==='Delete')return;
+      claim();return;
+    }
     if(event.ctrlKey&&!event.altKey&&!event.metaKey){
       const key=`CTRL+${event.key.toUpperCase()}`;
       const word=words.find(w=>w.toUpperCase().replace(/\s/g,'').includes(key));
