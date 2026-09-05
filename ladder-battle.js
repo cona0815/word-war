@@ -13,6 +13,7 @@
     if(win)cleared=floor;
     if(!win&&!cleared){next.hidden=true;return originalFinish(false)}
     originalFinish(true);
+    if(!win)window.Consumables?.reset();
     if(pendingLadderRecord)pendingLadderRecord.floor=cleared;
     missionTitle.textContent=win?`第 ${cleared} 層完成`:'天梯挑戰結束';
     missionStartBtn.textContent='重新挑戰第 1 層';
@@ -36,7 +37,7 @@
   const originalSubmit=submitLadder;
   submitLadder=async()=>{
     if(pendingLadderRecord&&pendingLadderRecord.correct/Math.max(1,pendingLadderRecord.attempts)*100<85){ladderNameStatus.textContent='天梯成績需要至少 85% 正確率。';return}
-    await originalSubmit();if(!pendingLadderRecord){ended=true;next.disabled=true}
+    await originalSubmit();if(!pendingLadderRecord){ended=true;next.disabled=true;window.Consumables?.reset()}
   };
   // The original click handler was assigned before this module loaded.
   submitLadderBtn.onclick=submitLadder;

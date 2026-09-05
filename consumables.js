@@ -11,9 +11,29 @@
   let run=null,pendingRun=null,busy=false,shield=false,slowUntil=0,hintUntil=0,star=false,epoch=0;
   const cloud=()=>!!(state.config.gasUrl&&state.auth?.sessionToken);
   const uid=()=>crypto.randomUUID();
+  const closing=new Set();
+  const context=()=>({account:state.profile.account,token:state.auth?.sessionToken,url:state.config.gasUrl});
+  const sameContext=c=>c.account===state.profile.account&&c.token===state.auth?.sessionToken&&c.url===state.config.gasUrl;
+  function accept(profile,c){if(profile&&sameContext(c)&&Number(profile.version)>=Number(state.profile.version||0)){state.profile=profileForRemote(profile,c.account);saveProfile()}}
+  function closeCandidate(candidate){
+    if(!candidate?.context?.token)return Promise.resolve();
+    if(candidate.closeTask)return candidate.closeTask;
+    closing.add(candidate);
+    candidate.closeTask=(async()=>{
+      // Finish in-flight writes before closing; a completed stage owns its reward receipt.
+      await candidate.task?.catch(()=>{});
+      await candidate.settlement?.catch(()=>{});
+      const c=candidate.context;
+      const result=await gasPost({action:'closeItemRun',runId:candidate.id,sessionToken:c.token},c.url);
+      if(!result.ok)throw new Error(result.error||'道具戰鬥紀錄關閉失敗');
+      accept(result.profile,c);closing.delete(candidate);
+    })().finally(()=>{candidate.closeTask=null});
+    return candidate.closeTask;
+  }
+  function retire(){const candidate=run||pendingRun;if(candidate)closeCandidate(candidate).catch(error=>{if(candidate.context&&sameContext(candidate.context))status.textContent='道具紀錄尚未同步，開始下一場時會重試。';console.warn('[Word War] item closure',error.message)})}
   let pausedAt=null;
   const effectNow=()=>pausedAt??Date.now();
-  function reset(){epoch++;pausedAt=null;run=null;pendingRun=null;busy=false;shield=false;slowUntil=0;hintUntil=0;star=false;status.textContent='';paint()}
+  function reset(){retire();epoch++;pausedAt=null;run=null;pendingRun=null;busy=false;shield=false;slowUntil=0;hintUntil=0;star=false;status.textContent='';paint()}
   function paint(){
     panel.hidden=!state.running;
     if(!buttons.children.length){
@@ -28,12 +48,16 @@
   async function prepare(){
     if(run)return;
     const generation=epoch,account=state.profile.account;
-    const candidate=pendingRun||(pendingRun={id:uid(),used:{},events:{}});
+    const candidate=pendingRun||(pendingRun={id:uid(),used:{},events:{},context:cloud()?context():null});
     if(cloud()){
-      const result=await gasPost({action:'startItemRun',runId:candidate.id,stage:levels[state.levelIndex].id,expectedVersion:state.profile.version});
+      await Promise.all([...closing].filter(c=>sameContext(c.context)).map(closeCandidate));
       if(generation!==epoch||account!==state.profile.account)return;
+      const c=candidate.context;
+      const result=await (candidate.task=gasPost({action:'startItemRun',runId:candidate.id,stage:levels[state.levelIndex].id,expectedVersion:state.profile.version,sessionToken:c.token},c.url));
+      if(generation!==epoch||!sameContext(c))return;
       if(!result.ok)throw new Error(result.error||'道具準備失敗');
-      state.profile=profileForRemote(result.profile,account);saveProfile();
+      if(result.profile?.inventory?.itemRun?.closed)throw new Error('道具戰鬥紀錄已關閉，請重新開始。');
+      accept(result.profile,c);
     }
     run=candidate;pendingRun=null;paint();
   }
@@ -51,10 +75,11 @@
     try{
       if(cloud()){
         currentRun.events[id] ||= uid();
-        const result=await gasPost({action:'consumeItem',runId:currentRun.id,itemId:id,eventId:currentRun.events[id],expectedVersion:state.profile.version});
-        if(generation!==epoch||account!==state.profile.account)return;
+        const c=currentRun.context ||= context();
+        const result=await (currentRun.task=gasPost({action:'consumeItem',runId:currentRun.id,itemId:id,eventId:currentRun.events[id],expectedVersion:state.profile.version,sessionToken:c.token},c.url));
+        if(generation!==epoch||!sameContext(c))return;
         if(!result.ok)throw new Error(result.error||'使用失敗');
-        state.profile=profileForRemote(result.profile,account);
+        accept(result.profile,c);
       }else state.profile.inventory.items[id]--;
       saveProfile();currentRun.used[id]=true;
       if(!state.running)return;
@@ -79,10 +104,18 @@
   spawn=(...args)=>{if(!cloud()&&!run)prepare();return originalSpawn(...args)};
   const originalSwitch=switchAccount;
   switchAccount=(...args)=>{reset();return originalSwitch(...args)};
+  const originalFinish=finish;
+  finish=win=>{const result=originalFinish(win);if(!win)reset();return result};
   const originalHud=hud;
   hud=()=>{originalHud();paint();if(hintUntil&&effectNow()>hintUntil){hintUntil=0;status.textContent='提示結束'}};
   const originalGasPost=gasPost;
-  gasPost=payload=>originalGasPost(payload.action==='finishStage'?{...payload,itemRunId:run?.id}:payload);
+  gasPost=(payload,url)=>{
+    if(payload.action!=='finishStage')return originalGasPost(payload,url);
+    const candidate=run,c=candidate?.context;
+    const task=originalGasPost({...payload,itemRunId:candidate?.id,...(c?{sessionToken:c.token}:{})},c?.url||url);
+    if(candidate)candidate.settlement=task;
+    return task;
+  };
   const originalReward=grantLocalStageReward;
   grantLocalStageReward=(lv,accuracy)=>{
     const reward=originalReward(lv,accuracy);
@@ -98,6 +131,6 @@
     pause:()=>{pausedAt??=Date.now()},
     resume:()=>{if(pausedAt===null)return;const elapsed=Date.now()-pausedAt;if(slowUntil)slowUntil+=elapsed;if(hintUntil)hintUntil+=elapsed;pausedAt=null},
     mistake:()=>{if(shield){shield=false;status.textContent='護盾抵銷失誤';return 0}return 6},
-    inspect:()=>({run:run?.id,used:{...run?.used},busy,shield,star,slowUntil})};
+    inspect:()=>({run:run?.id,used:{...run?.used},busy,shield,star,slowUntil,closing:closing.size})};
   paint();
 })();
