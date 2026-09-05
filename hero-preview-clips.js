@@ -29,6 +29,24 @@
     if(mode==='idle')showClip(false);
     gearNote.textContent=`${weapons[weapon].name} | ${(gearOptions[gear]||gearOptions.focus).name}`;
   };
+  const previousGrid=renderGrid;
+  renderGrid=()=>{
+    previousGrid();
+    grid.querySelectorAll('[data-lv]').forEach(card=>{
+      const clip=clips[`${hero}:${card.dataset.lv}:${weapon}`];
+      if(!clip)return;
+      const sprite=card.querySelector('.sprite'),url=clip.url.replace(/cast-strip\.png$/,'idle.png');
+      const image=new Image();image.src=url;
+      image.decode().then(()=>{
+        if(!sprite.isConnected)return;
+        sprite.style.setProperty('--hero',`url("${url}")`);
+        sprite.style.setProperty('--face','1');
+        sprite.style.backgroundSize='auto 100%';
+        sprite.dataset.clipIdle=url;
+      }).catch(()=>{});
+    });
+  };
   window.addEventListener('resize',()=>setHero());
+  renderGrid();
   setHero();
 })();
