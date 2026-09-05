@@ -18,15 +18,17 @@ try{
     for(let stage=0;stage<9;stage++){
       const result=await page.evaluate(index=>{
         state.profile.gems=Array(8).fill(true);begin(index);clearInterval(state.tick);mission.classList.add('hidden');
+        boss();hud();const bossLabel=enemyLabel.textContent;
+        begin(index);clearInterval(state.tick);mission.classList.add('hidden');
         state.score=1234567;state.combo=100;hud();
         const rect=e=>e.getBoundingClientRect(),cards=[...document.querySelectorAll('.hud-card')],menu=rect(menuBtn);
         const overlap=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
-        return {stage:index+1,inBounds:cards.every(e=>{const r=rect(e);return r.left>=0&&r.right<=innerWidth}),
+        return {stage:index+1,labelTransitions:bossLabel==='Boss \u751f\u547d'&&enemyLabel.textContent===T.enemy,inBounds:cards.every(e=>{const r=rect(e);return r.left>=0&&r.right<=innerWidth}),
           menuClear:cards.every(e=>!overlap(rect(e),menu)),
           contentFits:cards.every(e=>e.scrollWidth<=e.clientWidth+1),
           statsAligned:innerWidth>600||cards.slice(2).every(e=>Math.abs(rect(e).top-rect(cards[1]).top)<1)};
       },stage);
-      for(const key of ['inBounds','menuClear','contentFits','statsAligned'])assert.equal(result[key],true,JSON.stringify({width,...result}));
+      for(const key of ['labelTransitions','inBounds','menuClear','contentFits','statsAligned'])assert.equal(result[key],true,JSON.stringify({width,...result}));
       results.push({width,...result});
       if(stage===7)await page.screenshot({path:`${out}/${width}.png`});
     }
