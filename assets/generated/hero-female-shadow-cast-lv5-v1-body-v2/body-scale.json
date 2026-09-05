@@ -1,0 +1,12 @@
+{
+  "key": "female:5:shadow",
+  "folder": "hero-female-shadow-cast-lv5-v1",
+  "width": 1152,
+  "top": 168,
+  "bottom": 610,
+  "footx": 576.0,
+  "bodyHeight": 442,
+  "factor": 1.0407239819004526,
+  "targetBodyHeight": 460,
+  "output": "hero-female-shadow-cast-lv5-v1-body-v2"
+}
