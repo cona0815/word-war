@@ -28,6 +28,10 @@
   style.textContent = '#gmPanel{width:min(420px,90vw);max-height:88dvh;overflow:auto;background:#142b2b;color:#fff;border:1px solid #72d8b6;border-radius:8px;padding:20px}#gmPanel::backdrop{background:#000b}#gmPanel h2{font-size:22px;margin:0 0 10px}#gmPanel label{display:grid;grid-template-columns:100px 1fr;align-items:center;margin:8px 0}#gmPanel input,#gmPanel select{width:100%;min-width:0;padding:6px;background:#fff;color:#152c29}#gmPanel button{padding:9px;border:1px solid #82cfb2;background:#205648;color:white;cursor:pointer}.gmActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}#gmPanel p{font-size:13px}#gmToggle{position:fixed;right:8px;top:80px;z-index:30;padding:8px;background:#205648;color:white;border:1px solid #82cfb2}';
   document.head.append(style); document.body.append(panel);
   const q = id => panel.querySelector('#'+id);
+  q('gmStage').addEventListener('change',()=>{
+    const count=bossPhaseCount(Number(q('gmStage').value)+1);
+    q('gmPhase').replaceChildren(...Array.from({length:count},(_,i)=>new Option(String(i+1),String(i+1))));
+  });
   const refillItems=document.createElement('button');refillItems.id='gmItems';refillItems.textContent='消耗品各補 5 個';
   panel.querySelector('.gmActions').appendChild(refillItems);
   refillItems.onclick=()=>{
