@@ -50,7 +50,12 @@
     });
     if(focusedLevel)grid.querySelector(`[data-lv="${focusedLevel}"]`)?.focus({preventScroll:true});
   };
-  window.addEventListener('resize',()=>{renderGrid();setHero()});
+  window.addEventListener('resize',()=>{
+    grid.querySelectorAll('.sprite[data-clip-idle]').forEach(sprite=>{
+      sprite.style.backgroundSize=`auto ${Math.min(143,sprite.clientWidth*648/768)}px`;
+    });
+    setHero();
+  });
   renderGrid();
   setHero();
 })();

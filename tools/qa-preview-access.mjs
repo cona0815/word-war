@@ -28,6 +28,10 @@ try{
   assert.equal(colors.outline,'3px');
  }
  fs.mkdirSync('docs/qa-preview-access',{recursive:true});
+ await page.evaluate(()=>{window.qaFocusedCard=document.activeElement});
+ await page.setViewportSize({width:400,height:844});
+ await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ assert.equal(await page.evaluate(()=>qaFocusedCard.isConnected&&document.activeElement===qaFocusedCard),true,'Resize must preserve the focused card node');
  await page.locator('[data-lv="3"]').scrollIntoViewIfNeeded();await page.screenshot({path:'docs/qa-preview-access/mobile.png'});
  console.log('PASS keyboard Enter/Space/Tab selection, retained focus, pressed state and text contrast');
 }finally{await browser.close()}
