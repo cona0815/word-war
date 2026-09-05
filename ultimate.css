@@ -1,0 +1,8 @@
+#ultimateMeter{position:absolute;right:14px;bottom:14px;z-index:14;width:172px;padding:8px 10px;background:rgba(12,24,22,.88);border:1px solid #63c8ac;border-radius:8px;color:#effff8;font:13px/1.4 system-ui}
+#ultimateMeter strong{display:block;font-size:14px;min-height:20px}
+#ultimateMeter progress{display:block;width:100%;height:8px;margin:6px 0;accent-color:#75f0c3}
+.ultimate-actions{display:flex;gap:4px}.ultimate-actions button{flex:1;padding:3px;border:1px solid #72b99e;border-radius:4px;background:#153e34;color:white;cursor:pointer;font:12px system-ui}.ultimate-actions button:disabled{opacity:.45;cursor:default}
+#ultimateMeter.ready{border-color:#ffe267;box-shadow:0 0 18px #e2d04966}#ultimateMeter.ready strong{color:#ffe267}
+.ultimate-burst{position:absolute;left:50%;top:52%;width:min(75vw,700px);aspect-ratio:1;transform:translate(-50%,-50%);background-size:600% 100%;background-repeat:no-repeat;pointer-events:none;z-index:3;filter:drop-shadow(0 0 18px #78dbed)}
+.ultimate-tier-2{width:min(85vw,850px)}.ultimate-tier-3{width:min(96vw,1050px);filter:drop-shadow(0 0 26px #f0d468)}
+@media(max-width:600px){#ultimateMeter{width:138px;right:8px;bottom:8px;padding:6px}.ultimate-burst{width:96vw}}

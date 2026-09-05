@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Word War - World Inspiration Gallery</title>
+  <style>
+    :root {
+      --ink: #071a2b;
+      --blue: #123b78;
+      --teal: #2ad9d5;
+      --gold: #e9b84a;
+      --pink: #ef7ac6;
+      color-scheme: dark;
+      font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: #eef8ff;
+      background: linear-gradient(135deg, var(--ink), #0b2742 55%, var(--blue));
+    }
+    header {
+      padding: 28px clamp(18px, 4vw, 64px) 22px;
+      border-bottom: 1px solid rgba(42, 217, 213, .35);
+      background: rgba(7, 26, 43, .88);
+    }
+    h1 { margin: 0 0 8px; color: #ffe28a; font-size: clamp(25px, 4vw, 42px); }
+    header p { max-width: 850px; margin: 0; color: #b9d0dc; line-height: 1.6; }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 16px clamp(18px, 4vw, 64px);
+      border-bottom: 1px solid rgba(42, 217, 213, .2);
+      background: rgba(7, 26, 43, .7);
+    }
+    button {
+      border: 1px solid rgba(42, 217, 213, .55);
+      border-radius: 6px;
+      padding: 9px 14px;
+      color: #eafaff;
+      background: #0b2b43;
+      cursor: pointer;
+      font: inherit;
+    }
+    button:hover, button[aria-pressed="true"] { color: #111d29; background: var(--gold); border-color: #ffe28a; }
+    main { max-width: 1600px; margin: 0 auto; padding: 24px clamp(18px, 4vw, 64px) 48px; }
+    .meta { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 18px; color: #c5dbe4; }
+    .gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    figure { margin: 0; overflow: hidden; border: 1px solid rgba(42, 217, 213, .35); border-radius: 7px; background: rgba(6, 25, 40, .82); }
+    figure img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #071a2b; }
+    figcaption { padding: 13px 14px 15px; border-top: 1px solid rgba(42, 217, 213, .2); }
+    figcaption strong { display: block; margin-bottom: 4px; color: #ffe28a; }
+    figcaption span { color: #b9d0dc; font-size: 14px; }
+    figure[hidden] { display: none; }
+    @media (max-width: 1050px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 650px) { .gallery { grid-template-columns: 1fr; } .meta { display: block; } .meta span { display: block; margin-top: 5px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Word War - &#19990;&#30028;&#28789;&#24863;&#22294;&#24235;</h1>
+    <p>&#28858;&#26657;&#22290;&#25171;&#23383; RPG &#24314;&#31435;&#19968;&#22871;&#19968;&#33268;&#30340;&#34255;&#34255;&#19990;&#30028;&#65306;&#20843;&#20445;&#26223;&#40670;&#12289;&#35282;&#33394;&#25104;&#38263;&#12289;&#27494;&#22120;&#12289;&#23567;&#24618;&#12289;Boss&#12289;&#27861;&#34899;&#29305;&#25928;&#33287;&#22823;&#27211;&#22530;&#22825;&#26799;&#12290;</p>
+  </header>
+  <nav aria-label="Gallery filters">
+    <button type="button" data-filter="all" aria-pressed="true">All 30</button>
+    <button type="button" data-filter="map" aria-pressed="false">Maps 13</button>
+    <button type="button" data-filter="hero" aria-pressed="false">Heroes 6</button>
+    <button type="button" data-filter="weapon" aria-pressed="false">Weapons 5</button>
+    <button type="button" data-filter="minion" aria-pressed="false">Minions 3</button>
+    <button type="button" data-filter="boss" aria-pressed="false">Boss 1</button>
+    <button type="button" data-filter="fx" aria-pressed="false">FX / Arena 2</button>
+  </nav>
+  <main>
+    <div class="meta"><span>30 ImageGen references for the Word War world</span><span>Updated 2026-08-08</span></div>
+    <section class="gallery" id="gallery" aria-live="polite"></section>
+  </main>
+  <script>
+    const items = [
+      ["01-world-anchor.png", "World Anchor", "map", "The visual north star: bright blue-gold magic academy arena."],
+      ["02-academy-gate.png", "Academy Gate", "map", "Castle entrance with a clear central approach."],
+      ["03-central-arena.png", "Central Arena", "map", "Open combat space with keyboard magic geometry."],
+      ["04-level-01-gate.png", "Level 01 Gate", "map", "Beginner stage with room for keyboard-relative lanes."],
+      ["05-level-02-mushroom-garden.png", "Level 02 Mushroom Garden", "map", "Color-coded garden court with a safe battle center."],
+      ["06-five-lun-garden.png", "Level 03 Five-Lun Garden", "map", "Five colored trees and crystal markers."],
+      ["07-ru-mu-swan-garden.png", "Level 04 Ru-Mu Swan Garden", "map", "Swan landmark preserved above the combat floor."],
+      ["08-cheng-zhang-garden.png", "Level 05 Cheng-Zhang Garden", "map", "Mentor statue garden with an open foreground."],
+      ["09-lamb-kneeling-sanctuary.png", "Level 06 Lamb Sanctuary", "map", "Memorial garden framed for readable gameplay."],
+      ["10-tongxin-garden.png", "Level 07 Tongxin Garden", "map", "Family statue and bright school courtyard."],
+      ["11-siwei-hall-garden.png", "Level 08 Siwei Hall", "map", "Four-dimensional hall garden with a broad arena."],
+      ["12-daqiao-hall-exterior.png", "Daqiao Hall Exterior", "map", "Separate ladder-dungeon entrance."],
+      ["13-daqiao-hall-interior-gods.png", "Daqiao Hall Interior", "map", "Hall of gods for the final solo trial."],
+      ["14-male-hero-levels-1-3.png", "Male Hero Lv.1-Lv.3", "hero", "Beginner outfit progression."],
+      ["15-male-hero-levels-4-6.png", "Male Hero Lv.4-Lv.6", "hero", "Guard armor and stronger staff progression."],
+      ["16-male-hero-levels-7-10.png", "Male Hero Lv.7-Lv.10", "hero", "High-rank robes, crown and luminous weapon."],
+      ["17-female-hero-levels-1-3.png", "Female Hero Lv.1-Lv.3", "hero", "Beginner outfit progression."],
+      ["18-female-hero-levels-4-6.png", "Female Hero Lv.4-Lv.6", "hero", "Guard armor and stronger staff progression."],
+      ["19-female-hero-levels-7-10.png", "Female Hero Lv.7-Lv.10", "hero", "High-rank robes, crown and luminous weapon."],
+      ["20-weapon-lineup.png", "Weapon Lineup", "weapon", "Five attack identities: staff, ice, flame, thunder and shadow."],
+      ["21-star-crystal-staff.png", "Star Crystal Staff", "weapon", "Controlled starlight beam for early practice."],
+      ["22-ice-prism-wand.png", "Ice Prism Wand", "weapon", "Clear blue projectile and crystalline silhouette."],
+      ["23-flame-battle-wheel.png", "Flame Battle Wheel", "weapon", "Orbiting fire wheel for combo attacks."],
+      ["24-thunder-star-spear.png", "Thunder Star Spear", "weapon", "High-rank lightning lance with a focused beam."],
+      ["25-alphabet-minion-family.png", "Alphabet Minion Family", "minion", "Distinct silhouettes for letter-key practice."],
+      ["26-number-minion-family.png", "Number Minion Family", "minion", "Distinct silhouettes for number-key practice."],
+      ["27-zhuyin-minion-groups.png", "Zhuyin Minion Groups", "minion", "Initials, medials and finals use three visual families."],
+      ["28-boss-lineup.png", "Boss Lineup", "boss", "Eight bosses with stage-specific identity and readable poses."],
+      ["29-hero-cast-impact.png", "Hero Cast and Impact", "fx", "Idle, cast, projectile flight and hit impact timing."],
+      ["30-final-ladder-arena.png", "Final Ladder Arena", "fx", "Daqiao Hall solo mixed challenge with a clear center." ]
+    ];
+    const gallery = document.querySelector('#gallery');
+    const buttons = [...document.querySelectorAll('button[data-filter]')];
+    for (const [file, title, category, note] of items) {
+      const figure = document.createElement('figure');
+      figure.dataset.category = category;
+      const image = document.createElement('img');
+      image.src = `assets/inspiration/${file}`;
+      image.alt = title;
+      image.loading = 'lazy';
+      const caption = document.createElement('figcaption');
+      const heading = document.createElement('strong');
+      heading.textContent = title;
+      const description = document.createElement('span');
+      description.textContent = note;
+      caption.append(heading, description);
+      figure.append(image, caption);
+      gallery.append(figure);
+    }
+    buttons.forEach((button) => button.addEventListener('click', () => {
+      const filter = button.dataset.filter;
+      buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+      gallery.querySelectorAll('figure').forEach((figure) => {
+        figure.hidden = filter !== 'all' && figure.dataset.category !== filter;
+      });
+    }));
+  </script>
+</body>
+</html>

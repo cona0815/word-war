@@ -1,0 +1,23 @@
+{
+  "gutters": {
+    "x": [
+      0,
+      512,
+      1024
+    ],
+    "y": [
+      0,
+      512,
+      1024,
+      1536
+    ]
+  },
+  "frames": 6,
+  "sourceDirection": "left",
+  "cell": [
+    512,
+    512
+  ],
+  "sharedScale": true,
+  "releaseFrame": 3
+}

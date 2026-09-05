@@ -1,0 +1,386 @@
+[
+  {
+    "level": 1,
+    "key": "bade",
+    "source": "assets/generated/boss-atlas-01-gemini-sequence-baseline-20260607.png",
+    "out": "assets/generated/boss-safe-atlas-20260612-v2/boss-atlas-01-bade-safe-v2-20260612.png",
+    "frames": [
+      {
+        "frame": 1,
+        "min_margin": 30,
+        "bbox": [
+          105,
+          160,
+          406,
+          482
+        ]
+      },
+      {
+        "frame": 2,
+        "min_margin": 30,
+        "bbox": [
+          68,
+          67,
+          444,
+          482
+        ]
+      },
+      {
+        "frame": 3,
+        "min_margin": 30,
+        "bbox": [
+          34,
+          150,
+          478,
+          482
+        ]
+      },
+      {
+        "frame": 4,
+        "min_margin": 30,
+        "bbox": [
+          105,
+          109,
+          406,
+          482
+        ]
+      }
+    ]
+  },
+  {
+    "level": 2,
+    "key": "sanda",
+    "source": "assets/generated/boss-atlas-02-mushroom-skip-f2-20260607.png",
+    "out": "assets/generated/boss-safe-atlas-20260612-v2/boss-atlas-02-sanda-safe-v2-20260612.png",
+    "frames": [
+      {
+        "frame": 1,
+        "min_margin": 30,
+        "bbox": [
+          56,
+          60,
+          456,
+          482
+        ]
+      },
+      {
+        "frame": 2,
+        "min_margin": 30,
+        "bbox": [
+          57,
+          54,
+          455,
+          482
+        ]
+      },
+      {
+        "frame": 3,
+        "min_margin": 30,
+        "bbox": [
+          34,
+          59,
+          478,
+          482
+        ]
+      },
+      {
+        "frame": 4,
+        "min_margin": 30,
+        "bbox": [
+          56,
+          60,
+          456,
+          482
+        ]
+      }
+    ]
+  },
+  {
+    "level": 3,
+    "key": "wulun",
+    "source": "assets/generated/boss-atlas-03-lv3-sequence-baseline-20260607.png",
+    "out": "assets/generated/boss-safe-atlas-20260612-v2/boss-atlas-03-wulun-safe-v2-20260612.png",
+    "frames": [
+      {
+        "frame": 1,
+        "min_margin": 30,
+        "bbox": [
+          78,
+          157,
+          434,
+          482
+        ]
+      },
+      {
+        "frame": 2,
+        "min_margin": 30,
+        "bbox": [
+          58,
+          113,
+          454,
+          482
+        ]
+      },
+      {
+        "frame": 3,
+        "min_margin": 30,
+        "bbox": [
+          34,
+          145,
+          478,
+          482
+        ]
+      },
+      {
+        "frame": 4,
+        "min_margin": 30,
+        "bbox": [
+          83,
+          159,
+          428,
+          482
+        ]
+      }
+    ]
+  },
+  {
+    "level": 4,
+    "key": "rumu",
+    "source": "assets/generated/boss-atlas-04-fixed-left.png",
+    "out": "assets/generated/boss-safe-atlas-20260612-v2/boss-atlas-04-rumu-safe-v2-20260612.png",
+    "frames": [
+      {
+        "frame": 1,
+        "min_margin": 30,
+        "bbox": [
+          85,
+          30,
+          426,
+          482
+        ]
+      },
+      {
+        "frame": 2,
+        "min_margin": 30,
+        "bbox": [
+          86,
+          38,
+          426,
+          482
+        ]
+      },
+      {
+        "frame": 3,
+        "min_margin": 30,
+        "bbox": [
+          71,
+          30,
+          441,
+          482
+        ]
+      },
+      {
+        "frame": 4,
+        "min_margin": 30,
+        "bbox": [
+          71,
+          30,
+          441,
+          482
+        ]
+      }
+    ]
+  },
+  {
+    "level": 5,
+    "key": "growth",
+    "source": "assets/generated/boss-atlas-05-fixed-left.png",
+    "out": "assets/generated/boss-safe-atlas-20260612-v2/boss-atlas-05-growth-safe-v2-20260612.png",
+    "frames": [
+      {
+        "frame": 1,
+        "min_margin": 30,
+        "bbox": [
+          88,
+          62,
+          424,
+          482
+        ]
+      },
+      {
+        "frame": 2,
+        "min_margin": 30,
+        "bbox": [
+          34,
+          62,
+          478,
+          482
+        ]
+      },
+      {
+        "frame": 3,
+        "min_margin": 30,
+        "bbox": [
+          65,
+          55,
+          446,
+          482
+        ]
+      },
+      {
+        "frame": 4,
+        "min_margin": 30,
+        "bbox": [
+          65,
+          55,
+          446,
+          482
+        ]
+      }
+    ]
+  },
+  {
+    "level": 6,
+    "key": "lamb",
+    "source": "assets/generated/boss-atlas-06-fixed-left.png",
+    "out": "assets/generated/boss-safe-atlas-20260612-v2/boss-atlas-06-lamb-safe-v2-20260612.png",
+    "frames": [
+      {
+        "frame": 1,
+        "min_margin": 30,
+        "bbox": [
+          77,
+          39,
+          435,
+          482
+        ]
+      },
+      {
+        "frame": 2,
+        "min_margin": 30,
+        "bbox": [
+          35,
+          47,
+          476,
+          482
+        ]
+      },
+      {
+        "frame": 3,
+        "min_margin": 30,
+        "bbox": [
+          34,
+          138,
+          478,
+          482
+        ]
+      },
+      {
+        "frame": 4,
+        "min_margin": 30,
+        "bbox": [
+          34,
+          138,
+          478,
+          482
+        ]
+      }
+    ]
+  },
+  {
+    "level": 7,
+    "key": "childheart",
+    "source": "assets/generated/boss-atlas-07-fixed-left.png",
+    "out": "assets/generated/boss-safe-atlas-20260612-v2/boss-atlas-07-childheart-safe-v2-20260612.png",
+    "frames": [
+      {
+        "frame": 1,
+        "min_margin": 30,
+        "bbox": [
+          60,
+          30,
+          452,
+          482
+        ]
+      },
+      {
+        "frame": 2,
+        "min_margin": 30,
+        "bbox": [
+          65,
+          30,
+          446,
+          482
+        ]
+      },
+      {
+        "frame": 3,
+        "min_margin": 30,
+        "bbox": [
+          36,
+          30,
+          476,
+          482
+        ]
+      },
+      {
+        "frame": 4,
+        "min_margin": 30,
+        "bbox": [
+          36,
+          30,
+          476,
+          482
+        ]
+      }
+    ]
+  },
+  {
+    "level": 8,
+    "key": "daqiao",
+    "source": "assets/generated/boss-atlas-08-fixed-left.png",
+    "out": "assets/generated/boss-safe-atlas-20260612-v2/boss-atlas-08-daqiao-safe-v2-20260612.png",
+    "frames": [
+      {
+        "frame": 1,
+        "min_margin": 30,
+        "bbox": [
+          50,
+          38,
+          462,
+          482
+        ]
+      },
+      {
+        "frame": 2,
+        "min_margin": 30,
+        "bbox": [
+          58,
+          146,
+          453,
+          482
+        ]
+      },
+      {
+        "frame": 3,
+        "min_margin": 30,
+        "bbox": [
+          34,
+          77,
+          478,
+          482
+        ]
+      },
+      {
+        "frame": 4,
+        "min_margin": 30,
+        "bbox": [
+          34,
+          77,
+          478,
+          482
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Word War 小兵素材預覽</title>
+  <style>
+    :root{color-scheme:dark;--bg:#071421;--panel:#0d2535cc;--line:#28d7ff66;--text:#eefcff;--muted:#9fc2cf;--gold:#ffd766}
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at top,#163c4d,#071421 58%,#03080d);color:var(--text);font-family:"Microsoft JhengHei",system-ui,sans-serif}
+    header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;background:#06111bdd;border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+    h1{margin:0;font-size:24px}
+    a{color:var(--gold);text-decoration:none}
+    main{padding:24px;display:grid;gap:24px}
+    section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;box-shadow:0 18px 40px #0008}
+    h2{margin:0 0 14px;font-size:20px;color:var(--gold)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:14px}
+    .card{min-height:144px;border:1px solid #2fd7ff44;border-radius:8px;background:#06131dcc;display:grid;place-items:center;padding:10px;position:relative;overflow:hidden}
+    .card img{max-width:88px;max-height:88px;object-fit:contain;image-rendering:auto;filter:drop-shadow(0 8px 12px #0008)}
+    .card span{position:absolute;left:8px;right:8px;bottom:7px;text-align:center;color:#8ff6ff;font-weight:800;text-shadow:0 0 8px #00e5ff}
+    .note{color:var(--muted);line-height:1.7;margin:0}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Word War 小兵素材預覽</h1>
+    <a href="./index.html">回遊戲</a>
+  </header>
+  <main id="app"></main>
+  <script>
+    const A="assets/generated/";
+    const groups=[
+      ["方向小兵", [["上","assets/pixel-enemy-up.png"],["下","assets/pixel-enemy-down.png"],["左","assets/pixel-enemy-left.png"],["右","assets/pixel-enemy-right.png"]]],
+      ["數字小兵", "0123456789".split("").map(n=>[n,`${A}digit-monster-${n}.png`])],
+      ["英文字母小兵", "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(n=>[n,`${A}letter-monster-${n}.png`])],
+      ["注音聲母小兵", "ㄅ:b ㄆ:p ㄇ:m ㄈ:f ㄉ:d ㄊ:t ㄋ:n ㄌ:l ㄍ:g ㄎ:k ㄏ:h ㄐ:j ㄑ:q ㄒ:x ㄓ:zh ㄔ:ch ㄕ:sh ㄖ:r ㄗ:z ㄘ:c ㄙ:s".split(" ").map(x=>{const [k,v]=x.split(":");return [k,`${A}zhuyin-initial-${v}.png`]} )],
+      ["注音介音小兵", "ㄧ:yi ㄨ:wu ㄩ:yu".split(" ").map(x=>{const [k,v]=x.split(":");return [k,`${A}zhuyin-medial-${v}.png`]} )],
+      ["注音韻母小兵", "ㄚ:a ㄛ:o ㄜ:e ㄝ:eh ㄞ:ai ㄟ:ei ㄠ:ao ㄡ:ou ㄢ:an ㄣ:en ㄤ:ang ㄥ:eng ㄦ:er".split(" ").map(x=>{const [k,v]=x.split(":");return [k,`${A}zhuyin-final-${v}.png`]} )],
+      ["英文句子通用小兵", [["句子","assets/pixel-enemy-left.png"],["最終","assets/pixel-enemy-up.png"]]]
+    ];
+    app.innerHTML=`<section><p class="note">這頁列出目前遊戲實際會引用的小兵圖。之後若用 Image 2.0 重新生圖，只要替換同檔名，遊戲會自動吃新素材。</p></section>`+
+      groups.map(([title,items])=>`<section><h2>${title}</h2><div class="grid">${items.map(([name,src])=>`<div class="card"><img src="${src}" alt="${name}" onerror="this.style.opacity=.15"><span>${name}</span></div>`).join("")}</div></section>`).join("");
+  </script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+[
+  {
+    "boss": 1,
+    "key": "bade",
+    "title": "???",
+    "source": "assets/generated/boss-atlas-01-fixed-left.png",
+    "sourceSize": [
+      2048,
+      512
+    ],
+    "frames": [
+      {
+        "index": 1,
+        "action": "idle",
+        "file": "assets/generated/boss-frame-breakdown/boss-01-bade-frame-01-idle.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          51,
+          18,
+          460,
+          494
+        ]
+      },
+      {
+        "index": 2,
+        "action": "charge",
+        "file": "assets/generated/boss-frame-breakdown/boss-01-bade-frame-02-charge.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          52,
+          18,
+          459,
+          494
+        ]
+      },
+      {
+        "index": 3,
+        "action": "attack",
+        "file": "assets/generated/boss-frame-breakdown/boss-01-bade-frame-03-attack.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          37,
+          18,
+          475,
+          494
+        ]
+      },
+      {
+        "index": 4,
+        "action": "recover",
+        "file": "assets/generated/boss-frame-breakdown/boss-01-bade-frame-04-recover.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          37,
+          18,
+          475,
+          494
+        ]
+      }
+    ]
+  },
+  {
+    "boss": 2,
+    "key": "sanda",
+    "title": "????",
+    "source": "assets/generated/boss-atlas-02-fixed-left.png",
+    "sourceSize": [
+      2048,
+      512
+    ],
+    "frames": [
+      {
+        "index": 1,
+        "action": "idle",
+        "file": "assets/generated/boss-frame-breakdown/boss-02-sanda-frame-01-idle.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          42,
+          31,
+          469,
+          481
+        ]
+      },
+      {
+        "index": 2,
+        "action": "charge",
+        "file": "assets/generated/boss-frame-breakdown/boss-02-sanda-frame-02-charge.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          34,
+          27,
+          478,
+          485
+        ]
+      },
+      {
+        "index": 3,
+        "action": "attack",
+        "file": "assets/generated/boss-frame-breakdown/boss-02-sanda-frame-03-attack.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          27,
+          494,
+          484
+        ]
+      },
+      {
+        "index": 4,
+        "action": "recover",
+        "file": "assets/generated/boss-frame-breakdown/boss-02-sanda-frame-04-recover.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          27,
+          494,
+          484
+        ]
+      }
+    ]
+  },
+  {
+    "boss": 3,
+    "key": "wulun",
+    "title": "???",
+    "source": "assets/generated/boss-atlas-03-redrawn-left.png",
+    "sourceSize": [
+      2048,
+      512
+    ],
+    "frames": [
+      {
+        "index": 1,
+        "action": "idle",
+        "file": "assets/generated/boss-frame-breakdown/boss-03-wulun-frame-01-idle.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          142,
+          48,
+          494,
+          454
+        ]
+      },
+      {
+        "index": 2,
+        "action": "charge",
+        "file": "assets/generated/boss-frame-breakdown/boss-03-wulun-frame-02-charge.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          131,
+          44,
+          495,
+          450
+        ]
+      },
+      {
+        "index": 3,
+        "action": "attack",
+        "file": "assets/generated/boss-frame-breakdown/boss-03-wulun-frame-03-attack.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          16,
+          41,
+          487,
+          447
+        ]
+      },
+      {
+        "index": 4,
+        "action": "recover",
+        "file": "assets/generated/boss-frame-breakdown/boss-03-wulun-frame-04-recover.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          144,
+          50,
+          500,
+          456
+        ]
+      }
+    ]
+  },
+  {
+    "boss": 4,
+    "key": "rumu",
+    "title": "???",
+    "source": "assets/generated/boss-atlas-04-fixed-left.png",
+    "sourceSize": [
+      2048,
+      512
+    ],
+    "frames": [
+      {
+        "index": 1,
+        "action": "idle",
+        "file": "assets/generated/boss-frame-breakdown/boss-04-rumu-frame-01-idle.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          76,
+          18,
+          435,
+          494
+        ]
+      },
+      {
+        "index": 2,
+        "action": "charge",
+        "file": "assets/generated/boss-frame-breakdown/boss-04-rumu-frame-02-charge.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          40,
+          18,
+          471,
+          494
+        ]
+      },
+      {
+        "index": 3,
+        "action": "attack",
+        "file": "assets/generated/boss-frame-breakdown/boss-04-rumu-frame-03-attack.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          39,
+          18,
+          473,
+          494
+        ]
+      },
+      {
+        "index": 4,
+        "action": "recover",
+        "file": "assets/generated/boss-frame-breakdown/boss-04-rumu-frame-04-recover.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          39,
+          18,
+          473,
+          494
+        ]
+      }
+    ]
+  },
+  {
+    "boss": 5,
+    "key": "growth",
+    "title": "????",
+    "source": "assets/generated/boss-atlas-05-fixed-left.png",
+    "sourceSize": [
+      2048,
+      512
+    ],
+    "frames": [
+      {
+        "index": 1,
+        "action": "idle",
+        "file": "assets/generated/boss-frame-breakdown/boss-05-growth-frame-01-idle.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          41,
+          31,
+          471,
+          481
+        ]
+      },
+      {
+        "index": 2,
+        "action": "charge",
+        "file": "assets/generated/boss-frame-breakdown/boss-05-growth-frame-02-charge.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          20,
+          494,
+          492
+        ]
+      },
+      {
+        "index": 3,
+        "action": "attack",
+        "file": "assets/generated/boss-frame-breakdown/boss-05-growth-frame-03-attack.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          52,
+          18,
+          460,
+          494
+        ]
+      },
+      {
+        "index": 4,
+        "action": "recover",
+        "file": "assets/generated/boss-frame-breakdown/boss-05-growth-frame-04-recover.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          52,
+          18,
+          460,
+          494
+        ]
+      }
+    ]
+  },
+  {
+    "boss": 6,
+    "key": "lamb",
+    "title": "????",
+    "source": "assets/generated/boss-atlas-06-fixed-left.png",
+    "sourceSize": [
+      2048,
+      512
+    ],
+    "frames": [
+      {
+        "index": 1,
+        "action": "idle",
+        "file": "assets/generated/boss-frame-breakdown/boss-06-lamb-frame-01-idle.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          64,
+          18,
+          448,
+          494
+        ]
+      },
+      {
+        "index": 2,
+        "action": "charge",
+        "file": "assets/generated/boss-frame-breakdown/boss-06-lamb-frame-02-charge.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          22,
+          494,
+          489
+        ]
+      },
+      {
+        "index": 3,
+        "action": "attack",
+        "file": "assets/generated/boss-frame-breakdown/boss-06-lamb-frame-03-attack.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          62,
+          494,
+          449
+        ]
+      },
+      {
+        "index": 4,
+        "action": "recover",
+        "file": "assets/generated/boss-frame-breakdown/boss-06-lamb-frame-04-recover.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          62,
+          494,
+          449
+        ]
+      }
+    ]
+  },
+  {
+    "boss": 7,
+    "key": "childheart",
+    "title": "???",
+    "source": "assets/generated/boss-atlas-07-fixed-left.png",
+    "sourceSize": [
+      2048,
+      512
+    ],
+    "frames": [
+      {
+        "index": 1,
+        "action": "idle",
+        "file": "assets/generated/boss-frame-breakdown/boss-07-childheart-frame-01-idle.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          49,
+          18,
+          462,
+          494
+        ]
+      },
+      {
+        "index": 2,
+        "action": "charge",
+        "file": "assets/generated/boss-frame-breakdown/boss-07-childheart-frame-02-charge.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          26,
+          18,
+          486,
+          494
+        ]
+      },
+      {
+        "index": 3,
+        "action": "attack",
+        "file": "assets/generated/boss-frame-breakdown/boss-07-childheart-frame-03-attack.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          24,
+          18,
+          487,
+          494
+        ]
+      },
+      {
+        "index": 4,
+        "action": "recover",
+        "file": "assets/generated/boss-frame-breakdown/boss-07-childheart-frame-04-recover.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          24,
+          18,
+          487,
+          494
+        ]
+      }
+    ]
+  },
+  {
+    "boss": 8,
+    "key": "daqiao",
+    "title": "???",
+    "source": "assets/generated/boss-atlas-08-fixed-left.png",
+    "sourceSize": [
+      2048,
+      512
+    ],
+    "frames": [
+      {
+        "index": 1,
+        "action": "idle",
+        "file": "assets/generated/boss-frame-breakdown/boss-08-daqiao-frame-01-idle.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          35,
+          18,
+          477,
+          494
+        ]
+      },
+      {
+        "index": 2,
+        "action": "charge",
+        "file": "assets/generated/boss-frame-breakdown/boss-08-daqiao-frame-02-charge.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          72,
+          494,
+          440
+        ]
+      },
+      {
+        "index": 3,
+        "action": "attack",
+        "file": "assets/generated/boss-frame-breakdown/boss-08-daqiao-frame-03-attack.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          39,
+          494,
+          473
+        ]
+      },
+      {
+        "index": 4,
+        "action": "recover",
+        "file": "assets/generated/boss-frame-breakdown/boss-08-daqiao-frame-04-recover.png",
+        "size": [
+          512,
+          512
+        ],
+        "alphaBounds": [
+          18,
+          39,
+          494,
+          473
+        ]
+      }
+    ]
+  }
+]

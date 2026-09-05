@@ -1,0 +1,642 @@
+[
+  {
+    "level": 1,
+    "key": "bade",
+    "atlas": "assets/generated/boss-atlas-01-gemini-sequence-baseline-20260607.png",
+    "exists": true,
+    "frames": [
+      {
+        "frame": 1,
+        "bbox": [
+          95,
+          161,
+          416,
+          504
+        ],
+        "margins": {
+          "left": 95,
+          "top": 161,
+          "right": 96,
+          "bottom": 8
+        },
+        "min_margin": 8,
+        "touches": false,
+        "tight": true
+      },
+      {
+        "frame": 2,
+        "bbox": [
+          50,
+          62,
+          462,
+          504
+        ],
+        "margins": {
+          "left": 50,
+          "top": 62,
+          "right": 50,
+          "bottom": 8
+        },
+        "min_margin": 8,
+        "touches": false,
+        "tight": true
+      },
+      {
+        "frame": 3,
+        "bbox": [
+          19,
+          150,
+          492,
+          504
+        ],
+        "margins": {
+          "left": 19,
+          "top": 150,
+          "right": 20,
+          "bottom": 8
+        },
+        "min_margin": 8,
+        "touches": false,
+        "tight": true
+      },
+      {
+        "frame": 4,
+        "bbox": [
+          84,
+          106,
+          427,
+          503
+        ],
+        "margins": {
+          "left": 84,
+          "top": 106,
+          "right": 85,
+          "bottom": 9
+        },
+        "min_margin": 9,
+        "touches": false,
+        "tight": true
+      }
+    ]
+  },
+  {
+    "level": 2,
+    "key": "sanda",
+    "atlas": "assets/generated/boss-atlas-02-mushroom-skip-f2-20260607.png",
+    "exists": true,
+    "frames": [
+      {
+        "frame": 1,
+        "bbox": [
+          42,
+          31,
+          469,
+          481
+        ],
+        "margins": {
+          "left": 42,
+          "top": 31,
+          "right": 43,
+          "bottom": 31
+        },
+        "min_margin": 31,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 2,
+        "bbox": [
+          18,
+          27,
+          494,
+          484
+        ],
+        "margins": {
+          "left": 18,
+          "top": 27,
+          "right": 18,
+          "bottom": 28
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 3,
+        "bbox": [
+          20,
+          30,
+          494,
+          482
+        ],
+        "margins": {
+          "left": 20,
+          "top": 30,
+          "right": 18,
+          "bottom": 30
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 4,
+        "bbox": [
+          42,
+          31,
+          469,
+          481
+        ],
+        "margins": {
+          "left": 42,
+          "top": 31,
+          "right": 43,
+          "bottom": 31
+        },
+        "min_margin": 31,
+        "touches": false,
+        "tight": false
+      }
+    ]
+  },
+  {
+    "level": 3,
+    "key": "wulun",
+    "atlas": "assets/generated/boss-atlas-03-lv3-sequence-baseline-20260607.png",
+    "exists": true,
+    "frames": [
+      {
+        "frame": 1,
+        "bbox": [
+          55,
+          140,
+          456,
+          506
+        ],
+        "margins": {
+          "left": 55,
+          "top": 140,
+          "right": 56,
+          "bottom": 6
+        },
+        "min_margin": 6,
+        "touches": false,
+        "tight": true
+      },
+      {
+        "frame": 2,
+        "bbox": [
+          32,
+          86,
+          480,
+          506
+        ],
+        "margins": {
+          "left": 32,
+          "top": 86,
+          "right": 32,
+          "bottom": 6
+        },
+        "min_margin": 6,
+        "touches": false,
+        "tight": true
+      },
+      {
+        "frame": 3,
+        "bbox": [
+          6,
+          126,
+          506,
+          506
+        ],
+        "margins": {
+          "left": 6,
+          "top": 126,
+          "right": 6,
+          "bottom": 6
+        },
+        "min_margin": 6,
+        "touches": false,
+        "tight": true
+      },
+      {
+        "frame": 4,
+        "bbox": [
+          61,
+          142,
+          450,
+          506
+        ],
+        "margins": {
+          "left": 61,
+          "top": 142,
+          "right": 62,
+          "bottom": 6
+        },
+        "min_margin": 6,
+        "touches": false,
+        "tight": true
+      }
+    ]
+  },
+  {
+    "level": 4,
+    "key": "rumu",
+    "atlas": "assets/generated/boss-atlas-04-fixed-left.png",
+    "exists": true,
+    "frames": [
+      {
+        "frame": 1,
+        "bbox": [
+          76,
+          18,
+          435,
+          494
+        ],
+        "margins": {
+          "left": 76,
+          "top": 18,
+          "right": 77,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 2,
+        "bbox": [
+          40,
+          18,
+          471,
+          494
+        ],
+        "margins": {
+          "left": 40,
+          "top": 18,
+          "right": 41,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 3,
+        "bbox": [
+          39,
+          18,
+          473,
+          494
+        ],
+        "margins": {
+          "left": 39,
+          "top": 18,
+          "right": 39,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 4,
+        "bbox": [
+          39,
+          18,
+          473,
+          494
+        ],
+        "margins": {
+          "left": 39,
+          "top": 18,
+          "right": 39,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      }
+    ]
+  },
+  {
+    "level": 5,
+    "key": "growth",
+    "atlas": "assets/generated/boss-atlas-05-fixed-left.png",
+    "exists": true,
+    "frames": [
+      {
+        "frame": 1,
+        "bbox": [
+          41,
+          31,
+          471,
+          481
+        ],
+        "margins": {
+          "left": 41,
+          "top": 31,
+          "right": 41,
+          "bottom": 31
+        },
+        "min_margin": 31,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 2,
+        "bbox": [
+          18,
+          20,
+          494,
+          491
+        ],
+        "margins": {
+          "left": 18,
+          "top": 20,
+          "right": 18,
+          "bottom": 21
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 3,
+        "bbox": [
+          52,
+          18,
+          460,
+          494
+        ],
+        "margins": {
+          "left": 52,
+          "top": 18,
+          "right": 52,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 4,
+        "bbox": [
+          52,
+          18,
+          460,
+          494
+        ],
+        "margins": {
+          "left": 52,
+          "top": 18,
+          "right": 52,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      }
+    ]
+  },
+  {
+    "level": 6,
+    "key": "lamb",
+    "atlas": "assets/generated/boss-atlas-06-fixed-left.png",
+    "exists": true,
+    "frames": [
+      {
+        "frame": 1,
+        "bbox": [
+          64,
+          18,
+          448,
+          493
+        ],
+        "margins": {
+          "left": 64,
+          "top": 18,
+          "right": 64,
+          "bottom": 19
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 2,
+        "bbox": [
+          20,
+          23,
+          494,
+          489
+        ],
+        "margins": {
+          "left": 20,
+          "top": 23,
+          "right": 18,
+          "bottom": 23
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 3,
+        "bbox": [
+          18,
+          62,
+          494,
+          448
+        ],
+        "margins": {
+          "left": 18,
+          "top": 62,
+          "right": 18,
+          "bottom": 64
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 4,
+        "bbox": [
+          18,
+          62,
+          494,
+          448
+        ],
+        "margins": {
+          "left": 18,
+          "top": 62,
+          "right": 18,
+          "bottom": 64
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      }
+    ]
+  },
+  {
+    "level": 7,
+    "key": "childheart",
+    "atlas": "assets/generated/boss-atlas-07-fixed-left.png",
+    "exists": true,
+    "frames": [
+      {
+        "frame": 1,
+        "bbox": [
+          49,
+          18,
+          462,
+          494
+        ],
+        "margins": {
+          "left": 49,
+          "top": 18,
+          "right": 50,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 2,
+        "bbox": [
+          26,
+          18,
+          486,
+          494
+        ],
+        "margins": {
+          "left": 26,
+          "top": 18,
+          "right": 26,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 3,
+        "bbox": [
+          24,
+          18,
+          487,
+          494
+        ],
+        "margins": {
+          "left": 24,
+          "top": 18,
+          "right": 25,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 4,
+        "bbox": [
+          24,
+          18,
+          487,
+          494
+        ],
+        "margins": {
+          "left": 24,
+          "top": 18,
+          "right": 25,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      }
+    ]
+  },
+  {
+    "level": 8,
+    "key": "daqiao",
+    "atlas": "assets/generated/boss-atlas-08-fixed-left.png",
+    "exists": true,
+    "frames": [
+      {
+        "frame": 1,
+        "bbox": [
+          35,
+          18,
+          477,
+          494
+        ],
+        "margins": {
+          "left": 35,
+          "top": 18,
+          "right": 35,
+          "bottom": 18
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 2,
+        "bbox": [
+          18,
+          72,
+          494,
+          440
+        ],
+        "margins": {
+          "left": 18,
+          "top": 72,
+          "right": 18,
+          "bottom": 72
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 3,
+        "bbox": [
+          18,
+          39,
+          494,
+          473
+        ],
+        "margins": {
+          "left": 18,
+          "top": 39,
+          "right": 18,
+          "bottom": 39
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      },
+      {
+        "frame": 4,
+        "bbox": [
+          18,
+          39,
+          494,
+          473
+        ],
+        "margins": {
+          "left": 18,
+          "top": 39,
+          "right": 18,
+          "bottom": 39
+        },
+        "min_margin": 18,
+        "touches": false,
+        "tight": false
+      }
+    ]
+  }
+]

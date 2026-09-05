@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Word War Hero Preview</title>
+  <style>
+    :root{--bg:#07131f;--panel:rgba(4,20,32,.78);--line:rgba(101,239,255,.28);--cyan:#65efff;--gold:#ffe071;--text:#f2fbff}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0,rgba(101,239,255,.18),transparent 34%),linear-gradient(180deg,#07131f,#02070c);color:var(--text);font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif}
+    .wrap{max-width:1440px;margin:0 auto;padding:22px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
+    h1{margin:0;color:#fff5b5;font-size:clamp(26px,3vw,42px);letter-spacing:0}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    button,a{border:1px solid var(--line);border-radius:8px;background:rgba(4,20,32,.76);color:var(--text);font-weight:900;text-decoration:none;padding:10px 14px;cursor:pointer}
+    button.active{background:linear-gradient(180deg,#ffe77a,#f6bd3a);color:#251900;border-color:#ffe77a}
+    .board{display:grid;grid-template-columns:300px 1fr;gap:16px}
+    .stage,.grid,.weapon-panel{border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 18px 48px rgba(0,0,0,.28),inset 0 0 34px rgba(101,239,255,.06)}
+    .stage{position:sticky;top:18px;height:calc(100vh - 40px);min-height:640px;padding:16px;display:flex;flex-direction:column;gap:14px}
+    .preview{position:relative;flex:1;min-height:360px;border-radius:9px;overflow:hidden;background:radial-gradient(circle at 50% 68%,rgba(101,239,255,.22),transparent 36%),linear-gradient(180deg,rgba(19,58,82,.72),rgba(2,8,14,.92))}
+    .preview:before{content:"";position:absolute;left:50%;bottom:42px;width:74%;height:82px;transform:translateX(-50%);border:1px solid rgba(101,239,255,.24);border-radius:50%;background:radial-gradient(ellipse,rgba(101,239,255,.2),transparent 68%);box-shadow:0 0 28px rgba(101,239,255,.18),inset 0 0 24px rgba(101,239,255,.12)}
+    .preview:after{content:"✦  ·  ✧  ·  ✦";position:absolute;left:50%;top:17%;transform:translateX(-50%);width:88%;color:var(--weapon,#65efff);font-size:15px;letter-spacing:18px;text-align:center;opacity:.42;text-shadow:0 0 10px currentColor;animation:particleDrift 3.6s ease-in-out infinite;pointer-events:none}
+    .gear-layer{position:absolute;left:50%;top:51%;width:min(250px,78%);aspect-ratio:1;transform:translate(-50%,-50%) scaleX(var(--face,1));pointer-events:none;z-index:3;filter:drop-shadow(0 0 18px var(--gear-color,var(--weapon,#65efff)))}
+    /* Integrated hero PNGs already contain the selected weapon. This layer is effect-only. */
+    .gear-layer.effect-only{display:block!important}
+    .big-hero{z-index:4}
+    .gear-aura,.gear-main,.gear-extra{position:absolute;display:block}
+    .gear-aura{left:17%;top:16%;width:72%;height:72%;border:2px solid color-mix(in srgb,var(--gear-color,var(--weapon,#65efff)) 62%,transparent);border-radius:50%;opacity:.55;animation:gearPulse 1.8s ease-in-out infinite;box-shadow:0 0 16px color-mix(in srgb,var(--gear-color,var(--weapon,#65efff)) 42%,transparent),inset 0 0 18px color-mix(in srgb,var(--gear-color,var(--weapon,#65efff)) 24%,transparent)}
+    .gear-aura:before,.gear-aura:after{content:"";position:absolute;inset:-12%;border:1px solid color-mix(in srgb,var(--gear-color,var(--weapon,#65efff)) 56%,transparent);border-radius:50%;transform:rotate(28deg);opacity:.72}
+    .gear-aura:before{border-left-color:transparent;border-right-color:transparent;animation:gearOrbit 4.4s linear infinite}
+    .gear-aura:after{inset:9%;border-top-color:transparent;border-bottom-color:transparent;transform:rotate(-22deg);animation:gearOrbitReverse 3.2s linear infinite}
+    .gear-main{left:34%;top:31%;width:42%;height:42%;opacity:.95}
+    .gear-extra{left:53%;top:38%;width:34%;height:12%;border-radius:999px;background:linear-gradient(90deg,var(--weapon,#65efff),#fff);opacity:.72}
+    .gear-starlight .gear-main{left:22%;top:22%;width:12%;height:74%;border-radius:999px;background:linear-gradient(180deg,#ffe071,#9b5a1d 45%,#5b3818);transform:rotate(-18deg)}
+    .gear-starlight .gear-main:before{content:"";position:absolute;left:-68%;top:-10%;width:240%;height:22%;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:radial-gradient(circle,#fff 0 18%,var(--weapon,#65efff) 19% 62%,#224 63%)}
+    .gear-ice .gear-main{left:18%;top:37%;width:34%;height:34%;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff 0 12%,#a9f8ff 13% 38%,#1486ce 39% 68%,#053b70 69%);box-shadow:0 0 22px #8ee9ff}
+    .gear-ice .gear-main:after{content:"";position:absolute;inset:-12%;clip-path:polygon(50% 0,62% 32%,100% 50%,62% 68%,50% 100%,38% 68%,0 50%,38% 32%);border:3px solid #d9fbff}
+    .gear-fire .gear-main{left:8%;top:31%;width:64%;height:64%;border-radius:50%;border:10px solid #ffb13b;border-left-color:#ff3d1d;border-bottom-color:#9c1d11;box-shadow:0 0 28px #ff7b4d;animation:gearSpin 2.8s linear infinite}
+    .gear-fire .gear-extra{left:58%;top:42%;height:22%;background:linear-gradient(90deg,#ff3d1d,#ffe071,#fff);clip-path:polygon(0 50%,18% 0,100% 18%,72% 50%,100% 82%,18% 100%)}
+    .gear-thunder .gear-main{left:18%;top:42%;width:76%;height:10%;background:linear-gradient(90deg,#65420a,#ffe071,#fff);clip-path:polygon(0 35%,72% 35%,72% 0,100% 50%,72% 100%,72% 65%,0 65%);transform:rotate(-9deg)}
+    .gear-thunder .gear-main:before{content:"";position:absolute;left:45%;top:-140%;width:26%;height:380%;background:#ffe66d;clip-path:polygon(45% 0,72% 37%,54% 37%,80% 100%,18% 48%,40% 48%);filter:drop-shadow(0 0 12px #ffe66d)}
+    .gear-shadow .gear-main{left:17%;top:38%;width:34%;height:38%;clip-path:polygon(50% 0,88% 24%,76% 80%,50% 100%,24% 80%,12% 24%);background:linear-gradient(135deg,#fff,#b06cff 35%,#34135e 74%);box-shadow:0 0 24px #b06cff}
+    .gear-shadow .gear-extra{left:45%;top:29%;width:30%;height:30%;border:2px solid #b06cff;border-radius:50%;background:radial-gradient(circle,rgba(176,108,255,.5),transparent 60%);animation:gearPulse 1.1s ease-in-out infinite}
+    /* Weapons are baked into the hero render. Keep only the aura here; never stack a second weapon. */
+    .gear-layer.asset-gear .gear-main,.gear-layer.asset-gear .gear-extra{display:none}
+    .gear-layer.asset-gear.gear-starlight .gear-main{left:7%;top:8%;width:48%;height:84%;transform:rotate(0)}
+    .gear-layer.asset-gear.gear-ice .gear-main{left:7%;top:8%;width:48%;height:84%;transform:rotate(0)}
+    .gear-layer.asset-gear.gear-fire .gear-main{left:5%;top:8%;width:52%;height:84%;transform:rotate(0)}
+    .gear-layer.asset-gear.gear-thunder .gear-main{left:7%;top:8%;width:48%;height:84%;transform:rotate(0)}
+    .gear-layer.asset-gear.gear-shadow .gear-main{left:7%;top:8%;width:48%;height:84%;transform:rotate(0)}
+    .gear-layer.effect-only .gear-main,.gear-layer.effect-only .gear-extra{display:none}
+    .gear-layer.effect-only[data-gear="guardian"] .gear-aura{border-radius:48% 48% 54% 54%;clip-path:polygon(50% 0,92% 18%,82% 76%,50% 100%,18% 76%,8% 18%);border-width:3px}
+    .gear-layer.effect-only[data-gear="combo"] .gear-aura{border-style:dashed;border-width:3px;animation:gearSpin 4s linear infinite}
+    .gear-layer.effect-only[data-gear="crown"] .gear-aura{inset:8% 19% 62%;border-radius:5px 5px 45% 45%;border-width:3px;clip-path:polygon(0 100%,0 32%,24% 60%,50% 0,76% 60%,100% 32%,100% 100%)}
+    .gear-layer.effect-only[data-gear="crown"] .gear-aura:after{inset:20%;border-top-color:#fff2a8;border-bottom-color:transparent}
+    .gear-note strong{color:var(--gold)}
+    @keyframes gearPulse{0%,100%{opacity:.35;transform:scale(.92)}50%{opacity:.85;transform:scale(1.06)}}
+    @keyframes gearOrbit{to{transform:rotate(388deg)}}
+    @keyframes gearOrbitReverse{to{transform:rotate(-382deg)}}
+    @keyframes particleDrift{0%,100%{opacity:.2;transform:translate(-50%,4px)}50%{opacity:.7;transform:translate(-50%,-8px)}}
+    @keyframes gearSpin{to{transform:rotate(360deg)}}
+    .big-hero{position:absolute;left:50%;top:51%;width:min(250px,78%);aspect-ratio:1;background-color:transparent;background-image:var(--hero);background-size:400% 400%;background-repeat:no-repeat;filter:drop-shadow(0 20px 22px rgba(0,0,0,.45)) drop-shadow(0 0 22px var(--weapon,#65efff));transform:translate(-50%,-50%) scaleX(var(--face,1))}
+    .big-hero.integrated{aspect-ratio:768/648;background-size:100% 100%;background-position:center bottom;background-repeat:no-repeat;transform-origin:center bottom}
+    .big-hero.cast{animation:heroCast .72s steps(1,end) infinite}
+    .big-hero.integrated.cast{animation:heroIntegratedCast 1.05s cubic-bezier(.2,.75,.25,1) infinite}
+    .hero-motion-sprite{display:none;position:absolute;z-index:4;left:50%;top:51%;width:min(250px,78%);aspect-ratio:1;background:var(--motion-frame) center/contain no-repeat;filter:drop-shadow(0 20px 22px rgba(0,0,0,.45)) drop-shadow(0 0 22px var(--weapon,#65efff));transform:translate(-50%,-50%) scaleX(var(--face,1));pointer-events:none}
+    .hero-motion-sprite.playing{display:block}
+    .big-hero.motion-hidden{visibility:hidden}
+    .preview.motion-attack .shot{animation:shot .72s linear infinite}
+    .big-hero.idle{animation:heroIdle 1.6s ease-in-out infinite}
+    .big-hero.integrated.idle{animation:heroIntegratedIdle 1.8s ease-in-out infinite}
+    @keyframes heroIdle{0%,100%{transform:translate(-50%,-51%) scaleX(var(--face,1))}50%{transform:translate(-50%,-48%) scaleX(var(--face,1))}}
+    @keyframes heroIntegratedIdle{0%,100%{transform:translate(-50%,-50%) scaleX(var(--face,1)) rotate(0deg)}25%{transform:translate(-50%,-51.2%) scaleX(var(--face,1)) rotate(-.7deg)}50%{transform:translate(-50%,-52%) scaleX(var(--face,1)) scale(1.018) rotate(0deg)}75%{transform:translate(-50%,-50.8%) scaleX(var(--face,1)) rotate(.7deg)}}
+    @keyframes heroCast{0%,18%{background-position:0 0}19%,45%{background-position:0 33.333333%}46%,78%{background-position:0 66.666667%}79%,100%{background-position:0 100%}}
+    @keyframes heroIntegratedCast{0%{transform:translate(-50%,-50%) scaleX(var(--face,1)) rotate(0deg)}18%{transform:translate(-50%,-52%) scaleX(var(--face,1)) scale(.97) rotate(-2deg)}42%{transform:translate(-50%,-55%) scaleX(var(--face,1)) scale(1.035) rotate(2deg)}66%{transform:translate(-50%,-48%) scaleX(var(--face,1)) scale(1.075) rotate(-1deg)}82%{transform:translate(-50%,-51%) scaleX(var(--face,1)) scale(1.025) rotate(0deg)}100%{transform:translate(-50%,-50%) scaleX(var(--face,1)) scale(1) rotate(0deg)}}
+    .shot{position:absolute;left:54%;top:49%;width:135px;height:18px;border-radius:99px;background:linear-gradient(90deg,transparent,var(--weapon,#65efff),#fff);box-shadow:0 0 24px var(--weapon,#65efff);opacity:0}
+    .cast+.shot{animation:shot .72s linear infinite}
+    @keyframes shot{0%,35%{opacity:0;transform:translateX(-20px) scaleX(.35)}55%,82%{opacity:1;transform:translateX(58px) scaleX(1.25)}100%{opacity:0;transform:translateX(92px) scaleX(.7)}}
+    .stage h2{margin:0;color:var(--gold);font-size:22px}.stage p{margin:0;color:#bfd2da;line-height:1.55}
+    .grid{padding:14px;display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px}
+    .card{position:relative;min-height:210px;border:1px solid rgba(101,239,255,.22);border-radius:9px;background:linear-gradient(180deg,rgba(5,23,37,.82),rgba(5,15,25,.92));overflow:hidden;cursor:pointer}
+    .card.active{border-color:#ffe071;box-shadow:0 0 0 2px rgba(255,224,113,.18),0 0 30px rgba(255,224,113,.16)}
+    .sprite{width:142px;aspect-ratio:1;margin:18px auto 4px;background-image:var(--hero);background-size:400% 400%;background-position:0 0;background-repeat:no-repeat;filter:drop-shadow(0 14px 15px rgba(0,0,0,.42));animation:miniIdle 1.8s ease-in-out infinite}
+    .sprite.integrated{display:block;width:170px;height:143px;aspect-ratio:768/648;transform-origin:center bottom;background-size:100% 100%;background-position:center bottom;animation:miniIntegratedIdle 1.8s ease-in-out infinite}
+    @keyframes miniIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    @keyframes miniIntegratedIdle{0%,100%{transform:translateY(0) scaleX(var(--face,1))}50%{transform:translateY(-4px) scaleX(var(--face,1))}}
+    .meta{padding:10px 12px;border-top:1px solid rgba(101,239,255,.18);background:rgba(0,0,0,.18)}
+    .meta strong{display:block;color:var(--gold);font-size:18px}.meta span{display:block;color:#cfe0e8;font-size:13px;margin-top:3px}
+    .weapon-panel{margin-top:16px;padding:14px}.weapon-panel h2{margin:0 0 10px;color:var(--gold)}.weapon-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .weapon{min-height:96px;text-align:left}.weapon.locked{opacity:.68;filter:saturate(.72)}.weapon small{display:block;margin-top:5px;color:#afc1ca;font-weight:700;line-height:1.35}
+    .badge{display:inline-block;margin-top:6px;padding:3px 8px;border-radius:999px;background:rgba(255,224,113,.12);border:1px solid rgba(255,224,113,.35);color:#fff5b5;font-size:12px}
+    .gear-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+    .gear-pick{min-height:78px;padding:10px;text-align:left;border-color:color-mix(in srgb,var(--c,#65efff) 42%,rgba(101,239,255,.28));background:color-mix(in srgb,var(--c,#65efff) 8%,rgba(4,20,32,.76))}
+    .gear-pick strong,.gear-pick small{display:block}.gear-pick strong{color:var(--c,#65efff)}.gear-pick small{margin-top:5px;color:#afc1ca;line-height:1.35}.gear-pick.active{color:#251900;background:linear-gradient(180deg,#ffe77a,#f6bd3a);border-color:#ffe77a;box-shadow:0 0 18px color-mix(in srgb,var(--c,#65efff) 32%,transparent)}.gear-pick.active strong,.gear-pick.active small{color:#251900}
+    .gear-note{margin:10px 0 0;color:#cfe0e8;line-height:1.55}.gear-note strong{color:var(--gold)}
+    .tier-plan{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+    .tier{border:1px solid rgba(101,239,255,.22);border-radius:9px;background:rgba(0,0,0,.18);padding:10px}
+    .tier strong{display:block;color:#ffe071}.tier span{display:block;color:#cfe0e8;font-size:13px;margin-top:4px;line-height:1.45}
+    .asset-path{margin-top:8px;color:#8db0bd;font-size:12px;word-break:break-all}
+    .prompt-link{display:inline-flex;margin-top:10px;color:#ffe071;border-color:rgba(255,224,113,.35)}
+    .sheet{margin-top:12px;border:1px solid rgba(101,239,255,.22);border-radius:9px;overflow:hidden;background:#07131f}
+    .sheet img{display:block;width:100%;height:auto}
+    @media(max-width:980px){.board{grid-template-columns:1fr}.stage{position:relative;height:auto}.grid{grid-template-columns:repeat(2,1fr)}.weapon-grid,.gear-grid{grid-template-columns:repeat(2,1fr)}}
+    /* Integrated PNGs already contain the complete character and weapon. */
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>&#20154;&#29289;&#21319;&#32026;&#22294;&#38928;&#35261;</h1>
+        <p style="margin:6px 0 0;color:#bfd2da">&#27298;&#26597;&#30007;&#20027;&#35282;&#12289;&#22899;&#20027;&#35282; Lv.1 &#21040; Lv.10 &#30340; atlas &#22806;&#35264;&#33287;&#26045;&#27861;&#21205;&#20316;&#12290;</p>
+      </div>
+      <div class="actions">
+        <a href="index.html">&#22238;&#36938;&#25138;</a>
+        <button id="modeIdle" class="active">&#24453;&#27231;</button>
+        <button id="modeCast">&#26045;&#27861;</button>
+        <button id="faceBtn">&#36681;&#21521;</button>
+      </div>
+    </header>
+    <div class="board">
+      <aside class="stage">
+        <h2 id="title"></h2>
+        <div class="preview">
+          <div id="gearLayer" class="gear-layer asset-gear gear-starlight"><span class="gear-aura"></span><span class="gear-main"></span><span class="gear-extra"></span></div>
+          <div id="bigHero" class="big-hero idle"></div>
+          <div id="heroMotionSprite" class="hero-motion-sprite"></div>
+          <div class="shot"></div>
+        </div>
+        <p>&#20302;&#31561;&#32026;&#20197;&#22522;&#30990;&#26381;&#35037;&#28858;&#20027;&#65292;&#31561;&#32026;&#36234;&#39640;&#35037;&#20633;&#36234;&#33775;&#40599;&#12290;&#36889;&#35041;&#30452;&#25509;&#35712;&#36938;&#25138;&#30446;&#21069;&#20351;&#29992;&#30340;&#35282;&#33394; atlas&#12290;</p>
+      </aside>
+      <main>
+        <div class="actions" style="margin-bottom:12px">
+          <button id="maleBtn" class="active">&#30007;&#20027;&#35282;</button>
+          <button id="femaleBtn">&#22899;&#20027;&#35282;</button>
+        </div>
+        <section id="grid" class="grid"></section>
+        <section class="weapon-panel">
+          <h2>&#27494;&#22120;&#12289;&#36947;&#20855;&#33287; Combo &#29305;&#25928;&#21443;&#32771;</h2>
+          <div id="weapons" class="weapon-grid"></div>
+          <p id="gearNote" class="gear-note"></p>
+          <div id="gearPicks" class="gear-grid"></div>
+          <div id="tierPlan" class="tier-plan"></div>
+          <a class="prompt-link" href="docs/hero-weapon-asset-spec.md">&#26597;&#30475; Image 2.0 &#27491;&#24335;&#25552;&#31034;&#35422;&#33287;&#21629;&#21517;&#35215;&#26684;</a>
+          <div class="sheet"><img src="assets/generated/effects/player-fx-contact-sheet.png" alt="Combo FX"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script>
+    const ASSET="assets/generated/", ASSET_VERSION="20260824-v2";
+    const versionedAsset=path=>path.includes("?")?path:`${path}?v=${ASSET_VERSION}`;
+    const L={
+      male:"\u7537\u4e3b\u89d2",female:"\u5973\u4e3b\u89d2",
+      basic:"\u57fa\u790e\u670d\u88dd",mid:"\u9032\u968e\u62ab\u98a8\u8207\u8b77\u5177",high:"\u9ad8\u968e\u6cd5\u888d\u8207\u98fe\u54c1",max:"\u6eff\u7d1a\u83ef\u9e97\u88dd\u5099"
+    };
+    const weapons={
+      starlight:{name:"\u661f\u5149\u6cd5\u6756",color:"#65efff",unlock:1,role:"\u7a69\u5b9a\u55ae\u9ad4\u5149\u5f48\uff0c\u521d\u968e\u5b78\u751f\u7528\u3002",file:"assets/generated/equipment/weapon-starlight-staff.png"},
+      ice:{name:"\u51b0\u6676\u6cd5\u6838",color:"#8ee9ff",unlock:4,role:"\u51b0\u85cd\u84c4\u529b\u5149\u7403\uff0c\u5f37\u8abf\u6e96\u78ba\u7387\u3002",file:"assets/generated/equipment/weapon-ice-core.png"},
+      fire:{name:"\u70c8\u7130\u6230\u8f2a",color:"#ff7b4d",unlock:5,role:"\u7d05\u6a58\u65cb\u8f49\u7206\u88c2\uff0cCombo \u66f4\u660e\u986f\u3002",file:"assets/generated/equipment/weapon-fire-wheel.png"},
+      thunder:{name:"\u96f7\u9cf4\u661f\u69cd",color:"#ffe66d",unlock:7,role:"\u91d1\u8272\u9ad8\u901f\u7a7f\u523a\uff0c\u9ad8\u7b49\u7d1a Boss \u6230\u7528\u3002",file:"assets/generated/equipment/weapon-thunder-spear.png"},
+      shadow:{name:"\u6697\u5f71\u9b54\u6676",color:"#b06cff",unlock:8,role:"\u7d2b\u8272\u8ffd\u8e64\u9b54\u5f48\uff0c\u5f8c\u671f\u83ef\u9e97\u3002",file:"assets/generated/equipment/weapon-shadow-crystal.png"}
+    };
+    const tierPlan=[
+      ["Lv.1-Lv.3","\u898b\u7fd2\u5b78\u9662\u751f","\u5e73\u5e38\u6821\u5712\u5192\u96aa\u670d\u3001\u77ed\u62ab\u98a8\u3001\u57fa\u672c\u76ae\u9774\u8207\u7c21\u55ae\u5fbd\u7ae0"],
+      ["Lv.4-Lv.6","\u5b88\u8b77\u5b78\u5f92","\u52a0\u4e0a\u8b77\u80a9\u3001\u8170\u5305\u3001\u624b\u5957\u3001\u9b54\u6cd5\u7d0b\u7ae0\u8207\u66f4\u660e\u986f\u62ab\u98a8"],
+      ["Lv.7-Lv.9","\u661f\u8f1d\u6cd5\u5e2b","\u52a0\u4e0a\u982d\u98fe\u3001\u9805\u934a\u3001\u80f8\u7532\u3001\u5bf6\u77f3\u88dd\u98fe\u8207\u5149\u74b0"],
+      ["Lv.10","\u9375\u76e4\u52c7\u8005","\u5b8c\u6574\u50b3\u8aaa\u670d\u88dd\u3001\u9ad8\u968e\u982d\u98fe\u3001\u83ef\u9e97\u62ab\u98a8\u8207\u5bf6\u77f3\u5149\u74b0"]
+    ];
+    const gearOptions={focus:{name:"專注水晶",color:"#65efff",note:"青色專注環，代表穩定練習。"},guardian:{name:"守護披風",color:"#ffd86e",note:"金色護罩，代表降低失誤壓力。"},combo:{name:"連擊項鍊",color:"#b06cff",note:"紫色旋轉環，代表連續答對。"},crown:{name:"勇者冠冕",color:"#ffe66d",note:"金色冠形光印，代表滿級榮耀。"}};
+    let hero="male", level=1, mode=new URLSearchParams(location.search).has("hero-motion")?"cast":"idle", face=1, weapon="starlight", gear="focus";
+    const grid=document.getElementById("grid"), big=document.getElementById("bigHero"), title=document.getElementById("title");
+    const gearLayer=document.getElementById("gearLayer"), gearNote=document.getElementById("gearNote"), gearPicks=document.getElementById("gearPicks"), motionSprite=document.getElementById("heroMotionSprite");
+    const modeIdleBtn=document.getElementById("modeIdle"), modeCastBtn=document.getElementById("modeCast");
+    function heroUrl(h,l){return `${ASSET}hero-${h}-lv${l}-atlas.png`}
+    function levelNote(l){if(l<=3)return L.basic;if(l<=6)return L.mid;if(l<=8)return L.high;return L.max}
+    const integratedHeroAssets={male:{1:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-shadow.png"},2:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-shadow.png"},4:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-shadow.png"}},female:{1:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-shadow.png"},2:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-shadow.png"},4:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-shadow.png"}}};
+    // The integrated PNGs were generated with mixed source facing. -1 mirrors the few left-facing source renders into the canonical right-facing preview.
+    const HERO_SOURCE_MIRROR={male:Object.freeze({1:-1,2:1,3:1,4:-1,5:1,6:1,7:1,8:1,9:1,10:1}),female:Object.freeze({1:-1,2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1})};
+    const heroSourceMirror=(character,heroLevel)=>HERO_SOURCE_MIRROR[character]?.[Number(heroLevel)]??1;
+    const integratedWeaponSet=(hero,level)=>Object.fromEntries(["starlight","ice","fire","thunder","shadow"].map(weapon=>[weapon,`assets/generated/hero-weapons-normalized-v2/hero-${hero}-lv${level}-${weapon}.png`]));
+    for(let level=1;level<=10;level++){integratedHeroAssets.male[level]=integratedWeaponSet("male",level);integratedHeroAssets.female[level]=integratedWeaponSet("female",level)}
+    const heroMotionAssets={male:{starlight:{idle:"assets/generated/hero-motion/hero-male-starlight-idle.png",charge:"assets/generated/hero-motion/hero-male-starlight-charge.png",attack:"assets/generated/hero-motion/hero-male-starlight-attack.png",recover:"assets/generated/hero-motion/hero-male-starlight-recover.png"}},female:{starlight:{idle:"assets/generated/hero-motion/hero-female-starlight-idle.png",charge:"assets/generated/hero-motion/hero-female-starlight-charge.png",attack:"assets/generated/hero-motion/hero-female-starlight-attack.png",recover:"assets/generated/hero-motion/hero-female-starlight-recover.png"}}};
+    const HERO_MOTION_PHASES=[["idle",320],["charge",960],["attack",720],["recover",260]];
+    let motionTimer=null,motionPhaseIndex=0;
+    const preview=document.querySelector(".preview");
+    function stopHeroMotion(){if(motionTimer){clearTimeout(motionTimer);motionTimer=null}motionPhaseIndex=0;motionSprite.classList.remove("playing");preview.classList.remove("motion-attack");big.classList.remove("motion-hidden");motionSprite.style.removeProperty("--motion-frame")}
+    function startHeroMotion(){
+      stopHeroMotion();
+      const frames=heroMotionAssets[hero]?.starlight;
+      const useFrames=weapon==="starlight"&&frames;
+      if(!useFrames){big.classList.add("cast");return}
+      big.classList.add("motion-hidden");
+      motionSprite.style.setProperty("--face",face);
+      motionSprite.style.setProperty("--weapon",weapons[weapon].color);
+      motionSprite.classList.add("playing");
+      const playPhase=()=>{
+        const phase=HERO_MOTION_PHASES[motionPhaseIndex];
+        if(!phase){stopHeroMotion();return}
+        const [name,duration]=phase;
+        preview.classList.toggle("motion-attack",name==="attack");
+        motionSprite.style.setProperty("--motion-frame",`url("${versionedAsset(frames[name])}")`);
+        motionPhaseIndex++;
+        motionTimer=setTimeout(playPhase,duration);
+      };
+      playPhase();
+    }
+    function setHero(){const w=weapons[weapon],g=gearOptions[gear]||gearOptions.focus,integratedSet=integratedHeroAssets[hero]?.[level],integrated=Boolean(integratedSet?.[weapon]),rawHeroImage=integrated?integratedSet[weapon]:heroUrl(hero,level),heroImage=versionedAsset(rawHeroImage);big.style.setProperty("--hero",`url("${heroImage}")`);big.style.setProperty("--face",face);big.style.setProperty("--weapon",w.color);motionSprite.style.setProperty("--face",face);motionSprite.style.setProperty("--weapon",w.color);gearLayer.style.setProperty("--face",face);gearLayer.style.setProperty("--weapon",w.color);gearLayer.style.setProperty("--gear-color",g.color);gearLayer.dataset.gear=gear;gearLayer.className=`gear-layer effect-only gear-${gear}`;big.className=`big-hero ${mode}${integrated?" integrated":""}`;title.textContent=`${hero==="male"?L.male:L.female} Lv.${level} | ${w.name}`;gearNote.innerHTML=`${integrated?"\u5df2\u4f7f\u7528\u6574\u5408\u6b66\u5668\u7684\u5b8c\u6574\u4eba\u7269\u5716；\u661f\u5149\u6cd5\u6756\u53ef\u64ad\u653e\u5f85\u6a5f\u2192\u96c6\u6c23\u2192\u653b\u64ca\u2192\u4f11\u606f\u56db\u6bb5\u52d5\u4f5c\uff0c\u5176\u4ed6\u6b66\u5668\u4f7f\u7528\u5c08\u5c6c\u6574\u5408\u5716\u907f\u514d\u758a\u5716\u3002":"\u6b64\u7b49\u7d1a\u5c1a\u672a\u6709\u6574\u5408\u6b66\u5668\u5716\uff0c\u66ab\u7528\u539f\u59cb\u89d2\u8272\u7d20\u6750\u3002"}<br><strong>目前道具外觀：${g.name}</strong>｜${g.note}<br><span class="asset-path">${heroImage}</span>`}
+    function renderGrid(){grid.innerHTML=Array.from({length:10},(_,i)=>{const lv=i+1,integrated=Boolean(integratedHeroAssets[hero]?.[lv]?.[weapon]),rawPreview=integrated?integratedHeroAssets[hero][lv][weapon]:heroUrl(hero,lv),preview=versionedAsset(rawPreview);return `<button class="card ${lv===level?"active":""}" data-lv="${lv}"><div class="sprite ${integrated?"integrated":"atlas"}" style="--hero:url('${preview}')"></div><div class="meta"><strong>Lv.${lv}</strong><span>${levelNote(lv)}</span></div></button>`}).join("");grid.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{level=Number(b.dataset.lv);renderGrid();setHero()})}
+    const renderHero= setHero; setHero=()=>{stopHeroMotion();renderHero();if(mode==="cast")startHeroMotion()};
+    // Apply source correction after the shared renderer so each level card and the large preview use the same canonical facing.
+    const setHeroWithMotion=setHero;
+    setHero=()=>{setHeroWithMotion();big.style.setProperty("--face",heroSourceMirror(hero,level)*face)};
+    const renderGridWithAssets=renderGrid;
+    renderGrid=()=>{renderGridWithAssets();grid.querySelectorAll(".sprite.integrated").forEach((sprite,index)=>sprite.style.setProperty("--face",heroSourceMirror(hero,index+1)))};
+    function renderWeapons(){const box=document.getElementById("weapons");box.innerHTML=Object.entries(weapons).map(([k,w])=>`<button class="weapon ${k===weapon?"active":""} ${level<w.unlock?"locked":""}" data-w="${k}" style="--c:${w.color}">${w.name}<small>${w.role}</small><span class="badge">Lv.${w.unlock} \u89e3\u9396${level<w.unlock?" \u00b7 \u9810\u89bd\u4ecd\u53ef\u8a66\u7a7f":""}</span></button>`).join("");box.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{weapon=b.dataset.w;renderWeapons();renderGrid();setHero()})}
+    function renderGear(){gearPicks.innerHTML=Object.entries(gearOptions).map(([k,g])=>`<button type="button" class="gear-pick ${k===gear?"active":""}" data-gear="${k}" aria-pressed="${k===gear}" style="--c:${g.color}"><strong>${g.name}</strong><small>${g.note}</small></button>`).join("");gearPicks.querySelectorAll("[data-gear]").forEach(b=>b.onclick=()=>{gear=b.dataset.gear;renderGear();setHero()})}
+    function renderTierPlan(){document.getElementById("tierPlan").innerHTML=tierPlan.map(t=>`<div class="tier"><strong>${t[0]} ${t[1]}</strong><span>${t[2]}</span></div>`).join("")}
+    document.getElementById("maleBtn").onclick=()=>{hero="male";document.getElementById("maleBtn").classList.add("active");document.getElementById("femaleBtn").classList.remove("active");renderGrid();setHero()};
+    document.getElementById("femaleBtn").onclick=()=>{hero="female";document.getElementById("femaleBtn").classList.add("active");document.getElementById("maleBtn").classList.remove("active");renderGrid();setHero()};
+    modeIdleBtn.onclick=()=>{mode="idle";modeIdleBtn.classList.add("active");modeCastBtn.classList.remove("active");setHero()};
+    modeCastBtn.onclick=()=>{mode="cast";modeCastBtn.classList.add("active");modeIdleBtn.classList.remove("active");setHero()};
+    document.getElementById("faceBtn").onclick=()=>{face*=-1;setHero()};
+    if(mode==="cast"){modeCastBtn.classList.add("active");modeIdleBtn.classList.remove("active")}
+    renderGrid();renderWeapons();renderGear();renderTierPlan();setHero();
+  </script>
+</body>
+</html>
+

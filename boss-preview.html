@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Word War Boss 預覽</title>
+  <style>
+    :root {
+      --ink: #e9fbff;
+      --muted: rgba(233, 251, 255, .68);
+      --panel: rgba(5, 20, 30, .82);
+      --line: rgba(103, 226, 255, .34);
+      --gold: #ffd36e;
+      --cyan: #63efff;
+      --blue: #2f64e8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(82, 206, 255, .22), transparent 34%),
+        linear-gradient(135deg, #051018, #071c27 48%, #02070d);
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .sidebar,
+    .stage,
+    .card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: 0 18px 52px rgba(0, 0, 0, .32), inset 0 0 22px rgba(77, 228, 255, .08);
+      backdrop-filter: blur(12px);
+    }
+
+    .sidebar {
+      border-radius: 8px;
+      padding: 14px;
+      overflow: auto;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      letter-spacing: 0;
+      color: #fff3b2;
+    }
+
+    .hint {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .boss-button {
+      width: 100%;
+      min-height: 68px;
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      color: var(--ink);
+      text-align: left;
+      border: 1px solid rgba(103, 226, 255, .26);
+      border-radius: 8px;
+      background: rgba(5, 19, 30, .68);
+      cursor: pointer;
+    }
+
+    .boss-button:hover,
+    .boss-button.active {
+      border-color: var(--cyan);
+      background: linear-gradient(135deg, rgba(35, 102, 229, .4), rgba(7, 39, 57, .78));
+    }
+
+    .lv {
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    .boss-button strong {
+      display: block;
+      font-size: 15px;
+      color: white;
+    }
+
+    .boss-button span {
+      display: block;
+      margin-top: 3px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .stage {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      min-width: 0;
+    }
+
+    .stage-bg {
+      position: absolute;
+      inset: 0;
+      background-image: var(--bg);
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.02);
+      filter: saturate(1.04) brightness(.82);
+    }
+
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 48% 68%, rgba(98, 239, 255, .24), transparent 24%),
+        linear-gradient(180deg, rgba(0, 0, 0, .08), rgba(0, 0, 0, .28));
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 4;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .titlebox {
+      border: 1px solid rgba(255, 211, 110, .5);
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: rgba(4, 15, 22, .72);
+      box-shadow: 0 0 20px rgba(255, 211, 110, .12);
+    }
+
+    .titlebox .small {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .titlebox .name {
+      margin-top: 3px;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .controls button {
+      min-width: 82px;
+      height: 38px;
+      color: var(--ink);
+      font-weight: 800;
+      border: 1px solid rgba(103, 226, 255, .42);
+      border-radius: 8px;
+      background: rgba(5, 20, 30, .78);
+      cursor: pointer;
+    }
+
+    .controls button.active {
+      color: #061018;
+      background: linear-gradient(180deg, #73f1ff, #ffd36e);
+    }
+
+    .arena-line {
+      position: absolute;
+      z-index: 2;
+      left: 12%;
+      right: 12%;
+      bottom: 23.5%;
+      height: 3px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, transparent, rgba(255, 211, 110, .75), transparent);
+      opacity: .74;
+    }
+
+    .hero-mark,
+    .boss-mark {
+      position: absolute;
+      z-index: 3;
+      bottom: 20.5%;
+      width: 80px;
+      height: 28px;
+      border: 1px solid rgba(103, 226, 255, .46);
+      border-radius: 99px;
+      background: rgba(0, 255, 255, .1);
+      transform: translateX(-50%);
+    }
+
+    .hero-mark { left: 25%; }
+    .boss-mark { left: 74%; }
+
+    .hero-ghost {
+      position: absolute;
+      z-index: 4;
+      left: 25%;
+      bottom: 20.5%;
+      width: 92px;
+      height: 140px;
+      transform: translate(-50%, 0);
+      border-radius: 48% 48% 22% 22%;
+      background:
+        radial-gradient(circle at 50% 10%, #ffe9a2 0 9%, transparent 10%),
+        linear-gradient(180deg, rgba(52, 118, 238, .95), rgba(7, 24, 50, .95));
+      border: 2px solid rgba(255, 211, 110, .65);
+      box-shadow: 0 0 28px rgba(99, 239, 255, .3);
+    }
+
+    .hero-ghost::after {
+      content: "主角";
+      position: absolute;
+      left: 50%;
+      bottom: -26px;
+      transform: translateX(-50%);
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .boss-wrap {
+      position: absolute;
+      z-index: 5;
+      left: 74%;
+      bottom: 20.5%;
+      width: min(31vw, 430px);
+      aspect-ratio: 1 / 1;
+      transform: translate(-50%, 0);
+      display: grid;
+      place-items: end center;
+      filter: drop-shadow(0 24px 26px rgba(0, 0, 0, .42));
+    }
+
+    .boss-sprite {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background-image: var(--atlas);
+      background-size: 400% 100%;
+      background-repeat: no-repeat;
+      background-position: 0% 0%;
+      image-rendering: auto;
+      transform: scaleX(var(--face, 1));
+      transform-origin: center;
+    }
+
+    .boss-sprite.playing {
+      animation: bossSequence 3.3s steps(1, end) infinite;
+    }
+
+    @keyframes bossSequence {
+      0%, 8.9% { background-position: 0% 0%; }
+      9%, 63.5% { background-position: 33.333333% 0%; }
+      63.6%, 100% { background-position: 66.666667% 0%; }
+    }
+
+    .frame-grid {
+      position: absolute;
+      z-index: 6;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 10px;
+      max-width: 880px;
+    }
+
+    .card {
+      border-radius: 8px;
+      padding: 8px;
+      min-height: 128px;
+    }
+
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .thumb {
+      width: 100%;
+      aspect-ratio: 1.25 / 1;
+      background-image: var(--atlas);
+      background-size: 400% 100%;
+      background-repeat: no-repeat;
+      background-position: var(--pos) 0%;
+      border-radius: 6px;
+      background-color: rgba(0, 0, 0, .22);
+    }
+
+    .note {
+      position: absolute;
+      z-index: 7;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      max-width: 620px;
+      padding: 9px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      border: 1px solid rgba(103, 226, 255, .26);
+      border-radius: 8px;
+      background: rgba(2, 12, 18, .72);
+    }
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 220px 1fr; }
+      .boss-wrap { width: min(40vw, 360px); }
+      .frame-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); max-width: 430px; }
+      .note { display: none; }
+    }
+  </style>
+  <script src="boss-motion.js"></script>
+  <style>.thumb{background-size:600% 100%}.frame-grid{grid-template-columns:repeat(6,minmax(70px,1fr));max-width:1000px}.controls{flex-wrap:wrap}@media(max-width:700px){.app{grid-template-columns:1fr}.sidebar{max-height:190px;overflow:auto}.frame-grid{grid-template-columns:repeat(3,minmax(70px,1fr))}.boss-wrap{width:250px}}</style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar">
+      <h1>Boss 動作預覽</h1>
+            <p class="hint">待機・準備・蓄力・施放・收招・復位</p>
+      <div id="bossList"></div>
+    </aside>
+
+    <section class="stage" id="stage">
+      <div class="stage-bg"></div>
+      <div class="topbar">
+        <div class="titlebox">
+          <div class="small" id="bossLevel">Lv.1</div>
+          <div class="name" id="bossName">Boss</div>
+        </div>
+        <div class="controls">
+                    <button id="playBtn" class="active">播放</button>
+                    <button data-frame="0">第 1 格 待機</button>
+                    <button data-frame="1">準備</button>
+                    <button data-frame="2">蓄力</button>
+                    <button data-frame="3">施放</button>
+                    <button data-frame="4">收招</button>
+                    <button data-frame="5">復位</button>
+        </div>
+      </div>
+
+      <div class="arena-line"></div>
+      <div class="hero-mark"></div>
+      <div class="boss-mark"></div>
+      <div class="hero-ghost"></div>
+      <div class="boss-wrap">
+        <div class="boss-sprite playing" id="bossSprite"></div>
+      </div>
+
+      <div class="frame-grid" id="frameGrid"></div>
+            <div class="note">用左側選單切換 Lv.1～Lv.8，確認每隻 Boss 都在畫面內、臉朝向主角，並有清楚的集氣與攻擊動作。</div>
+    </section>
+  </main>
+
+  <script>
+    const bosses = [
+      {
+        level: 1,
+        zone: "八德亭",
+        name: "八德結界獸",
+        atlas: "assets/generated/boss-safe-atlas-20260612-v3/boss-atlas-01-bade-safe-v3-20260612.png",
+        bg: "assets/generated/level-01-bade-ting-stage-safe.png"
+      },
+      {
+        level: 2,
+        zone: "三達亭",
+        name: "三達蘑菇守衛",
+        atlas: "assets/generated/boss-safe-atlas-20260612-v3/boss-atlas-02-sanda-safe-v3-20260612.png",
+        bg: "assets/generated/level-02-sanda-de-ting-stage-safe.png"
+      },
+      {
+        level: 3,
+        zone: "五倫園",
+        name: "五倫星衛",
+        atlas: "assets/generated/boss-safe-atlas-20260612-v3/boss-atlas-03-wulun-safe-v3-20260612.png",
+        bg: "assets/generated/level-03-wulun-garden-stage-safe.png"
+      },
+      {
+        level: 4,
+        zone: "如沐園",
+        name: "如沐天鵝",
+        atlas: "assets/generated/boss-safe-atlas-20260612-v3/boss-atlas-04-rumu-safe-v3-20260612.png",
+        bg: "assets/generated/level-04-rumu-crane-fountain-stage-safe.png"
+      },
+      {
+        level: 5,
+        zone: "成長學園",
+        name: "成長長老",
+        atlas: "assets/generated/boss-safe-atlas-20260612-v3/boss-atlas-05-growth-safe-v3-20260612.png",
+        bg: "assets/generated/level-05-growth-academy-stage-safe.png"
+      },
+      {
+        level: 6,
+        zone: "羔羊園",
+        name: "羔羊晶獸",
+        atlas: "assets/generated/boss-safe-atlas-20260612-v3/boss-atlas-06-lamb-safe-v3-20260612.png",
+        bg: "assets/generated/level-06-lamb-garden-stage-safe.png"
+      },
+      {
+        level: 7,
+        zone: "童心園",
+        name: "童心夢獸",
+        atlas: "assets/generated/boss-safe-atlas-20260612-v3/boss-atlas-07-childheart-safe-v3-20260612.png",
+        bg: "assets/generated/level-07-childheart-garden-stage-safe.png"
+      },
+      {
+        level: 8,
+        zone: "大橋堂",
+        name: "大橋神獸",
+        atlas: "assets/generated/boss-safe-atlas-20260612-v3/boss-atlas-08-daqiao-safe-v3-20260612.png",
+        bg: "assets/generated/daqiao-hall-interior-legendary-beasts.png"
+      }
+    ];
+
+        const frameNames = ["待機", "準備", "蓄力", "施放", "收招", "復位"];
+    const framePositions = ["0%", "20%", "40%", "60%", "80%", "100%"];
+    const BOSS_FACE_BY_LEVEL = Object.freeze({1:1,2:1,3:1,4:1,5:1,6:1,7:1,8:1});
+    let selected = 0;
+    let playing = true;
+
+    const list = document.getElementById("bossList");
+    const stage = document.getElementById("stage");
+    const sprite = document.getElementById("bossSprite");
+    const frameGrid = document.getElementById("frameGrid");
+    const playBtn = document.getElementById("playBtn");
+    const bossLevel = document.getElementById("bossLevel");
+    const bossName = document.getElementById("bossName");
+
+    function renderList() {
+      list.innerHTML = bosses.map((boss, index) => `
+        <button class="boss-button ${index === selected ? "active" : ""}" data-index="${index}">
+          <div class="lv">Lv.${boss.level}</div>
+          <div>
+            <strong>${boss.zone}</strong>
+            <span>${boss.name}</span>
+          </div>
+        </button>
+      `).join("");
+    }
+
+    function setFrame(index) {
+      playing = false;
+      BossMotion.frame(sprite,index);
+      sprite.classList.remove("playing");
+      sprite.style.backgroundPosition = `${framePositions[index]} 0%`;
+      playBtn.classList.remove("active");
+      document.querySelectorAll(".controls button[data-frame]").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.frame) === index);
+      });
+    }
+
+    function play() {
+      playing = true;
+      BossMotion.play(sprite,{duration:2400,releaseAt:1400,loop:true});
+      sprite.style.backgroundPosition = "";
+      sprite.classList.add("playing");
+      playBtn.classList.add("active");
+      document.querySelectorAll(".controls button[data-frame]").forEach((button) => button.classList.remove("active"));
+    }
+
+    function renderBoss() {
+      const boss = bosses[selected];
+      stage.style.setProperty("--bg", `url("${boss.bg}")`);
+      stage.style.setProperty("--atlas", `url("${BossMotion.url(boss.level)}")`);
+      BossMotion.mount(sprite,boss.level,{loop:true}).catch(error=>{bossName.textContent="素材載入失敗";console.error(error)});
+      stage.style.setProperty("--face", BOSS_FACE_BY_LEVEL[boss.level] ?? 1);
+      bossLevel.textContent = `Lv.${boss.level} | ${boss.zone}`;
+      bossName.textContent = boss.name;
+      frameGrid.innerHTML = frameNames.map((name, index) => `
+        <article class="card">
+          <div class="card-title">
+            <span>${name}</span>
+            <span>循環</span>
+          </div>
+          <div class="thumb" style="--pos:${framePositions[index]}"></div>
+        </article>
+      `).join("");
+      renderList();
+      play();
+    }
+
+    list.addEventListener("click", (event) => {
+      const button = event.target.closest(".boss-button");
+      if (!button) return;
+      selected = Number(button.dataset.index);
+      renderBoss();
+    });
+
+    playBtn.addEventListener("click", play);
+
+    document.querySelectorAll(".controls button[data-frame]").forEach((button) => {
+      button.addEventListener("click", () => setFrame(Number(button.dataset.frame)));
+    });
+
+    renderBoss();
+  </script>
+</body>
+</html>

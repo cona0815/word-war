@@ -1,0 +1,16 @@
+#loginScreen[data-cover]{grid-template-columns:minmax(0,1fr) minmax(0,440px) minmax(0,1fr);padding:68px 24px 18px;gap:12px;background-image:var(--cover-image);background-size:cover;background-position:center;isolation:isolate}
+#loginScreen[data-cover=a]{--cover-image:url('assets/covers/cover-a.png');--cover-accent:#ffdc77}
+#loginScreen[data-cover=b]{--cover-image:url('assets/covers/cover-b.png');--cover-accent:#8de9fb}
+#loginScreen[data-cover=c]{--cover-image:url('assets/covers/cover-c.png');--cover-accent:#ffb79c}
+#loginScreen[data-cover] .login-card{padding:18px 12px;text-shadow:0 2px 6px #000,0 0 18px #000}
+#loginScreen[data-cover] .logo{width:400px;max-width:100%;margin-bottom:10px}
+#loginScreen[data-cover] .login-hero{height:min(82dvh,900px);filter:drop-shadow(0 14px 12px #0008) drop-shadow(0 0 12px #c4deed55)}
+#loginScreen[data-cover] .tabs .tab{background:#0c1c28db;border-color:#ffffff55}
+#loginScreen[data-cover] .tabs .tab.active,#loginScreen[data-cover] .seg.active{background:var(--cover-accent);color:#18292f}
+#loginScreen[data-cover] input{background:#091922e8;border:1px solid #bbd6d899;color:white}
+#loginScreen[data-cover] #startBtn{background:var(--cover-accent);box-shadow:0 3px 0 #442f19,0 0 22px #f5d07355;color:#1d2630;text-shadow:none}
+.cover-switch{position:absolute;z-index:5;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:4px;background:#0a1723df;border:1px solid #b6c6cb77;border-radius:8px;white-space:nowrap}
+.cover-switch a{font:600 14px system-ui;color:#f3faff;text-decoration:none;padding:8px 14px;border-radius:4px}
+.cover-switch a[aria-current]{color:#16252c;background:#f1dfaa}.cover-switch a:focus-visible{outline:3px solid #88eafa}
+@media(max-width:760px){#loginScreen[data-cover]{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:190px auto;padding:66px 12px 18px;gap:4px;background-size:auto 65dvh;background-position:center top;background-repeat:no-repeat;background-color:#0b1925}#loginScreen[data-cover] .login-hero{height:190px}#loginScreen[data-cover] .login-card{padding:12px;grid-column:1/-1}#loginScreen[data-cover] .logo{width:290px}.cover-switch a{padding:8px;font-size:12px}}
+@media(min-width:761px) and (max-height:650px){#loginScreen[data-cover]{padding-top:56px}#loginScreen[data-cover] .logo{width:250px}#loginScreen[data-cover] .login-hero{height:calc(100dvh - 80px)}}

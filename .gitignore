@@ -1,0 +1,14 @@
+*.log
+*.zip
+.agents/
+.codex*
+.env*
+.clasprc.json
+.clasp.json
+node_modules/
+tmp-clean-test/
+index.before-*.html
+docs/qa-*/
+assets/**/raw.png
+assets/**/grid.png
+assets/**/pipeline-meta.json

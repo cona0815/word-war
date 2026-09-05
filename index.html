@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Word War</title>
+  <style>
+    :root {
+      --ink:#ecfbff; --muted:rgba(236,251,255,.72); --panel:rgba(4,18,28,.82);
+      --line:rgba(101,239,255,.32); --cyan:#65efff; --gold:#ffd86e;
+      --green:#43c58c; --red:#ff735d; --orange:#ffb45e;
+      font-family:"Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+    }
+    *{box-sizing:border-box} html,body{margin:0;min-height:100%}
+    body{color:var(--ink);background:#07131e;overflow:hidden}
+    button,input{font:inherit} button{cursor:pointer;border:0}.hidden{display:none!important}
+    .screen{position:fixed;inset:0;overflow:hidden}
+    #loginScreen{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px) minmax(0,1fr);grid-template-rows:minmax(min-content,1fr);gap:16px;align-items:center;padding:24px;height:100dvh;overflow:auto;background:linear-gradient(90deg,rgba(2,8,14,.55),rgba(2,8,14,.25),rgba(2,8,14,.55)),url("assets/login-castle.png") center/cover no-repeat}
+    #loginScreen .login-hero{position:static;display:block;grid-row:1;align-self:end;width:100%;height:min(84dvh,820px);min-width:0;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 16px 18px rgba(0,0,0,.35));pointer-events:none}
+    #loginScreen .login-hero.female{grid-column:1}#loginScreen .login-hero.male{grid-column:3}
+    .login-card{position:relative;grid-column:2;grid-row:1;min-width:0;width:100%;padding:22px;border:1px solid transparent;border-radius:8px;background:transparent;box-shadow:none}
+    .logo{display:block;width:min(320px,100%);height:auto;margin:0 auto 10px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
+    h1{margin:0 0 8px;text-align:center;color:#fff2a8;font-size:36px}.login-card p{margin:0 0 18px;text-align:center;color:var(--muted);font-size:18px}
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 18px}.two{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .btn,.tab,.seg{min-height:46px;border-radius:8px;color:var(--ink);font-weight:900;border:1px solid rgba(101,239,255,.34);background:rgba(4,20,32,.78)}
+    .tab.active,.seg.active{color:#07131e;background:linear-gradient(180deg,#78f2ff,#ffd86e);border-color:transparent}
+    .primary{color:#07131e;background:linear-gradient(180deg,#ffe883,#f1b62f);box-shadow:0 12px 24px rgba(255,216,110,.18)}
+    .panel{min-height:238px;padding:16px;border:1px solid rgba(101,239,255,.22);border-radius:8px;background:rgba(0,0,0,.18)}
+    .form{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.actions{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:10px;margin-top:18px}
+    label{display:grid;gap:7px;color:#fff1aa;font-weight:900}input{height:52px;padding:0 14px;color:white;border:1px solid rgba(255,216,110,.38);border-radius:8px;outline:0;background:rgba(2,11,20,.72)}
+    .list{margin:0;padding-left:24px;color:var(--muted);line-height:1.8}.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(101,239,255,.16);color:var(--muted)}
+    .menu-btn{position:fixed;z-index:50;top:14px;right:14px;width:82px;height:48px;border-radius:8px;color:var(--ink);font-weight:900;border:1px solid var(--line);background:rgba(5,20,30,.9)}
+    .game{background:#06101a}.stage-bg{position:absolute;inset:0;background-image:var(--stage-bg);background-size:var(--stage-size,cover);background-position:var(--stage-pos,center center);background-repeat:no-repeat;filter:saturate(1.04) brightness(.86);transform:scale(var(--stage-scale,1))}
+    .game:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 62%,transparent 0 28%,rgba(0,0,0,.2) 68%),linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.25))}
+    .hud{position:absolute;z-index:5;top:8px;left:8px;display:flex;gap:6px;align-items:stretch}.hud-card{min-width:74px;min-height:42px;padding:5px 8px;border:1px solid rgba(101,239,255,.28);border-radius:7px;background:linear-gradient(180deg,rgba(4,18,28,.74),rgba(4,18,28,.52));box-shadow:inset 0 0 14px rgba(101,239,255,.06),0 10px 24px rgba(0,0,0,.16);backdrop-filter:blur(5px)}
+    .hud-card.level{min-width:218px;display:flex;align-items:center;justify-content:space-between;gap:12px}.hud-label{display:block;color:var(--muted);font-size:11px;font-weight:900}.hud-value{display:block;margin-top:0;color:white;font-size:20px;line-height:1.05;font-weight:900}.hud-title{font-size:17px;font-weight:900;white-space:nowrap}.hud-round{color:var(--muted);font-size:13px;font-weight:900;white-space:nowrap}
+    .hero{position:absolute;z-index:4;left:var(--hero-x,50%);top:var(--hero-y,58%);width:min(15vw,210px);aspect-ratio:1/1;transform:translate(-50%,-50%) scaleX(var(--hero-face,1));background-color:transparent;background-image:var(--hero-atlas);background-size:var(--hero-bg-size,400% 400%);background-repeat:no-repeat;background-position:var(--hero-bg-position,0 0);filter:drop-shadow(0 18px 20px rgba(0,0,0,.38))}
+    /* Weapon art is baked into integrated hero PNGs. Never render a second weapon layer. */
+    .hero-weapon{display:none}
+    /* Gear is an effect-only layer. Weapon silhouettes remain exclusively in the integrated hero PNG. */
+    .hero-gear{position:absolute;z-index:3;left:var(--hero-x,50%);top:var(--hero-y,58%);width:min(18vw,245px);aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;filter:drop-shadow(0 0 16px var(--gear-color,#65efff));opacity:.9}
+    .hero-gear:before,.hero-gear:after{content:"";position:absolute;inset:9%;border-radius:50%;border:2px solid color-mix(in srgb,var(--gear-color,#65efff) 64%,transparent);box-shadow:0 0 20px color-mix(in srgb,var(--gear-color,#65efff) 42%,transparent),inset 0 0 18px color-mix(in srgb,var(--gear-color,#65efff) 18%,transparent);animation:heroGearPulse 1.8s ease-in-out infinite}
+    .hero-gear:after{inset:1%;border-width:1px;border-top-color:transparent;border-bottom-color:transparent;animation:heroGearOrbit 4.8s linear infinite}
+    .hero-gear[data-gear="focus"]{--gear-color:#65efff}
+    .hero-gear[data-gear="guardian"]{--gear-color:#ffd86e}
+    .hero-gear[data-gear="guardian"]:before{inset:18% 21% 7%;border-radius:48% 48% 54% 54%;border-width:3px;clip-path:polygon(50% 0,92% 18%,82% 76%,50% 100%,18% 76%,8% 18%)}
+    .hero-gear[data-gear="combo"]{--gear-color:#b06cff}
+    .hero-gear[data-gear="combo"]:before{inset:12%;border-style:dashed;border-width:3px;animation:heroGearSpin 4s linear infinite}
+    .hero-gear[data-gear="combo"]:after{border-left-color:#65efff;border-right-color:#65efff}
+    .hero-gear[data-gear="crown"]{--gear-color:#ffe66d}
+    .hero-gear[data-gear="crown"]:before{inset:8% 19% 62%;border-radius:5px 5px 45% 45%;border-width:3px;clip-path:polygon(0 100%,0 32%,24% 60%,50% 0,76% 60%,100% 32%,100% 100%)}
+    .hero-gear[data-gear="crown"]:after{inset:20%;border-top-color:#fff2a8;border-bottom-color:transparent}
+    @keyframes heroGearPulse{0%,100%{opacity:.38;transform:scale(.93)}50%{opacity:.8;transform:scale(1.04)}}
+    @keyframes heroGearOrbit{to{transform:rotate(360deg)}}
+    @keyframes heroGearSpin{to{transform:rotate(-360deg)}}
+    .hero.integrated{aspect-ratio:768/648;background-size:100% 100%;background-position:center bottom;transform-origin:center bottom;will-change:transform;animation:heroIntegratedIdle 1.8s ease-in-out infinite}
+    .hero.integrated.casting{animation:heroIntegratedCast 1.05s cubic-bezier(.2,.75,.25,1) 1 both}
+    .hero.integrated.pose-sheet{width:min(17.5vw,245px);aspect-ratio:896/648;background-size:600% 100%;background-position:0 0;animation:none}
+    .hero-motion-sprite{display:none;position:absolute;z-index:5;left:var(--hero-x,50%);top:var(--hero-y,58%);width:min(15vw,210px);aspect-ratio:1;background:var(--motion-frame) center/contain no-repeat;filter:drop-shadow(0 18px 20px rgba(0,0,0,.38));transform:translate(-50%,-50%) scaleX(var(--hero-face,1));pointer-events:none}
+    .hero-motion-sprite.playing{display:block}
+    .hero.motion-hidden{visibility:hidden}
+    @keyframes heroIntegratedIdle{0%,100%{transform:translate(-50%,-50%) scaleX(var(--hero-face,1)) rotate(0deg)}25%{transform:translate(-50%,-51.2%) scaleX(var(--hero-face,1)) rotate(-.7deg)}50%{transform:translate(-50%,-52%) scaleX(var(--hero-face,1)) scale(1.018) rotate(0deg)}75%{transform:translate(-50%,-50.8%) scaleX(var(--hero-face,1)) rotate(.7deg)}}
+    @keyframes heroIntegratedCast{0%{transform:translate(-50%,-50%) scaleX(var(--hero-face,1)) rotate(0deg)}18%{transform:translate(-50%,-52%) scaleX(var(--hero-face,1)) scale(.97) rotate(-2deg)}42%{transform:translate(-50%,-55%) scaleX(var(--hero-face,1)) scale(1.035) rotate(2deg)}66%{transform:translate(-50%,-48%) scaleX(var(--hero-face,1)) scale(1.075) rotate(-1deg)}82%{transform:translate(-50%,-51%) scaleX(var(--hero-face,1)) scale(1.025) rotate(0deg)}100%{transform:translate(-50%,-50%) scaleX(var(--hero-face,1)) scale(1) rotate(0deg)}}
+    .hero.casting{animation:heroCast .46s steps(1,end) 1}@keyframes heroCast{0%,18%{background-position:0 0}19%,45%{background-position:0 33.333333%}46%,78%{background-position:0 66.666667%}79%,100%{background-position:0 100%}}
+    .aura{position:absolute;z-index:3;left:var(--hero-x,50%);top:var(--hero-y,58%);width:min(17vw,250px);aspect-ratio:1/.42;transform:translate(-50%,38%);border:2px solid rgba(101,239,255,.35);border-radius:50%;box-shadow:0 0 42px rgba(101,239,255,.25),inset 0 0 28px rgba(101,239,255,.14)}
+    .enemy{position:absolute;z-index:4;left:var(--x);top:var(--y);width:var(--size,112px);transform:translate(-50%,-50%);transition:transform .18s,opacity .2s}.enemy.defeated{opacity:0;transform:translate(-50%,-50%) scale(.5)}.enemy img{width:100%;display:block;filter:drop-shadow(0 13px 14px rgba(0,0,0,.4))}
+    .tag,.boss-tag{position:absolute;left:50%;top:-32px;min-width:76px;width:max-content;max-width:min(520px,54vw);padding:5px 12px;transform:translateX(-50%);text-align:center;writing-mode:horizontal-tb;text-orientation:mixed;white-space:nowrap;word-break:keep-all;overflow-wrap:normal;color:var(--cyan);font-size:24px;line-height:1.1;font-weight:900;border:1px solid rgba(101,239,255,.38);border-radius:7px;background:rgba(3,17,26,.82);text-shadow:0 0 10px rgba(101,239,255,.8)}
+    .tag.long{top:-46px;max-width:min(640px,62vw);font-size:18px;line-height:1.18;white-space:normal;overflow-wrap:normal;word-break:keep-all;text-wrap:balance}
+    .zh-tone{display:inline-flex;align-items:flex-start;gap:1px}.zh-tone .tone-mark{font-size:.58em;line-height:1;margin-left:1px;transform:translateY(-.32em)}
+    .order{display:none}
+    .projectile{position:absolute;z-index:8;left:var(--sx);top:var(--sy);width:var(--fx-size,28px);height:var(--fx-size,28px);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;background:radial-gradient(circle,white 0 18%,var(--fx-core,#fff2a8) 19% 34%,var(--fx-a,#65efff) 35% 58%,transparent 60%);box-shadow:0 0 20px var(--fx-a,#65efff),0 0 46px var(--fx-b,rgba(101,239,255,.68));animation:fly var(--fx-time,.46s) cubic-bezier(.2,.78,.22,1) forwards}.projectile:before,.projectile:after{content:"";position:absolute;inset:42% -170%;height:16%;border-radius:99px;background:linear-gradient(90deg,transparent,var(--fx-a,#65efff),white,var(--fx-c,#ffd86e),transparent);filter:blur(.4px);transform:rotate(var(--fx-angle,0deg));opacity:.82}.projectile:after{inset:15% -115%;height:70%;border:1px solid var(--fx-c,#ffd86e);background:transparent;opacity:.48}.projectile.combo{width:var(--fx-size,44px);height:var(--fx-size,44px);box-shadow:0 0 26px white,0 0 70px var(--fx-a,#65efff),0 0 120px var(--fx-c,#ffd86e)}.projectile.combo:before{inset:44% -260%;height:22%;filter:blur(1px);opacity:.95}.projectile.combo:after{inset:-30% -180%;height:160%;border-width:2px;opacity:.65}@keyframes fly{to{left:var(--tx);top:var(--ty);transform:translate(-50%,-50%) scale(1.25);opacity:.9}}
+    .impact{position:absolute;z-index:9;left:var(--tx);top:var(--ty);width:var(--impact-size,82px);height:var(--impact-size,82px);border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,white 0 8%,var(--fx-core,#fff2a8) 9% 18%,var(--fx-a,#65efff) 19% 40%,transparent 43%),conic-gradient(from 0deg,transparent,var(--fx-c,#ffd86e),transparent,var(--fx-a,#65efff),transparent);box-shadow:0 0 32px var(--fx-a,#65efff),0 0 74px var(--fx-b,rgba(101,239,255,.58));animation:pop var(--impact-time,.42s) ease-out forwards;pointer-events:none}.impact.combo{width:var(--impact-size,142px);height:var(--impact-size,142px);box-shadow:0 0 42px white,0 0 110px var(--fx-a,#65efff),0 0 160px var(--fx-c,#ffd86e)}.combo-ring{position:absolute;z-index:7;left:var(--sx);top:var(--sy);width:var(--ring-size,168px);height:var(--ring-size,168px);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;background:radial-gradient(circle,transparent 0 43%,var(--fx-a,#65efff) 44% 46%,transparent 47% 54%,var(--fx-c,#ffd86e) 55% 57%,transparent 58%),conic-gradient(from 30deg,transparent,var(--fx-a,#65efff),transparent,var(--fx-c,#ffd86e),transparent);filter:drop-shadow(0 0 18px var(--fx-a,#65efff));animation:ringBurst .72s ease-out forwards}.combo-callout{position:absolute;z-index:10;left:var(--sx);top:calc(var(--sy) - 12%);transform:translate(-50%,-50%);padding:7px 18px;border:1px solid rgba(255,216,110,.72);border-radius:8px;color:#fff2a8;font-size:24px;font-weight:900;background:rgba(4,18,28,.82);text-shadow:0 0 12px var(--fx-a,#65efff);box-shadow:0 0 26px rgba(255,216,110,.22);animation:callout .72s ease-out forwards;pointer-events:none}@keyframes pop{from{transform:translate(-50%,-50%) scale(.3) rotate(0deg);opacity:1}to{transform:translate(-50%,-50%) scale(1.85) rotate(36deg);opacity:0}}@keyframes ringBurst{from{transform:translate(-50%,-50%) scale(.45) rotate(0deg);opacity:.95}to{transform:translate(-50%,-50%) scale(1.7) rotate(120deg);opacity:0}}@keyframes callout{0%{opacity:0;transform:translate(-50%,-30%) scale(.8)}18%,72%{opacity:1;transform:translate(-50%,-55%) scale(1)}100%{opacity:0;transform:translate(-50%,-85%) scale(1.08)}}
+    .sprite-fx{position:absolute;z-index:11;left:var(--sx);top:var(--sy);width:var(--sprite-size,142px);aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;animation:spriteTravel var(--fx-time,.72s) cubic-bezier(.18,.78,.18,1) forwards;filter:drop-shadow(0 0 16px var(--fx-a,#65efff)) drop-shadow(0 0 34px var(--fx-c,#ffd86e))}.sprite-fx-cell{width:100%;height:100%;background-image:var(--sprite-sheet);background-size:200% 200%;background-repeat:no-repeat;background-position:0 0;animation:spriteFrame var(--fx-time,.72s) steps(1,end) forwards}.sprite-fx.impact-only{left:var(--tx);top:var(--ty);animation:spriteImpact .48s ease-out forwards}.sprite-fx.impact-only .sprite-fx-cell{background-position:100% 100%;animation:none}@keyframes spriteTravel{0%{left:var(--sx);top:var(--sy);opacity:0;transform:translate(-50%,-50%) scale(.66)}16%{opacity:1;transform:translate(-50%,-50%) scale(.92)}70%{left:var(--tx);top:var(--ty);opacity:1;transform:translate(-50%,-50%) scale(1.06)}100%{left:var(--tx);top:var(--ty);opacity:0;transform:translate(-50%,-50%) scale(1.22)}}@keyframes spriteFrame{0%,24%{background-position:0 0}25%,54%{background-position:100% 0}55%,78%{background-position:0 100%}79%,100%{background-position:100% 100%}}@keyframes spriteImpact{0%{opacity:1;transform:translate(-50%,-50%) scale(.72)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.72)}}
+    .boss{position:absolute;z-index:4;left:var(--boss-x,78%);top:var(--boss-y,62%);width:min(28vw,430px);aspect-ratio:1/1;transform:translate(-50%,-50%);filter:drop-shadow(0 22px 20px rgba(0,0,0,.42))}.boss-sprite{width:100%;aspect-ratio:1/1;background-image:var(--boss-atlas);background-size:400% 100%;background-repeat:no-repeat;background-position:0 0;transform:scaleX(var(--boss-face,1))}.boss.active .boss-sprite{animation:bossLoop 3.3s steps(1,end) infinite}@keyframes bossLoop{0%,8.9%{background-position:0 0}9%,63.5%{background-position:33.333333% 0}63.6%,100%{background-position:66.666667% 0}}
+    .boss-tag{top:-42px;color:#fff2a8;font-size:18px;min-width:220px}.boss-hp{position:absolute;left:50%;top:-12px;width:260px;height:12px;transform:translateX(-50%);border-radius:99px;background:rgba(0,0,0,.58);overflow:hidden}.boss-hp span{display:block;height:100%;width:calc(var(--boss-hp,1)*100%);background:linear-gradient(90deg,var(--red),#ffe77a,var(--cyan));transition:width .2s}
+    .boss-command{position:absolute;left:50%;top:28px;z-index:5;min-width:100px;padding:7px 18px;transform:translateX(-50%);text-align:center;color:var(--cyan);font-size:30px;line-height:1;font-weight:900;border:1px solid rgba(101,239,255,.52);border-radius:8px;background:rgba(3,17,26,.86);box-shadow:0 0 18px rgba(101,239,255,.35),inset 0 0 16px rgba(101,239,255,.08);text-shadow:0 0 12px rgba(101,239,255,.88)}.boss-warning{position:absolute;left:50%;top:54%;z-index:8;padding:9px 18px;transform:translate(-50%,-50%);border:2px solid #ff7b4d;border-radius:9px;color:#fff2a8;font-size:24px;font-weight:900;background:rgba(72,18,13,.9);box-shadow:0 0 26px rgba(255,123,77,.75);animation:bossWarning 1.1s ease-out forwards;pointer-events:none}@keyframes bossWarning{0%{opacity:0;transform:translate(-50%,-50%) scale(.7)}18%,72%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.08)}}.boss-strike .boss-sprite{animation:bossStrike .72s ease-out}@keyframes bossStrike{0%{filter:brightness(1)}35%{filter:brightness(1.8) drop-shadow(0 0 24px #ff7b4d)}100%{filter:brightness(1)}}
+    .mission{position:absolute;z-index:12;inset:0;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.48);backdrop-filter:blur(4px)}.mission-card{width:min(720px,92vw);padding:24px;border:1px solid rgba(255,216,110,.5);border-radius:10px;background:rgba(4,18,28,.9);box-shadow:0 26px 80px rgba(0,0,0,.45)}.mission-card h2{margin:0 0 10px;color:#fff2a8}.mission-card p{color:var(--muted);line-height:1.8}.ladder-name-box{display:grid;gap:8px;margin:14px 0}.ladder-name-box label{gap:6px}.ladder-name-box input{height:44px}.ladder-name-box .two{margin-top:2px}
+    .play-panel{position:absolute;z-index:6;left:10px;bottom:10px;width:min(360px,calc(100vw - 20px));border:1px solid rgba(101,239,255,.28);border-radius:8px;background:linear-gradient(180deg,rgba(4,18,28,.72),rgba(4,18,28,.5));box-shadow:inset 0 0 22px rgba(101,239,255,.06),0 14px 36px rgba(0,0,0,.18);backdrop-filter:blur(6px);overflow:hidden}.q-head{min-height:30px;display:flex;align-items:center;justify-content:space-between;padding:6px 10px;color:var(--muted);font-size:13px;font-weight:900;border-bottom:1px solid rgba(101,239,255,.16);background:rgba(2,13,21,.44)}.question{min-height:42px;display:grid;place-items:center;padding:6px 10px;color:var(--cyan);font-size:clamp(20px,2.5vw,30px);line-height:1.12;font-weight:900;text-align:center;word-break:break-word}.question:empty{min-height:0;padding:0}
+    .bars{display:grid;gap:4px;padding:8px 10px 8px}.bar-meta{display:flex;justify-content:space-between;color:var(--ink);font-size:12px;line-height:1;font-weight:900}.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}.bar span{display:block;height:100%;width:var(--w);border-radius:inherit;background:var(--c)}.input-row{display:grid;grid-template-columns:1fr 82px;gap:7px;padding:0 10px 10px}.input-row input{height:38px;padding:0 10px;border-color:rgba(101,239,255,.3);font-size:14px}.input-row .btn{min-height:38px}
+    .drawer{position:fixed;z-index:60;top:0;right:0;bottom:0;width:min(480px,92vw);padding:18px;background:rgba(5,17,28,.96);border-left:1px solid var(--line);transform:translateX(105%);transition:transform .22s;overflow:auto}.drawer.open{transform:translateX(0)}.drawer h2{margin:0 0 12px;color:#fff2a8}.drawer .tabs{grid-template-columns:repeat(4,1fr)}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.level-card{min-height:88px;padding:12px;border-radius:8px;border:1px solid rgba(101,239,255,.26);color:var(--ink);background:rgba(4,22,34,.78);text-align:left}.level-card strong{display:block;color:var(--gold);font-size:18px}.level-card span,.level-card small{display:block;color:var(--muted)}.level-card small{margin-top:6px;color:var(--cyan);font-weight:900}.level-card.locked{opacity:.52;filter:saturate(.45)}.gem-line{margin:0 0 12px;padding:10px 12px;border:1px solid rgba(255,216,110,.32);border-radius:8px;color:#fff2a8;background:rgba(255,216,110,.08);font-weight:900}.mini-form{display:grid;gap:10px}.mini-form textarea{min-height:78px;padding:10px 12px;color:white;border:1px solid rgba(255,216,110,.38);border-radius:8px;background:rgba(2,11,20,.72);resize:vertical;font:inherit}.mini-form textarea.bulk{min-height:150px}.mini-form select{height:42px;padding:0 10px;color:white;border:1px solid rgba(101,239,255,.34);border-radius:8px;background:#061827;font:inherit}.summary-list{display:grid;gap:8px}.summary-card{padding:10px 12px;border:1px solid rgba(101,239,255,.22);border-radius:8px;background:rgba(2,13,21,.54);color:var(--muted)}.summary-card strong{display:block;color:#fff2a8}.summary-card span{display:block;margin-top:4px}.note{margin:8px 0 0;color:var(--muted);line-height:1.6}.status{margin-top:8px;color:var(--cyan);font-weight:900;min-height:22px}
+     #weaponInfo,#gearInfo{flex:1;text-align:left}.weapon-picks,.gear-picks{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}.weapon-picks .btn,.gear-picks .btn{min-height:42px;padding:6px 8px}.weapon-picks .active,.gear-picks .active{color:#241a00;border-color:#ffe77a;background:linear-gradient(180deg,#ffe77a,#f6bd3a)}.weapon-picks .locked,.gear-picks .locked{opacity:.5;filter:saturate(.35)}.weapon-note,.gear-note{display:block;margin-top:8px;color:var(--muted);font-size:14px;line-height:1.45}
+     .shop-block{margin-top:14px;padding-top:12px;border-top:1px solid rgba(101,239,255,.16)}.shop-title{margin-bottom:8px;color:#fff2a8;font-weight:900}.shop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.shop-item{min-height:76px;padding:9px;text-align:left;border:1px solid rgba(255,216,110,.28);border-radius:8px;color:var(--ink);background:rgba(255,216,110,.06)}.shop-item strong,.shop-item small{display:block}.shop-item strong{color:#fff2a8}.shop-item small{margin-top:4px;color:var(--muted);line-height:1.25}.shop-item.owned{border-color:rgba(67,197,140,.52);background:rgba(67,197,140,.08)}.shop-item.locked,.shop-item.disabled{opacity:.5;filter:saturate(.5)}
+.boss-lab{display:grid;gap:10px}.boss-lab-stage{position:relative;height:250px;overflow:hidden;border:1px solid rgba(101,239,255,.32);border-radius:9px;background:radial-gradient(circle at 50% 70%,rgba(101,239,255,.18),transparent 38%),linear-gradient(180deg,rgba(8,34,48,.86),rgba(2,9,16,.92))}.boss-lab-stage:before{content:"";position:absolute;inset:auto 22px 22px;height:70px;border:1px solid rgba(101,239,255,.18);border-radius:50%;background:radial-gradient(ellipse,rgba(101,239,255,.16),transparent 65%)}.boss-lab-hero{position:absolute;left:15%;bottom:32px;width:124px;height:146px;background-image:var(--hero-integrated,var(--hero-atlas));background-size:var(--hero-integrated-size,400% 400%);background-position:var(--hero-integrated-position,0 0);background-repeat:no-repeat;filter:drop-shadow(0 10px 12px rgba(0,0,0,.45));transform:scaleX(var(--hero-face,1));transform-origin:center bottom}.boss-lab-boss{position:absolute;right:6%;bottom:22px;width:var(--boss-lab-size,180px);aspect-ratio:1;filter:drop-shadow(0 18px 18px rgba(0,0,0,.46)) drop-shadow(0 0 var(--boss-glow,10px) var(--boss-color,rgba(101,239,255,.35)))}.boss-lab-sprite{width:100%;height:100%;background-image:var(--boss-atlas);background-size:400% 100%;transform:scaleX(var(--boss-face,1));animation:bossLabLoop var(--boss-cycle,4.2s) steps(1,end) infinite}@keyframes bossLabLoop{0%,18%{background-position:0 0}18.1%,74%{background-position:33.333333% 0}74.1%,100%{background-position:66.666667% 0}}.boss-lab-command{position:absolute;right:18%;top:18px;min-width:86px;padding:6px 14px;border:1px solid rgba(101,239,255,.45);border-radius:8px;color:var(--cyan);text-align:center;font-size:24px;font-weight:900;background:rgba(3,17,26,.82);text-shadow:0 0 10px rgba(101,239,255,.8)}.boss-lab-shot{position:absolute;right:39%;bottom:105px;width:90px;height:18px;border-radius:99px;background:linear-gradient(90deg,transparent,var(--weapon-color,#65efff),white);box-shadow:0 0 22px var(--weapon-color,#65efff);animation:bossLabShot var(--boss-cycle,4.2s) linear infinite;opacity:0}@keyframes bossLabShot{0%,73%{opacity:0;transform:translateX(30px) scaleX(.35)}78%,90%{opacity:1;transform:translateX(-160px) scaleX(1.35)}91%,100%{opacity:0;transform:translateX(-190px) scaleX(.8)}}.boss-lab-impact{position:absolute;left:17%;bottom:94px;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle,white 0 12%,var(--weapon-color,#65efff) 13% 45%,transparent 47%);box-shadow:0 0 22px var(--weapon-color,#65efff);animation:bossLabImpact var(--boss-cycle,4.2s) ease-out infinite;opacity:0}@keyframes bossLabImpact{0%,86%{opacity:0;transform:scale(.45)}90%{opacity:1;transform:scale(1.2)}100%{opacity:0;transform:scale(1.9)}}.boss-lab-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.boss-chip{padding:8px;border:1px solid rgba(255,216,110,.28);border-radius:8px;background:rgba(255,216,110,.08);color:#fff2a8;text-align:center;font-weight:900}.boss-option-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.boss-option-grid .active{background:linear-gradient(180deg,#ffe77a,#f6bd3a);color:#241a00;border-color:#ffe77a}.boss-lab-weapon-ice{--weapon-color:#65efff;--boss-color:rgba(101,239,255,.5)}.boss-lab-weapon-fire{--weapon-color:#ff7b4d;--boss-color:rgba(255,123,77,.5)}.boss-lab-weapon-thunder{--weapon-color:#ffe66d;--boss-color:rgba(255,230,109,.58)}.boss-lab-weapon-shadow{--weapon-color:#b06cff;--boss-color:rgba(176,108,255,.52)}
+    @media(max-width:900px){body{overflow:auto}.screen{min-height:100vh;position:relative}.login-hero{display:none}.form,.actions{grid-template-columns:1fr}.hud{flex-wrap:wrap;right:100px}.hero{width:150px}.boss{width:270px;left:73%}}
+    @media(max-width:900px){.hero.integrated.pose-sheet{width:175px}}
+    /* Direction is data-driven: 1 preserves a left-facing atlas, -1 mirrors a right-facing source. */
+    /* Boss atlases are authored with their intended facing; never mirror them in CSS. */
+    .boss-sprite,.boss-lab-sprite{transform:scaleX(var(--boss-face,1))!important;transform-origin:center}
+    .boss.active.boss-strike .boss-sprite{animation:bossAttackCue .72s steps(1,end)}
+    @keyframes bossAttackCue{0%,64%{background-position:66.666667% 0;filter:brightness(1.25)}65%,84%{background-position:33.333333% 0;filter:brightness(1)}85%,100%{background-position:0 0;filter:brightness(1)}}
+    /* Keep the normalized hero canvas proportional in the compact Boss lab. */
+    .boss-lab-hero{width:124px;height:105px;aspect-ratio:768/648;transform-origin:center bottom}
+    /* Login art and controls own separate grid tracks, including at browser zoom. */
+    #loginScreen .login-card h1{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+    #loginScreen .login-card p{font-size:14px;line-height:1.6;margin:0 0 12px;overflow-wrap:anywhere}
+    #loginScreen .tabs{gap:8px;margin:12px 0 16px}
+    #loginScreen .panel{min-height:0;padding:0;border:0;border-radius:0;background:none}
+    #loginScreen .form{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    #loginScreen label{min-width:0;font-size:14px;line-height:1.5;grid-template-rows:1fr auto}
+    #loginScreen input{min-width:0;width:100%;height:44px;font-size:16px}
+    #loginScreen .btn,#loginScreen .tab,#loginScreen .seg{min-width:0;min-height:44px;padding:8px;font-size:16px;line-height:1.4;overflow-wrap:anywhere}
+    #loginScreen .actions{grid-template-columns:1fr;margin-top:14px}
+    #loginScreen #openGuideBtn,#loginScreen #openRankBtn{display:none}
+    #loginScreen .list,#loginScreen .row{font-size:14px;overflow-wrap:anywhere}
+    #loginScreen button:focus-visible,#loginScreen input:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+    #loginScreen .login-card label,#loginScreen #subtitle,#loginScreen .list,#loginScreen .row{text-shadow:0 1px 3px #020b14,0 0 6px #020b14;color:#fff5cf}
+    #loginScreen .login-hero{animation:loginBreathe 6s ease-in-out infinite}
+    #loginScreen .login-hero.male{animation-delay:-3s}
+    #loginScreen .logo{animation:loginLogoGlow 5s ease-in-out infinite}
+    @keyframes loginBreathe{0%,100%{translate:0 0}50%{translate:0 -4px}}
+    @keyframes loginLogoGlow{0%,100%{filter:drop-shadow(0 8px 14px rgba(0,0,0,.35)) brightness(1)}50%{filter:drop-shadow(0 4px 12px rgba(101,239,255,.65)) brightness(1.12)}}
+    @media(prefers-reduced-motion:reduce){#loginScreen .login-hero,#loginScreen .logo{animation:none}}
+    @media(min-width:761px) and (max-height:620px){
+      #loginScreen .login-hero{align-self:start;height:calc(100dvh - 48px)}
+      #loginScreen .login-card{padding:16px}
+      #loginScreen .logo{width:220px;margin-bottom:6px}
+      #loginScreen .tabs{margin:8px 0 12px}
+    }
+    @media(max-width:760px){
+      #loginScreen{position:fixed;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:180px auto;align-content:start;gap:12px;padding:16px}
+      #loginScreen .login-hero{height:180px;object-position:center bottom}
+      #loginScreen .login-hero.male{grid-column:2}
+      #loginScreen .login-card{grid-column:1/-1;grid-row:2;width:min(100%,520px);justify-self:center;padding:18px}
+      #loginScreen .logo{width:min(260px,100%)}
+      #loginScreen .form{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <section id="loginScreen" class="screen login">
+    <img class="login-hero female" src="assets/login-hero-female-aligned-v1.png" alt="">
+    <img class="login-hero male" src="assets/login-hero-male-aligned-v1.png" alt="">
+    <div class="login-card">
+      <img class="logo" src="assets/word-war-logo-wide.png" alt="Word War">
+      <h1>Word War</h1>
+      <p id="subtitle"></p>
+      <div class="tabs">
+        <button class="tab active" data-login-tab="account" id="tabAccount"></button>
+        <button class="tab" data-login-tab="guide" id="tabGuide"></button>
+        <button class="tab" data-login-tab="rank" id="tabRank"></button>
+      </div>
+      <div id="loginAccount" class="panel">
+        <div class="form">
+          <label><span id="accountLabel"></span><input id="accountInput" autocomplete="username" value="50101"></label>
+          <label><span id="passwordLabel"></span><input id="passwordInput" type="password" autocomplete="current-password" value="50101"></label>
+        </div>
+        <div class="two" style="margin-top:14px">
+          <button class="seg active" data-hero="male" id="maleBtn"></button>
+          <button class="seg" data-hero="female" id="femaleBtn"></button>
+        </div>
+        <div class="actions">
+          <button id="startBtn" class="btn primary"></button>
+          <button id="openGuideBtn" class="btn"></button>
+          <button id="openRankBtn" class="btn"></button>
+        </div>
+      </div>
+      <div id="loginGuide" class="panel hidden"><ol id="guideList" class="list"></ol></div>
+      <div id="loginRank" class="panel hidden"><div id="rankList"></div></div>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="screen game hidden">
+    <div class="stage-bg"></div>
+    <button id="menuBtn" class="menu-btn"></button>
+    <div class="hud">
+      <div class="hud-card level"><span class="hud-title" id="levelTitle"></span><span class="hud-round" id="roundText"></span></div>
+      <div class="hud-card"><span class="hud-label" id="scoreLabel"></span><span id="scoreText" class="hud-value">0</span></div>
+      <div class="hud-card"><span class="hud-label" id="comboLabel"></span><span id="comboText" class="hud-value">0</span></div>
+      <div class="hud-card"><span class="hud-label" id="accLabel"></span><span id="accuracyText" class="hud-value">100%</span></div>
+    </div>
+    <div class="aura"></div><div id="heroGear" class="hero-gear" data-gear="focus" aria-hidden="true"></div><div id="hero" class="hero"></div><div id="heroMotion" class="hero-motion-sprite"></div><div id="heroWeapon" class="hero-weapon"></div><div id="enemyLayer"></div><div id="effectLayer"></div>
+    <div id="mission" class="mission hidden"><div class="mission-card"><h2 id="missionTitle"></h2><p id="missionText"></p><div id="ladderNameBox" class="ladder-name-box hidden"><label>天梯暱稱<input id="ladderNickname" maxlength="10" autocomplete="off" placeholder="2～10 個字元"></label><div class="two"><button id="submitLadderBtn" class="btn primary" type="button">送出天梯成績</button><button id="checkLadderNameBtn" class="btn" type="button">檢查暱稱</button></div><p id="ladderNameStatus" class="status"></p></div><button id="missionStartBtn" class="btn primary" type="button" onclick="handleMissionStart()" style="width:100%"></button></div></div>
+    <div class="play-panel">
+      <div class="q-head"><span id="questionType"></span><span id="difficultyText"></span></div>
+      <div id="questionText" class="question"></div>
+      <div class="bars">
+        <div><div class="bar-meta"><span id="enemyLabel"></span><span id="enemyCountText"></span></div><div class="bar"><span id="enemyBar" style="--w:100%;--c:var(--orange)"></span></div></div>
+        <div><div class="bar-meta"><span id="hpLabel"></span><span id="hpText"></span></div><div class="bar"><span id="hpBar" style="--w:100%;--c:var(--green)"></span></div></div>
+      </div>
+      <div class="input-row"><input id="answerInput"><button id="attackBtn" class="btn primary"></button></div>
+    </div>
+  </section>
+
+  <aside id="drawer" class="drawer">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button id="closeMenuBtn" class="btn" style="width:86px"></button></div>
+    <h2 id="drawerTitle"></h2>
+    <div class="tabs">
+      <button class="tab active" data-menu-tab="levels" id="menuTabLevels"></button>
+      <button class="tab" data-menu-tab="avatar" id="menuTabAvatar"></button>
+      <button class="tab" data-menu-tab="records" id="menuTabRecords"></button>
+      <button class="tab" data-menu-tab="settings" id="menuTabSettings"></button>
+    </div>
+    <div id="menuLevels"><div id="gemProgress" class="gem-line"></div><div id="levelGrid" class="grid"></div></div>
+    <div id="menuAvatar" class="hidden">
+      <div class="row"><strong id="avatarLabel"></strong><span id="avatarInfo"></span></div>
+      <div class="row"><strong>財富</strong><span id="walletInfo"></span></div>
+      <div class="row"><strong id="weaponLabel"></strong><span id="weaponInfo"></span></div>
+      <div class="row"><strong>裝備</strong><span id="gearInfo"></span></div>
+      <div class="shop-block"><div class="shop-title">商店</div><div id="shopInfo" class="shop-grid"></div><p id="shopStatus" class="status"></p></div>
+      <div class="row"><strong id="skillLabel"></strong><span id="skillInfo"></span></div>
+      <button id="switchHeroBtn" class="btn primary" style="width:100%;margin-top:12px"></button>
+    </div>
+    <div id="menuRecords" class="hidden"><div id="recordList"></div></div>
+    <div id="menuSettings" class="hidden">
+      <div class="mini-form">
+        <label><span id="gasUrlLabel"></span><input id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec"></label>
+        <label><span id="adminTokenLabel"></span><input id="adminTokenInput" type="password"></label>
+        <div class="two">
+          <button id="saveSettingsBtn" class="btn primary"></button>
+          <button id="testGasBtn" class="btn"></button>
+        </div>
+        <button id="syncRecordsBtn" class="btn" style="width:100%"></button>
+        <p id="settingsStatus" class="status"></p>
+        <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
+        <strong id="studentProgressLabel"></strong>
+        <div class="two">
+          <button id="loadProgressBtn" class="btn primary"></button>
+          <button id="exportRecordsBtn" class="btn"></button>
+        </div>
+        <div id="studentProgressList" class="summary-list"></div>
+        <p id="progressStatus" class="status"></p>
+        <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
+        <strong>Boss 強化預覽</strong>
+        <div id="bossLab" class="boss-lab"></div>
+        <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
+        <strong id="questionBankLabel"></strong>
+        <label><span>模式</span><select id="questionMode"><option value="en">英文</option><option value="zh">中文</option></select></label>
+        <label><span>題目</span><textarea id="questionPrompt"></textarea></label>
+        <label><span>難度</span><input id="questionDifficulty" type="number" min="1" max="5" value="1"></label>
+        <button id="addQuestionBtn" class="btn primary" style="width:100%"></button>
+        <p id="questionStatus" class="status"></p>
+        <label><span id="bulkQuestionsLabel"></span><textarea id="bulkQuestionsInput" class="bulk"></textarea></label>
+        <div class="two">
+          <button id="bulkImportBtn" class="btn primary"></button>
+          <button id="loadQuestionsBtn" class="btn"></button>
+        </div>
+        <button id="exportQuestionsBtn" class="btn" style="width:100%"></button>
+        <p id="bulkStatus" class="status"></p>
+        <p id="settingsNote" class="note"></p>
+      </div>
+    </div>
+  </aside>
+  <audio id="academyAudio" src="assets/magic-academy-intro.wav" preload="auto"></audio>
+  <script src="boss-motion.js"></script>
+
+  <script>
+    const T = {
+      subtitle:"\u9b54\u6cd5\u6253\u5b57\u5b78\u9662 | \u6821\u5712\u5b88\u9ede\u5f0f\u6253\u5b57\u5192\u96aa",
+      account:"\u5e33\u865f\u9078\u64c7", guide:"\u904a\u6232\u8aaa\u660e", rank:"\u5929\u68af\u6392\u884c",
+      accountLabel:"\u5e33\u865f\uff08\u73ed\u7d1a+\u5ea7\u865f\uff0c\u4f8b\u5982 50101\uff09",
+      passwordLabel:"\u5bc6\u78bc\uff08\u9810\u8a2d\u8207\u5e33\u865f\u76f8\u540c\uff0c\u4f8b\u5982 50101\uff09", male:"\u7537\u4e3b\u89d2", female:"\u5973\u4e3b\u89d2",
+      start:"\u958b\u59cb\u5192\u96aa", menu:"\u9078\u55ae", close:"\u95dc\u9589", levels:"\u95dc\u5361", avatar:"\u89d2\u8272", records:"\u7d00\u9304", settings:"\u8a2d\u5b9a",
+      score:"\u5206\u6578", combo:"\u9023\u64ca", accuracy:"\u6b63\u78ba\u7387", enemy:"\u5269\u9918\u602a\u7269", hp:"\u5b78\u751f\u80fd\u91cf",
+      attack:"\u653b\u64ca", inputHint:"\u55ae\u9375\u984c\u76ee\u76f4\u63a5\u653b\u64ca\uff1b\u55ae\u5b57\u3001\u8a5e\u8a9e\u6216\u53e5\u5b50\u8f38\u5165\u5f8c\u6309 Enter",
+      mission:"\u4efb\u52d9\u63d0\u793a", startLevel:"\u958b\u59cb\u95dc\u5361", nextLevel:"\u4e0b\u4e00\u95dc", retry:"\u518d\u6311\u6230",
+      done:"\u95dc\u5361\u5b8c\u6210", fail:"\u6311\u6230\u5931\u6557", noRecord:"\u5c1a\u7121\u672c\u6a5f\u7d00\u9304\u3002",
+      weapon:"\u6b66\u5668", skill:"\u6280\u80fd\u6a39", weaponInfo:"\u661f\u5149\u6cd5\u6756\uff08\u9810\u8a2d\uff09",
+      skillInfo:"\u6838\u5fc3\u6d41\u7a0b\u5b8c\u6210\u5f8c\u958b\u653e\u7d30\u4fee", switchHero:"\u5207\u63db\u7537\u5973\u4e3b\u89d2",
+      gem:"\u5bf6\u77f3", locked:"\u672a\u89e3\u9396", ladderLocked:"\u96c6\u6eff\u516b\u9846\u5bf6\u77f3\u5f8c\uff0c\u624d\u80fd\u9032\u5165\u5927\u6a4b\u5802\u5929\u68af\u526f\u672c\u3002",
+      gasUrl:"GAS Web App URL", adminToken:"\u7ba1\u7406\u5bc6\u9470", saveSettings:"\u5132\u5b58\u8a2d\u5b9a", testGas:"\u6e2c\u8a66 GAS", syncRecords:"\u4e0a\u50b3\u672c\u6a5f\u7d00\u9304", studentProgress:"\u5b78\u751f\u9032\u5ea6", loadProgress:"\u8b80\u53d6\u5b78\u751f\u9032\u5ea6", exportRecords:"\u532f\u51fa\u672c\u6a5f\u7d00\u9304",
+      questionBank:"\u984c\u5eab\u65b0\u589e", addQuestion:"\u65b0\u589e\u984c\u76ee", bulkQuestions:"\u6279\u6b21\u8cbc\u4e0a\u984c\u76ee", bulkImport:"\u6279\u6b21\u65b0\u589e", loadQuestions:"\u8b80\u53d6 GAS \u984c\u5eab", exportQuestions:"\u532f\u51fa\u5df2\u8f09\u5165\u984c\u5eab", saved:"\u5df2\u5132\u5b58", gasMissing:"\u8acb\u5148\u8a2d\u5b9a GAS URL", gasOk:"GAS \u9023\u7dda\u6b63\u5e38", gasFail:"GAS \u9023\u7dda\u5931\u6557", syncOk:"\u7d00\u9304\u5df2\u540c\u6b65"
+    };
+    T.gasUrl="GAS 網頁應用程式網址";
+    const C = (...hex) => String.fromCharCode(...hex.map(h => parseInt(h, 16)));
+    const UP=C("4e0a"), DOWN=C("4e0b"), LEFT=C("5de6"), RIGHT=C("53f3");
+    const zi = ["3105","3106","3107","3108","3109","310a","310b","310c","310d","310e","310f","3110","3111","3112","3113","3114","3115","3116","3117","3118","3119"].map(C);
+    const zm = ["3127","3128","3129"].map(C);
+    const zf = ["311a","311b","311c","311d","311e","311f","3120","3121","3122","3123","3124","3125","3126"].map(C);
+    const ASSET="assets/generated/", STORE="word-war-core-records", PROFILE="word-war-core-profile", CONFIG="word-war-core-config", AUTH="word-war-core-auth", LADDER_STORE="word-war-ladder-records";
+    const QUESTION_SCHEMA_VERSION=1;
+    const QUESTION_STAGE_RULES=Object.freeze({7:{mode:"en",label:"英文句子"},8:{mode:"zh",label:"中文句子"}});
+    const levels=[
+      {id:1,zone:C("516b","5fb7","4ead"),title:"英文字母鍵位",type:"英文字母",bg:"level-01-bade-ting-stage-safe.png",mission:"Cona 智者：先熟悉英文字母在鍵盤上的位置。小兵會從對應鍵位方向慢慢靠近。",words:"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),waveSets:["ASDF".split(""),"JKL".split(""),"QWERZXCV".split(""),"UIOPNM".split("")],bossWords:"ASDFJKLQWERZXCVUIOPNM".split(""),count:26,speed:.03,mode:"letters",boss:"Lv.1 Boss | 字母史萊姆王",atlas:"boss-atlas-01-bade-safe-v3-20260612.png"},
+      {id:2,zone:C("4e09","9054","5fb7","4ead"),title:"英文小單字",type:"英打單字",bg:"level-02-sanda-de-ting-stage-safe.png",mission:"Cona 智者：這一關從單一字母進入 2 到 4 個字母的小單字，出怪方向看第一個字母。",words:"an is it up cat dog sun pen book desk fish bird".split(" "),waveSets:["an is it up".split(" "),"cat dog sun pen".split(" "),"book desk fish bird".split(" "),"cat sun book desk pen".split(" ")],bossWords:"an is it up cat dog sun pen book desk fish bird".split(" "),count:12,speed:.028,mode:"words",boss:"Lv.2 Boss | 單字樹怪",atlas:"boss-atlas-02-sanda-safe-v3-20260612.png"},
+      {id:3,zone:C("4e94","502b","5712"),title:"注音符號",type:"注音練習",bg:"level-03-wulun-garden-stage-safe.png",mission:"Cona 智者：這一關只練單一注音符號，不拼音、不選字，先記住注音鍵位。",words:zi.concat(zm,zf),waveSets:[["ㄅ","ㄆ","ㄇ","ㄈ"],["ㄉ","ㄊ","ㄋ","ㄌ"],["ㄚ","ㄛ","ㄜ","ㄝ","ㄧ","ㄨ","ㄩ"],["ㄅ","ㄇ","ㄚ","ㄧ","ㄨ","ㄓ","ㄕ"]],bossWords:["ㄅ","ㄆ","ㄇ","ㄈ","ㄚ","ㄛ","ㄜ","ㄝ","ㄧ","ㄨ","ㄩ","ㄓ","ㄕ"],count:37,speed:.032,mode:"zhuyin",boss:"Lv.3 Boss | 注音石像獸",atlas:"boss-atlas-03-wulun-safe-v3-20260612.png"},
+      {id:4,zone:C("5982","6c90","5712"),title:"注音聲調與標點",type:"注音聲調",bg:"level-04-rumu-crane-fountain-stage-safe.png",bgSize:"auto 100%",bgPos:"center center",mission:"Cona 智者：這一關只練單一注音加聲調，不出兩個注音合起來的題目。一聲不標，二聲 ˊ、三聲 ˇ、四聲 ˋ、輕聲 ˙。",words:["ㄅ","ㄆˊ","ㄇˇ","ㄈˋ","ㄉ˙","ㄊ","ㄋˊ","ㄌˇ","ㄧ","ㄨˊ","ㄩˇ","ㄚˋ","ㄛ˙","ㄜ","ㄝˊ","ㄞˇ","ㄓˋ","ㄔˊ","ㄕˇ","ㄖ˙","ㄗ","ㄘˊ","ㄙˇ","ㄡˋ","，","。","？","！","：","、","「","」"],waveSets:[["ㄅ","ㄆˊ","ㄇˇ","ㄈˋ","ㄉ˙","ㄊ","ㄋˊ","ㄌˇ"],["ㄧ","ㄨˊ","ㄩˇ","ㄚˋ","ㄛ˙","ㄜ","ㄝˊ","ㄞˇ"],["ㄓˋ","ㄔˊ","ㄕˇ","ㄖ˙","ㄗ","ㄘˊ","ㄙˇ","ㄡˋ"],["，","。","？","！","：","、","「","」"]],bossWords:["ㄅ","ㄆˊ","ㄇˇ","ㄈˋ","ㄧ","ㄨˊ","ㄚˋ","ㄓˋ","ㄕˇ","，","。","？","！"],count:32,speed:.034,mode:"phonics",boss:"Lv.4 Boss | 符號魔鳥",atlas:"boss-atlas-04-rumu-safe-v3-20260612.png",bossFace:1},
+      {id:5,zone:C("6210","9577","5b78","5712"),title:"中文單字",type:"中打單字",bg:"level-05-growth-academy-stage-safe.png",mission:"Cona 智者：正式進入中文輸入。本關只練單一國字，出怪方向看這個字的第一個注音。",words:["人","口","手","山","水","火","木","日","月","田","學","校","書","課","師","大","橋","班","電","腦"],waveSets:[["人","口","手","山","水"],["火","木","日","月","田"],["學","校","書","課","師"],["大","橋","班","電","腦"]],bossWords:["人","口","手","山","水","學","校","書","大","橋","電","腦"],count:20,speed:.033,mode:"chineseChar",boss:"Lv.5 Boss | 國字鐵甲獸",atlas:"boss-atlas-05-growth-safe-v3-20260612.png"},
+      {id:6,zone:C("7f94","7f8a","8dea","4e73"),title:"詞語與熱鍵",type:"詞語熱鍵",bg:"level-06-lamb-garden-stage-safe.png",mission:"Cona 智者：這一關練中文詞語，也練 Ctrl+C、Ctrl+V、Ctrl+Z、Ctrl+A 這些常用熱鍵。熱鍵怪會從下方出現。",words:["學校","老師","同學","教室","電腦","鍵盤","滑鼠","螢幕","圖書館","電腦課","小朋友","打字王","複製 Ctrl+C","貼上 Ctrl+V","復原 Ctrl+Z","全選 Ctrl+A"],waveSets:[["學校","老師","同學","教室"],["電腦","鍵盤","滑鼠","螢幕"],["圖書館","電腦課","小朋友","打字王"],["複製 Ctrl+C","貼上 Ctrl+V","復原 Ctrl+Z","全選 Ctrl+A"]],bossWords:["學校","老師","同學","教室","圖書館","電腦課","複製 Ctrl+C","貼上 Ctrl+V","復原 Ctrl+Z","全選 Ctrl+A"],count:16,speed:.033,mode:"phrases",boss:"Lv.6 Boss | 熱鍵商人王",atlas:"boss-atlas-06-lamb-safe-v3-20260612.png"},
+      {id:7,zone:C("7ae5","5fc3","5712"),title:"英打句子",type:"英打題",bg:"level-07-childheart-garden-stage-safe.png",mission:"Cona 智者：第 7 關開始練英文句子。老師可以在管理者模式匯入題庫，沒有連線時先使用內建短句。",words:["I am happy.","This is my pen.","I like apples.","Are you OK?","Use the mouse gently.","Read the sentence before typing.","Keep your hands on the home row.","Accuracy is more important than speed."],waveSets:[["I am happy.","This is my pen."],["I like apples.","Are you OK?"],["Use the mouse gently.","Read the sentence before typing."],["Keep your hands on the home row.","Accuracy is more important than speed."]],bossWords:["I am happy.","This is my pen.","I like apples.","Are you OK?","Accuracy is more important than speed."],count:8,speed:.025,mode:"sentences",boss:"Lv.7 Boss | 英文句龍",atlas:"boss-atlas-07-childheart-safe-v3-20260612.png",bossFace:1},
+      {id:8,zone:C("56db","7dad","5802"),title:"中打句子",type:"中打題",bg:"level-08-siwei-hall-stage-safe.png",mission:"Cona 智者：第 8 關是中文句子輸入。老師可以匯入國語、資訊素養或校園生活題庫。",words:["我會打字。","我愛大橋國小。","使用電腦要愛惜設備。","不可以隨意點擊不明連結。","今天很開心。","大橋國小真美。"],waveSets:[["我會打字。","我愛大橋國小。"],["今天很開心。","大橋國小真美。"],["使用電腦要愛惜設備。"],["不可以隨意點擊不明連結。"]],bossWords:["我會打字。","我愛大橋國小。","使用電腦要愛惜設備。","不可以隨意點擊不明連結。"],count:6,speed:.023,mode:"sentences",boss:"Lv.8 Boss | 中文句子魔王",atlas:"boss-atlas-08-daqiao-safe-v3-20260612.png",bossFace:1},
+      {id:9,zone:C("5927","6a4b","5802"),title:"天梯副本",type:"綜合天梯",bg:"daqiao-hall-interior-legendary-beasts.png",mission:"Cona 智者：集滿八顆寶石後，才能進入大橋堂最後試練。這裡會混合前八關內容並留下天梯紀錄。",words:[UP,DOWN,LEFT,RIGHT,"A","S","D","F","an","cat","ㄅ","ㄧ","ㄚ","ㄅˊ","人","學校","複製 Ctrl+C","I am happy.","我會打字。"],waveSets:[[UP,DOWN,LEFT,RIGHT],["A","S","D","F","J","K","L"],["an","cat","book","ㄅ","ㄧ","ㄚ","ㄅˊ"],["人","學校","複製 Ctrl+C","I am happy.","我會打字。"]],bossWords:["A","cat","ㄅ","ㄅˊ","人","學校","複製 Ctrl+C","I am happy.","我會打字。"],count:19,speed:.03,mode:"final",boss:"Lv.9 Boss | 八寶石鍵盤魔王",atlas:"boss-atlas-08-daqiao-safe-v3-20260612.png",bossFace:1}
+    ];
+    // The safe-v3 atlases already contain the final left-facing artwork.
+    // Normalize the late-stage entries here so stale legacy filenames cannot
+    // reintroduce a mirrored or mismatched Boss in either battle or lab view.
+    const SAFE_BOSS_ATLAS=Object.freeze({
+      1:"boss-atlas-01-bade-safe-v3-20260612.png",
+      2:"boss-atlas-02-sanda-safe-v3-20260612.png",
+      3:"boss-atlas-03-wulun-safe-v3-20260612.png",
+      4:"boss-atlas-04-rumu-safe-v3-20260612.png",
+      5:"boss-atlas-05-growth-safe-v3-20260612.png",
+      6:"boss-atlas-06-lamb-safe-v3-20260612.png",
+      7:"boss-atlas-07-childheart-safe-v3-20260612.png",
+      8:"boss-atlas-08-daqiao-safe-v3-20260612.png",
+      9:"boss-atlas-08-daqiao-safe-v3-20260612.png"
+    });
+    levels.forEach(level=>{
+      level.atlas=SAFE_BOSS_ATLAS[level.id]||level.atlas;
+      level.bossFace=1;
+    });
+    const zSlug=new Map([
+      ...zi.map((ch,i)=>[ch,["b","p","m","f","d","t","n","l","g","k","h","j","q","x","zh","ch","sh","r","z","c","s"][i]]),
+      ...zm.map((ch,i)=>[ch,["yi","wu","yu"][i]]),
+      ...zf.map((ch,i)=>[ch,["a","o","e","eh","ai","ei","ao","ou","an","en","ang","eng","er"][i]])
+    ]);
+    const dirImg=new Map([[UP,"assets/pixel-enemy-up.png"],[DOWN,"assets/pixel-enemy-down.png"],[LEFT,"assets/pixel-enemy-left.png"],[RIGHT,"assets/pixel-enemy-right.png"]]);
+    const img={
+      digits:w=>`${ASSET}digit-monster-${w}.png`,
+      letters:w=>`${ASSET}letter-monster-${w}.png`,
+      direction:w=>dirImg.get(w)||"assets/pixel-enemy-right.png",
+      zhuyin:w=>`${ASSET}zhuyin-${zi.includes(w)?"initial":zm.includes(w)?"medial":"final"}-${zSlug.get(w)||"b"}.png`,
+      sentences:()=>"assets/pixel-enemy-left.png",
+      final:()=>"assets/pixel-enemy-up.png"
+    };
+    const minionPools={
+      words:["letter-monster-S.png","letter-monster-Q.png","letter-monster-L.png","letter-monster-O.png","letter-monster-W.png","letter-monster-X.png","letter-monster-M.png","letter-monster-D.png"],
+      zhuyin:["zhuyin-initial-b.png","zhuyin-initial-m.png","zhuyin-initial-k.png","zhuyin-initial-sh.png","zhuyin-medial-yi.png","zhuyin-medial-yu.png","zhuyin-final-a.png","zhuyin-final-ang.png","letter-monster-Q.png","letter-monster-G.png","digit-monster-3.png","digit-monster-8.png"],
+      phonics:["zhuyin-initial-f.png","zhuyin-initial-l.png","zhuyin-initial-zh.png","zhuyin-initial-c.png","zhuyin-medial-wu.png","zhuyin-final-ai.png","zhuyin-final-ou.png","zhuyin-final-eng.png","letter-monster-P.png","letter-monster-Y.png","digit-monster-1.png","digit-monster-6.png"],
+      chineseChar:["zhuyin-initial-sh.png","zhuyin-initial-k.png","zhuyin-initial-j.png","zhuyin-medial-yu.png","zhuyin-final-an.png","letter-monster-G.png","letter-monster-P.png","digit-monster-4.png"],
+      phrases:["letter-monster-O.png","letter-monster-W.png","letter-monster-G.png","letter-monster-L.png","digit-monster-8.png","zhuyin-final-eng.png","zhuyin-medial-wu.png"],
+      sentences:["letter-monster-M.png","letter-monster-O.png","letter-monster-W.png","letter-monster-Y.png","letter-monster-Z.png","digit-monster-3.png"],
+      final:["letter-monster-Z.png","digit-monster-9.png","zhuyin-initial-zh.png","zhuyin-final-ang.png","letter-monster-M.png","letter-monster-G.png","letter-monster-W.png","letter-monster-Q.png"]
+    };
+    const km={Q:[18,28],W:[25,27],E:[32,27],R:[39,27],T:[46,27],Y:[54,27],U:[61,27],I:[68,27],O:[75,27],P:[82,28],A:[21,43],S:[28,43],D:[35,43],F:[42,43],G:[49,43],H:[56,43],J:[63,43],K:[70,43],L:[77,43],Z:[24,65],X:[31,65],C:[38,65],V:[45,65],B:[52,65],N:[59,65],M:[66,65]};
+    const digitPos={"7":[22,16],"8":[50,12],"9":[78,16],"4":[10,46],"5":[50,24],"6":[90,46],"1":[22,84],"2":[50,88],"3":[78,84],"0":[38,88]};
+    const directionPos={[UP]:[50,10],[LEFT]:[9,50],[RIGHT]:[91,50],[DOWN]:[50,88]};
+    const zhuyinPos=new Map([
+      ["ㄅ",[12,17]],["ㄉ",[20,17]],["ㄓ",[44,17]],["ㄚ",[68,17]],["ㄞ",[76,17]],["ㄢ",[84,17]],["ㄦ",[91,17]],
+      ["ㄆ",[18,28]],["ㄊ",[25,27]],["ㄍ",[32,27]],["ㄐ",[39,27]],["ㄔ",[46,27]],["ㄗ",[54,27]],["ㄧ",[61,27]],["ㄛ",[68,27]],["ㄟ",[75,27]],["ㄣ",[82,28]],
+      ["ㄇ",[21,43]],["ㄋ",[28,43]],["ㄎ",[35,43]],["ㄑ",[42,43]],["ㄕ",[49,43]],["ㄘ",[56,43]],["ㄨ",[63,43]],["ㄜ",[70,43]],["ㄠ",[77,43]],["ㄤ",[84,43]],
+      ["ㄈ",[24,65]],["ㄌ",[31,65]],["ㄏ",[38,65]],["ㄒ",[45,65]],["ㄖ",[52,65]],["ㄙ",[59,65]],["ㄩ",[66,65]],["ㄝ",[73,65]],["ㄡ",[80,65]],["ㄥ",[87,65]]
+    ]);
+    const symbolPos=new Map([["，",[70,16]],["。",[78,16]],["？",[86,16]],["！",[92,16]],["：",[62,16]],["、",[74,16]],["「",[56,16]],["」",[60,16]],["ˊ",[47,12]],["ˇ",[50,12]],["ˋ",[53,12]],["˙",[56,12]]]);
+    const hotkeyPos=new Map([["CTRL+C",[36,88]],["CTRL+V",[44,88]],["CTRL+Z",[28,88]],["CTRL+A",[20,88]]]);
+    const hanInitial=new Map([["我","ㄨ"],["大","ㄉ"],["橋","ㄑ"],["學","ㄒ"],["校","ㄒ"],["書","ㄕ"],["課","ㄎ"],["師","ㄕ"],["電","ㄉ"],["腦","ㄋ"],["鍵","ㄐ"],["盤","ㄆ"],["滑","ㄏ"],["鼠","ㄕ"],["螢","ㄧ"],["幕","ㄇ"],["圖","ㄊ"],["教","ㄐ"],["室","ㄕ"],["老","ㄌ"],["同","ㄊ"],["人","ㄖ"],["口","ㄎ"],["手","ㄕ"],["山","ㄕ"],["水","ㄕ"],["火","ㄏ"],["木","ㄇ"],["日","ㄖ"],["月","ㄩ"],["田","ㄊ"],["班","ㄅ"],["會","ㄏ"],["使","ㄕ"],["用","ㄩ"],["打","ㄉ"],["字","ㄗ"],["今","ㄐ"],["天","ㄊ"],["開","ㄎ"],["心","ㄒ"],["很","ㄏ"],["愛","ㄞ"],["不","ㄅ"],["可","ㄎ"],["以","ㄧ"],["隨","ㄙ"],["意","ㄧ"],["點","ㄉ"],["擊","ㄐ"]]);
+    [["朋","ㄆ"],["友","ㄧ"],["王","ㄨ"],["複","ㄈ"],["製","ㄓ"],["貼","ㄊ"],["上","ㄕ"],["復","ㄈ"],["原","ㄩ"],["全","ㄑ"],["選","ㄒ"],["館","ㄍ"],["小","ㄒ"],["國","ㄍ"],["真","ㄓ"],["美","ㄇ"],["資","ㄗ"],["訊","ㄒ"],["安","ㄢ"],["設","ㄕ"],["備","ㄅ"],["明","ㄇ"],["連","ㄌ"],["結","ㄐ"],["要","ㄧ"],["惜","ㄒ"],["生","ㄕ"],["活","ㄏ"],["孩","ㄏ"],["子","ㄗ"]].forEach(([k,v])=>hanInitial.set(k,v));
+    const $=id=>document.getElementById(id);
+    const loginScreen=$("loginScreen"),gameScreen=$("gameScreen"),loginAccount=$("loginAccount"),loginGuide=$("loginGuide"),loginRank=$("loginRank"),subtitle=$("subtitle"),tabAccount=$("tabAccount"),tabGuide=$("tabGuide"),tabRank=$("tabRank"),accountLabel=$("accountLabel"),passwordLabel=$("passwordLabel"),accountInput=$("accountInput"),passwordInput=$("passwordInput"),maleBtn=$("maleBtn"),femaleBtn=$("femaleBtn"),startBtn=$("startBtn"),openGuideBtn=$("openGuideBtn"),openRankBtn=$("openRankBtn"),menuBtn=$("menuBtn"),levelTitle=$("levelTitle"),roundText=$("roundText"),scoreLabel=$("scoreLabel"),scoreText=$("scoreText"),comboLabel=$("comboLabel"),comboText=$("comboText"),accLabel=$("accLabel"),accuracyText=$("accuracyText"),enemyLabel=$("enemyLabel"),enemyCountText=$("enemyCountText"),enemyBar=$("enemyBar"),hpLabel=$("hpLabel"),hpText=$("hpText"),hpBar=$("hpBar"),questionType=$("questionType"),difficultyText=$("difficultyText"),questionText=$("questionText"),answerInput=$("answerInput"),attackBtn=$("attackBtn"),mission=$("mission"),missionTitle=$("missionTitle"),missionText=$("missionText"),missionStartBtn=$("missionStartBtn"),drawer=$("drawer"),closeMenuBtn=$("closeMenuBtn"),drawerTitle=$("drawerTitle"),menuTabLevels=$("menuTabLevels"),menuTabAvatar=$("menuTabAvatar"),menuTabRecords=$("menuTabRecords"),menuTabSettings=$("menuTabSettings"),avatarLabel=$("avatarLabel"),avatarInfo=$("avatarInfo"),weaponLabel=$("weaponLabel"),weaponInfo=$("weaponInfo"),skillLabel=$("skillLabel"),skillInfo=$("skillInfo"),switchHeroBtn=$("switchHeroBtn"),gemProgress=$("gemProgress"),walletInfo=$("walletInfo"),levelGrid=$("levelGrid"),recordList=$("recordList"),gasUrlLabel=$("gasUrlLabel"),gasUrlInput=$("gasUrlInput"),adminTokenLabel=$("adminTokenLabel"),adminTokenInput=$("adminTokenInput"),saveSettingsBtn=$("saveSettingsBtn"),testGasBtn=$("testGasBtn"),syncRecordsBtn=$("syncRecordsBtn"),settingsStatus=$("settingsStatus"),studentProgressLabel=$("studentProgressLabel"),studentProgressList=$("studentProgressList"),progressStatus=$("progressStatus"),loadProgressBtn=$("loadProgressBtn"),exportRecordsBtn=$("exportRecordsBtn"),questionBankLabel=$("questionBankLabel"),questionPrompt=$("questionPrompt"),questionDifficulty=$("questionDifficulty"),questionMode=$("questionMode"),questionStatus=$("questionStatus"),addQuestionBtn=$("addQuestionBtn"),bulkQuestionsLabel=$("bulkQuestionsLabel"),bulkQuestionsInput=$("bulkQuestionsInput"),bulkImportBtn=$("bulkImportBtn"),loadQuestionsBtn=$("loadQuestionsBtn"),exportQuestionsBtn=$("exportQuestionsBtn"),bulkStatus=$("bulkStatus"),guideList=$("guideList"),rankList=$("rankList"),shopInfo=$("shopInfo"),shopStatus=$("shopStatus"),gearInfo=$("gearInfo"),hero=$("hero"),heroMotion=$("heroMotion"),heroWeapon=$("heroWeapon"),enemyLayer=$("enemyLayer"),effectLayer=$("effectLayer"),ladderNameBox=$("ladderNameBox"),ladderNickname=$("ladderNickname"),ladderNameStatus=$("ladderNameStatus"),submitLadderBtn=$("submitLadderBtn"),checkLadderNameBtn=$("checkLadderNameBtn"),academyAudio=$("academyAudio");
+    const heroGear=$("heroGear");
+    const BATTLE_LINE_Y=62;
+    const heroNormal={x:50,y:58}, heroBoss={x:31,y:BATTLE_LINE_Y}, bossPos={x:78,y:BATTLE_LINE_Y};
+    const bossLabState={levelIndex:0,power:2,weapon:"ice"};
+    const bossWeapons={ice:{name:"冰晶法核",desc:"藍色光球，節奏清楚，適合低年級辨識。",color:"#65efff"},fire:{name:"烈焰戰輪",desc:"紅橘爆發，攻擊感更強，適合中段關卡。",color:"#ff7b4d"},thunder:{name:"雷鳴星槍",desc:"金色高速光波，高等 Boss 使用更有壓迫感。",color:"#ffe66d"},shadow:{name:"暗影魔晶",desc:"紫色追蹤能量，適合最後試練與天梯副本。",color:"#b06cff"}};
+    const playerWeapons={
+      starlight:{name:"星光法杖",desc:"穩定光彈，Combo 6 觸發星芒大招。",threshold:6,a:"#65efff",b:"rgba(101,239,255,.72)",c:"#fff2a8",core:"#ffffff",fx:"assets/generated/effects/player-fx-starlight.png"},
+      ice:{name:"冰晶法核",desc:"冰藍光束，Lv.4 後爆炸範圍變大。",threshold:5,a:"#78f2ff",b:"rgba(120,242,255,.78)",c:"#b9f7ff",core:"#ffffff",fx:"assets/generated/effects/player-fx-ice.png"},
+      fire:{name:"烈焰戰輪",desc:"紅橘爆裂，Combo 會變成旋轉火輪。",threshold:5,a:"#ff7b4d",b:"rgba(255,123,77,.78)",c:"#ffe46b",core:"#fff7dc",fx:"assets/generated/effects/player-fx-fire.png"},
+      thunder:{name:"雷鳴星槍",desc:"金色高速穿刺，Lv.7 後 Boss 傷害提高。",threshold:4,a:"#ffe66d",b:"rgba(255,230,109,.82)",c:"#65efff",core:"#ffffff",fx:"assets/generated/effects/player-fx-thunder.png"},
+      shadow:{name:"暗影魔晶",desc:"紫色追蹤魔彈，Combo 會展開暗影法陣。",threshold:5,a:"#b06cff",b:"rgba(176,108,255,.76)",c:"#65efff",core:"#f5e9ff",fx:"assets/generated/effects/player-fx-shadow.png"}
+    };
+    const playerGear={focus:{name:"專注水晶",unlock:1,desc:"答對時額外獲得少量分數，適合初學者。",score:8,damage:0},guardian:{name:"守護披風",unlock:4,desc:"怪物靠近時減少能量損失，讓練習更穩定。",score:0,damage:0},combo:{name:"連擊項鍊",unlock:7,desc:"連續答對更容易觸發武器大招。",score:4,damage:0},crown:{name:"勇者冠冕",unlock:10,desc:"滿級裝備，Boss 戰反擊傷害提升。",score:0,damage:1}};
+    const playerItemCatalog={
+      potion:{name:"小補血藥水",price:120,unlock:1,desc:"每關最多使用 1 次，降低一次失誤的挫折。"},
+      shield:{name:"專注護盾",price:250,unlock:1,desc:"每關最多使用 1 次，抵銷一次錯誤扣血。"},
+      hourglass:{name:"慢速沙漏",price:300,unlock:1,desc:"每關最多使用 1 次，短時間減慢小怪。"},
+      hint:{name:"提示水晶",price:180,unlock:1,desc:"每關最多使用 1 次，顯示目前題目的鍵位。"},
+      comboStar:{name:"Combo 星星",price:400,unlock:1,desc:"每關最多使用 1 次，增加金幣加成，不增加答題傷害上限。"}
+    };
+    const playerWeaponPrices={starlight:0,ice:350,fire:650,thunder:1000,shadow:1500};
+    const playerGearPrices={focus:0,guardian:260,combo:520,crown:900};
+    const stageFirstCoins=[0,120,140,160,180,210,240,280,320],stageRepeatCoins=[0,35,40,45,50,60,70,80,90];
+    // The current Boss atlases are authored facing left. Keep the source direction
+    // unchanged so they face the hero on the left without a second CSS flip.
+    // These atlases were exported as left-facing final assets. Keep the source
+    // direction explicit per stage so a future replacement cannot silently flip
+    // only one preview or one battle renderer.
+    const BOSS_FACE_BY_STAGE=Object.freeze({1:1,2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1});
+    const BOSS_MIN_CORRECT_BY_STAGE=Object.freeze({1:[10,10,12],2:[6,6,7],3:[10,10,12],4:[10,10,12],5:[7,7,8],6:[6,6,7],7:[4,4,5],8:[4,4,5],9:[6,6,8]});
+    function bossFace(index){const stage=Number(levels[index]?.id)||index+1;return BOSS_FACE_BY_STAGE[stage]??1}
+    function bossMinCorrect(stage,phase){const rules=BOSS_MIN_CORRECT_BY_STAGE[Number(stage)]||BOSS_MIN_CORRECT_BY_STAGE[9];return rules[Math.max(1,Math.min(3,Number(phase)||1))-1]}
+    function bossPhaseFloor(stage,phase){if(phase===1)return .67;if(phase===2)return .34;return 0}
+    function bossMaxHp(lv){const stage=Number(lv?.id)||1,profileLevel=Math.max(1,Number(state.profile.level)||1);return 72+stage*9+Math.max(0,profileLevel-1)*4}
+     const state={profile:loadAccountProfile("50101"),config:load(CONFIG,{gasUrl:"",adminToken:""}),records:loadAccountRecords("50101"),ladderRecords:load(LADDER_STORE,[]),auth:loadAccountAuth("50101"),questions:[],levelIndex:0,enemies:[],current:null,bossMode:false,bossHp:0,maxBossHp:3,bossPhase:1,bossPhaseHits:0,bossPhaseStartedAt:0,bossAttackAt:0,bossAttackPending:false,bossAttackCount:0,hp:100,score:0,combo:0,correct:0,attempts:0,tick:null,startedAt:Date.now(),waveIndex:0,waves:[],cleared:0,practiceTotal:0,qaShotPending:false,ladderRun:null};
+     const qaMode=new URLSearchParams(location.search).get("qa")==="full";
+     const visualQaMode=new URLSearchParams(location.search).get("qa")==="visual";
+    let pendingLadderRecord=null;
+    function handleMissionStart(){if(state.running)return;if(state.outcome==="locked"){mission.classList.add("hidden");menu();drawer.classList.add("open");return}if(state.outcome==="done"&&state.levelIndex<levels.length-1)begin(state.levelIndex+1);else if(state.outcome==="fail"||state.outcome==="done")begin(state.levelIndex);else startBattle()}
+    window.handleMissionStart=handleMissionStart;
+    state.profile.weapon=state.profile.weapon||"starlight";
+    state.profile.gear=state.profile.gear||"focus";
+    heroGear.dataset.gear=state.profile.gear;
+    function load(k,f){try{return JSON.parse(localStorage.getItem(k))||f}catch{return f}} function save(k,v){if((qaMode||visualQaMode)&&(k===PROFILE||k===STORE||k===LADDER_STORE||k.startsWith(PROFILE+":")||k.startsWith(STORE+":")))return;const scoped=k===PROFILE?profileStorageKey(state?.profile?.account):k===STORE?recordsStorageKey(state?.profile?.account):k;localStorage.setItem(scoped,JSON.stringify(v))}
+    function accountValue(account){const id=String(account||"").trim();return /^\d{5}$/.test(id)?id:"50101"}
+    function profileStorageKey(account){return PROFILE+":"+accountValue(account)}
+    function recordsStorageKey(account){return STORE+":"+accountValue(account)}
+    function authStorageKey(account){return AUTH+":"+accountValue(account)}
+    function defaultProfile(account){return{account:accountValue(account),version:1,hero:"male",level:1,xp:0,coins:0,gems:[],weapon:"starlight",gear:"focus",inventory:defaultInventory()}}
+    function defaultInventory(){return{weapons:["starlight"],gear:["focus"],items:{}}}
+    function normalizeInventory(raw,weapon="starlight",gear="focus"){
+      const source=raw&&typeof raw==="object"?raw:{},weapons=["starlight",...(Array.isArray(source.weapons)?source.weapons:[])],gears=["focus",...(Array.isArray(source.gear)?source.gear:[])],items={};
+      Object.keys(playerItemCatalog).forEach(k=>{items[k]=Math.max(0,Math.min(99,Number(source.items?.[k])||0))});
+      if(playerWeapons[weapon]&&!weapons.includes(weapon))weapons.push(weapon);if(playerGear[gear]&&!gears.includes(gear))gears.push(gear);
+      return{weapons:[...new Set(weapons.filter(k=>playerWeapons[k]))],gear:[...new Set(gears.filter(k=>playerGear[k]))],items}
+    }
+    function normalizeProfile(raw,account){const id=accountValue(account),base=defaultProfile(id),source=raw&&typeof raw==="object"?raw:{},p={...base,...source,account:id};p.version=Math.max(1,Number(p.version)||1);p.level=Math.max(1,Math.min(10,Number(p.level)||1));p.xp=Math.max(0,Number(p.xp)||0);p.coins=Math.max(0,Number(p.coins)||0);p.gems=Array.isArray(p.gems)?p.gems.slice(0,8).map(Boolean):[];p.hero=p.hero==="female"?"female":"male";p.inventory=normalizeInventory(p.inventory,p.weapon,p.gear);p.weapon=p.inventory.weapons.includes(p.weapon)?p.weapon:"starlight";p.gear=p.inventory.gear.includes(p.gear)?p.gear:"focus";return p}
+    function loadAccountProfile(account){const id=accountValue(account),stored=load(profileStorageKey(id),null),legacy=id==="50101"?load(PROFILE,null):null;return normalizeProfile({...defaultProfile(id),...(stored||legacy||{}),account:id},id)}
+    function loadAccountRecords(account){const id=accountValue(account),stored=load(recordsStorageKey(id),null),legacy=id==="50101"?load(STORE,[]):[];return Array.isArray(stored)?stored:Array.isArray(legacy)?legacy:[]}
+    function loadAccountAuth(account){const auth=load(authStorageKey(account),null);return auth&&auth.accountId===accountValue(account)?auth:null}
+    function saveProfile(){if(visualQaMode)return;save(profileStorageKey(state.profile.account),state.profile)}
+    function saveRecords(){if(visualQaMode)return;save(recordsStorageKey(state.profile.account),state.records)}
+    function saveAuth(){if(state.auth)save(authStorageKey(state.profile.account),state.auth);else localStorage.removeItem(authStorageKey(state.profile.account))}
+    function switchAccount(account,remoteProfile=null){const id=accountValue(account),local=loadAccountProfile(id);state.profile=normalizeProfile({...local,...(remoteProfile||{}),account:id},id);if(visualQaMode){state.config={gasUrl:"",adminToken:""};state.profile=normalizeProfile({...state.profile,level:10,coins:5000,weapon:"starlight",gear:"focus",inventory:{weapons:["starlight"],gear:["focus"],items:{}}},id)}heroGear.dataset.gear=state.profile.gear;state.records=loadAccountRecords(id);state.auth=loadAccountAuth(id);state.questions=[];saveProfile()}
+     function profileForRemote(raw,account){const id=accountValue(account),base=defaultProfile(id),remote=raw&&typeof raw==="object"?raw:{};return normalizeProfile({...base,...remote,account:id},id)}
+    function normalizeQuestionText(value){return String(value??"").normalize("NFC").replace(/[\u0000-\u001f\u007f]/g,"").trim().slice(0,800)}
+    function normalizeQuestion(raw){
+      if(!raw||typeof raw!=="object")return null;
+      const rawMode=String(raw.mode||"").toLowerCase().trim(),mode=rawMode==="en"||rawMode==="zh"?rawMode:"";
+      const inferredStage=mode==="en"?7:mode==="zh"?8:0,stage=Number(raw.stage)||inferredStage;
+      const rule=QUESTION_STAGE_RULES[stage];
+      const prompt=normalizeQuestionText(raw.prompt),answer=normalizeQuestionText(raw.answer||prompt);
+      const enabled=raw.enabled!==false&&String(raw.enabled).toLowerCase()!=="false";
+      if(!rule||mode!==rule.mode||!prompt||!answer||!enabled)return null;
+      const wave=Math.max(0,Math.min(4,Number(raw.wave)||0));
+      const tags=Array.isArray(raw.tags)?raw.tags.map(normalizeQuestionText).filter(Boolean):String(raw.tags||"").split(",").map(normalizeQuestionText).filter(Boolean);
+      return{schemaVersion:Number(raw.version)||QUESTION_SCHEMA_VERSION,id:normalizeQuestionText(raw.id)||`${stage}-${hashText(answer)}`,stage,wave,mode,prompt,answer,display:normalizeQuestionText(raw.display)||prompt,laneKey:normalizeQuestionText(raw.laneKey)||spawnLaneKey(answer),difficulty:Math.max(1,Math.min(5,Number(raw.difficulty)||1)),tags,enabled:true,source:normalizeQuestionText(raw.source)||"gas",license:normalizeQuestionText(raw.license)||"teacher-authored",version:Number(raw.version)||1};
+    }
+    function normalizeQuestionList(rows){
+      const seen=new Set();
+      return(Array.isArray(rows)?rows:[]).map(normalizeQuestion).filter(Boolean).filter(q=>{const key=`${q.stage}|${q.mode}|${q.answer}`;if(seen.has(key))return false;seen.add(key);return true}).sort((a,b)=>a.stage-b.stage||a.wave-b.wave||a.id.localeCompare(b.id));
+    }
+    function gemCount(){return (state.profile.gems||[]).filter(Boolean).length}
+    function hasGem(i){return !!(state.profile.gems||[])[i]}
+    function unlocked(i){return i<8||gemCount()>=8}
+    function isLadder(lv){return lv&&lv.id>8}
+    function stageProgress(lv){return isLadder(lv)?"大橋堂天梯":`第 ${lv.id} / 8 關`}
+    function stageLevelLabel(lv){return isLadder(lv)?"天梯":`Lv.${lv.id}`}
+    function stageMenuNumber(lv){return isLadder(lv)?"天梯":`${lv.id}.`}
+    function stageMissionNote(lv){return isLadder(lv)?"大橋堂是集滿八顆寶石後開放的綜合天梯挑戰，會混合前八關題型並留下最高紀錄。":"本關分成 4 波練習，約 3 分鐘。小兵位置會對應鍵盤區位。"}
+    function levelWords(lv){const qs=state.questions||[],en=qs.filter(q=>q.stage===7&&q.mode==="en").map(q=>q.answer||q.prompt).filter(Boolean),zh=qs.filter(q=>q.stage===8&&q.mode==="zh").map(q=>q.answer||q.prompt).filter(Boolean);if(lv.id===7&&en.length)return en;if(lv.id===8&&zh.length)return zh;if(lv.id===9&&(en.length||zh.length))return lv.words.concat(en,zh);return lv.words}
+    function bossPool(lv){const remote=levelWords(lv);if((lv.id===7||lv.id===8)&&remote!==lv.words)return remote;return lv.bossWords||remote}
+    function text(){subtitle.textContent=T.subtitle;tabAccount.textContent=T.account;tabGuide.textContent=T.guide;tabRank.textContent=T.rank;accountLabel.textContent=T.accountLabel;passwordLabel.textContent=T.passwordLabel;maleBtn.textContent=T.male;femaleBtn.textContent=T.female;startBtn.textContent=T.start;openGuideBtn.textContent=T.guide;openRankBtn.textContent=T.rank;menuBtn.textContent=T.menu;scoreLabel.textContent=T.score;comboLabel.textContent=T.combo;accLabel.textContent=T.accuracy;enemyLabel.textContent=T.enemy;hpLabel.textContent=T.hp;answerInput.placeholder=T.inputHint;attackBtn.textContent=T.attack;missionStartBtn.textContent=T.startLevel;closeMenuBtn.textContent=T.close;drawerTitle.textContent=T.menu;menuTabLevels.textContent=T.levels;menuTabAvatar.textContent=T.avatar;menuTabRecords.textContent=T.records;menuTabSettings.textContent=T.settings;avatarLabel.textContent=T.avatar;weaponLabel.textContent=T.weapon;skillLabel.textContent=T.skill;weaponInfo.textContent=T.weaponInfo;skillInfo.textContent=T.skillInfo;switchHeroBtn.textContent=T.switchHero;gasUrlLabel.textContent=T.gasUrl;adminTokenLabel.textContent=T.adminToken;saveSettingsBtn.textContent=T.saveSettings;testGasBtn.textContent=T.testGas;syncRecordsBtn.textContent=T.syncRecords;studentProgressLabel.textContent=T.studentProgress;loadProgressBtn.textContent=T.loadProgress;exportRecordsBtn.textContent=T.exportRecords;questionBankLabel.textContent=T.questionBank;addQuestionBtn.textContent=T.addQuestion;bulkQuestionsLabel.textContent=T.bulkQuestions;bulkImportBtn.textContent=T.bulkImport;loadQuestionsBtn.textContent=T.loadQuestions;exportQuestionsBtn.textContent=T.exportQuestions;bulkQuestionsInput.placeholder="I am happy.|1|Unit 1\nThis is my pen.|1|Unit 2\n我會打字。|1|資訊課";settingsNote.textContent="GAS \u672a\u8a2d\u5b9a\u6642\u6703\u5148\u7528\u672c\u6a5f\u7d00\u9304\uff1b\u7b2c 7\u30018 \u95dc\u984c\u5eab\u53ef\u5f9e\u9019\u88e1\u65b0\u589e\u5230 GAS\u3002\u6279\u6b21\u683c\u5f0f\uff1a\u6bcf\u884c\u4e00\u984c\uff0c\u53ef\u7528\u300c\u984c\u76ee|\u96e3\u5ea6|\u4e3b\u984c\u300d\u3002";guideList.innerHTML=["使用班級加座號登入；GAS 模式預設密碼與帳號相同，例如 50101。本機示範帳號 50101 可用 1234。","主線共有八關，每關對應一個 DCPS 校園景點。","小兵會依鍵盤位置從畫面對應方向靠近，單一字母與單一注音打到就會自動攻擊。","單字、詞語與句子輸入完成後按 Enter 攻擊。","每關通過後取得一顆寶石，集滿八顆後開放大橋堂天梯試練。","未設定 GAS 時紀錄保存在本機；連線 GAS 後會以帳號隔離同步進度。"].map(x=>`<li>${x}</li>`).join("")}
+    function tabLogin(t){["account","guide","rank"].forEach(n=>{$("login"+n[0].toUpperCase()+n.slice(1)).classList.toggle("hidden",n!==t);document.querySelector(`[data-login-tab="${n}"]`).classList.toggle("active",n===t)});if(t==="rank")rank()}
+    function ladderName(raw){const value=String(raw??"").normalize("NFKC").replace(/[\u0000-\u001f\u007f\u200b-\u200d\ufeff]/g,"").replace(/\s+/g,"").trim();if(value.length<2||value.length>10)return{ok:false,error:"暱稱需為 2～10 個字元。"};if(!/^[\u4e00-\u9fffA-Za-z0-9_-]+$/.test(value))return{ok:false,error:"暱稱只能使用繁體中文、英文字母、數字、底線或連字號。"};if(/^\d{5}$/.test(value)||/^\d{7,10}$/.test(value)||/@|https?:\/\//i.test(value))return{ok:false,error:"暱稱不能使用帳號、電話、網址或電子郵件格式。"};const blocked=["幹","屌","操","他媽","媽的","白癡","智障","fuck","shit","bitch","asshole"];if(blocked.some(word=>value.toLowerCase().includes(word.toLowerCase())))return{ok:false,error:"名稱不適合公開，請換一個。"};return{ok:true,value}}
+    function renderRank(rows,source="本機"){rankList.textContent="";if(!rows.length){const empty=document.createElement("p");empty.textContent=T.noRecord;rankList.appendChild(empty);return}const note=document.createElement("p");note.className="note";note.textContent=`${source}｜公開顯示前 50 名`;rankList.appendChild(note);rows.slice(0,50).forEach((r,i)=>{const row=document.createElement("div");row.className="row";const name=document.createElement("strong");name.textContent=`${r.rank||i+1}. ${r.nickname||"匿名勇者"}`;const score=document.createElement("span");score.textContent=`第 ${r.floor||1} 層｜${Number(r.score||0).toLocaleString()} ${T.score}｜${Number(r.accuracy||0)}%`;row.append(name,score);rankList.appendChild(row)})}
+    function rank(){const local=state.ladderRecords.filter(r=>r.moderationStatus!=="rejected").sort((a,b)=>Number(b.floor||0)-Number(a.floor||0)||Number(b.score||0)-Number(a.score||0)||Number(b.accuracy||0)-Number(a.accuracy||0)||Number(a.durationMs||0)-Number(b.durationMs||0)).slice(0,50);renderRank(local,"本機");if(state.config.gasUrl){gasGet("leaderboard",{mode:"ladder",limit:50}).then(res=>{if(res.ok)renderRank(res.records||[],"GAS")}).catch(()=>{})}}
+    function summarizeRecords(records){const map=new Map();records.forEach(r=>{const id=r.studentName||r.account||"unknown";const row=map.get(id)||{studentName:id,className:r.className||String(id).slice(0,3),seatNo:r.seatNo||String(id).slice(3),bestStage:0,gems:0,bestScore:0,correct:0,attempts:0,plays:0,lastAt:""};row.bestStage=Math.max(row.bestStage,Number(r.stage||r.level||0));if(r.result==="win"&&Number(r.stage||0)<=8)row.gems=Math.max(row.gems,Number(r.stage||0));row.bestScore=Math.max(row.bestScore,Number(r.score||0));row.correct+=Number(r.correct||0);row.attempts+=Number(r.attempts||0);row.plays++;row.lastAt=r.createdAt||r.date||row.lastAt;map.set(id,row)});return [...map.values()].map(r=>({...r,accuracy:r.attempts?Math.round(r.correct/r.attempts*100):100})).sort((a,b)=>b.bestStage-a.bestStage||b.bestScore-a.bestScore||b.accuracy-a.accuracy)}
+    function renderStudentProgress(rows,source){studentProgressList.innerHTML=rows.length?rows.slice(0,40).map(r=>`<div class="summary-card"><strong>${esc(r.className||"")} ${esc(r.seatNo||"")} ${esc(r.studentName||"")}</strong><span>\u6700\u9ad8\u95dc\u5361 ${r.bestStage||0} | \u5bf6\u77f3 ${r.gems||0}/8 | \u6700\u4f73\u5206\u6578 ${Number(r.bestScore||0).toLocaleString()} | \u6b63\u78ba\u7387 ${r.accuracy||100}% | \u5b8c\u6210\u984c\u6578 ${r.correct||0}</span></div>`).join(""):`<p class="note">\u5c1a\u7121\u5b78\u751f\u9032\u5ea6\u7d00\u9304\u3002</p>`;progressStatus.textContent=source?`\u4f86\u6e90\uff1a${source} | ${rows.length} \u4f4d\u5b78\u751f`:""}
+    function canUse(item){return Number(state.profile.level||1)>=Number(item.unlock||1)}
+    function ownedWeapon(key){return state.profile.inventory?.weapons?.includes(key)}
+    function ownedGear(key){return state.profile.inventory?.gear?.includes(key)}
+    function shopItem(id){if(playerWeapons[id])return{...playerWeapons[id],id,kind:"weapon",price:playerWeaponPrices[id]||0,unlock:{starlight:1,ice:4,fire:5,thunder:7,shadow:8}[id]||1};if(playerGear[id])return{...playerGear[id],id,kind:"gear",price:playerGearPrices[id]||0};if(playerItemCatalog[id])return{...playerItemCatalog[id],id,kind:"item"};return null}
+    const buyingItems=new Set();
+    function renderPlayerWeapons(){const key=state.profile.weapon||"starlight",w=playerWeapons[key]||playerWeapons.starlight;weaponInfo.innerHTML=`<span>${w.name}</span><span class="weapon-note">${w.desc}<br>等級 ${state.profile.level}：Combo 每 ${comboThreshold(w)} 連擊觸發大招。</span><div class="weapon-picks">${Object.entries(playerWeapons).map(([k,item])=>{const unlock=shopItem(k).unlock,ok=Number(state.profile.level||1)>=unlock,has=ownedWeapon(k);return `<button class="btn ${k===key?"active":""} ${ok&&has?"":"locked"}" data-player-weapon="${k}" title="${has?"已擁有":"請先到商店購買"}">${item.name}<small>${has?"已擁有":ok?`${shopItem(k).price} 金幣`:`Lv.${unlock}`}</small></button>`}).join("")}</div>`;weaponInfo.querySelectorAll("[data-player-weapon]").forEach(b=>b.onclick=()=>{const k=b.dataset.playerWeapon;if(!canUse(shopItem(k))||!ownedWeapon(k))return;state.profile.weapon=k;saveProfile();queueProfileSync();renderPlayerWeapons();setup()})}
+    function renderPlayerGear(){const key=state.profile.gear||"focus",g=playerGear[key]||playerGear.focus;heroGear.dataset.gear=key;gearInfo.innerHTML=`<span>${g.name}</span><span class="weapon-note">${g.desc}</span><div class="gear-picks">${Object.entries(playerGear).map(([k,item])=>{const ok=canUse(item),has=ownedGear(k);return `<button class="btn ${k===key?"active":""} ${ok&&has?"":"locked"}" data-player-gear="${k}" title="${has?"已擁有":"請先到商店購買"}">${item.name}<small>${has?"已擁有":ok?`${shopItem(k).price} 金幣`:`Lv.${item.unlock}`}</small></button>`}).join("")}</div>`;gearInfo.querySelectorAll("[data-player-gear]").forEach(b=>b.onclick=()=>{const k=b.dataset.playerGear,item=playerGear[k];if(!canUse(item)||!ownedGear(k))return;state.profile.gear=k;saveProfile();queueProfileSync();renderPlayerGear();setup()})}
+    function renderShop(){const box=$("shopInfo");if(!box)return;const inv=state.profile.inventory||defaultInventory(),entries=[...Object.keys(playerWeapons),...Object.keys(playerGear),...Object.keys(playerItemCatalog)];box.innerHTML=entries.map(id=>{const item=shopItem(id),has=item.kind==="weapon"?ownedWeapon(id):item.kind==="gear"?ownedGear(id):false,qty=item.kind==="item"?Number(inv.items?.[id]||0):0,levelOk=canUse(item),busy=buyingItems.has(id),label=item.kind==="item"?`持有 ${qty}｜${item.price} 金幣`:has?"已擁有":levelOk?`${item.price} 金幣`:`需要 Lv.${item.unlock}`;return `<button class="shop-item ${has?"owned":""} ${!levelOk||busy?"disabled":""}" data-shop-id="${id}" ${!levelOk||busy?"disabled":""}><strong>${item.name}</strong><small>${label}</small></button>`}).join("");box.querySelectorAll("[data-shop-id]").forEach(b=>b.onclick=()=>buyItem(b.dataset.shopId))}
+    async function buyItem(id){const item=shopItem(id),status=$("shopStatus");if(!item||buyingItems.has(id))return;const inv=state.profile.inventory||defaultInventory(),has=item.kind==="weapon"?ownedWeapon(id):item.kind==="gear"?ownedGear(id):false;if(!canUse(item)){if(status)status.textContent=`${item.name} 需要 Lv.${item.unlock}。`;return}if(has){if(status)status.textContent=`${item.name} 已經擁有。`;return}if(state.profile.coins<item.price){if(status)status.textContent="金幣不足，先完成關卡取得金幣。";return}buyingItems.add(id);renderShop();if(status)status.textContent=`正在購買 ${item.name}…`;try{if(state.config.gasUrl&&state.auth?.sessionToken){const res=await gasPost({action:"purchase",itemId:id,expectedVersion:state.profile.version});if(!res.ok)throw new Error(res.error||"購買失敗");state.profile=profileForRemote(res.profile,state.profile.account)}else{state.profile.coins-=item.price;if(item.kind==="weapon")inv.weapons.push(id);else if(item.kind==="gear")inv.gear.push(id);else inv.items[id]=(inv.items[id]||0)+1;state.profile.inventory=normalizeInventory(inv,state.profile.weapon,state.profile.gear);if(item.kind==="weapon")state.profile.weapon=id;if(item.kind==="gear")state.profile.gear=id}saveProfile();setup();menu();tabMenu("avatar");drawer.classList.add("open");if(status)status.textContent=`已購買 ${item.name}。`}catch(err){if(status)status.textContent=err.message}finally{buyingItems.delete(id);renderShop();const currentStatus=$("shopStatus");if(currentStatus&&status?.textContent)currentStatus.textContent=status.textContent}}
+    function menu(){gemProgress.textContent=`${T.gem}: ${gemCount()} / 8 ${gemCount()>=8?"| \u5927\u6a4b\u5802\u5929\u68af\u5df2\u958b\u653e":"| "+T.ladderLocked}`;levelGrid.innerHTML=levels.map((lv,i)=>`<button class="level-card ${unlocked(i)?"":"locked"}" data-level="${i}"><strong>${stageMenuNumber(lv)} ${lv.zone}</strong><span>${lv.title}</span><small>${i<8?(hasGem(i)?"\u25c6 "+T.gem:"\u25c7 "+T.gem):unlocked(i)?"\u2605 \u5929\u68af\u5df2\u958b\u653e":T.locked}</small></button>`).join("");avatarInfo.textContent=(state.profile.hero==="male"?T.male:T.female)+" Lv."+state.profile.level+" | "+T.gem+" "+gemCount()+"/8";walletInfo.textContent=`${state.profile.coins||0} 金幣｜XP ${state.profile.xp||0}`;renderPlayerWeapons();renderPlayerGear();renderShop();recordList.innerHTML=state.records.length?state.records.slice(-10).reverse().map(r=>`<div class="row"><strong>${r.zone}</strong><span>${r.score} | ${r.accuracy}% | ${r.date}</span></div>`).join(""):`<p>${T.noRecord}</p>`;gasUrlInput.value=state.config.gasUrl||"";adminTokenInput.value=state.config.adminToken||"";renderStudentProgress(summarizeRecords(state.records),"\u672c\u6a5f");renderBossLab()}
+    function tabMenu(t){["levels","avatar","records","settings"].forEach(n=>{$("menu"+n[0].toUpperCase()+n.slice(1)).classList.toggle("hidden",n!==t);document.querySelector(`[data-menu-tab="${n}"]`).classList.toggle("active",n===t)})}
+    async function start(){const a=accountInput.value.trim(),p=passwordInput.value.trim();if(!/^\d{5}$/.test(a)){alert(T.accountLabel);return}if(state.config.gasUrl){try{const res=await gasPost({action:"login",account:a,password:p});if(!res.ok)throw new Error(res.error||"登入失敗");switchAccount(a,profileForRemote(res.profile,a));state.auth={accountId:a,sessionToken:res.sessionToken,expiresAt:res.expiresAt};saveAuth()}catch(err){alert(err.message);return}}else if(p!==a&&(a!=="50101"||p!=="1234")){alert(T.passwordLabel);return}else{switchAccount(a)}state.profile.gems=state.profile.gems||[];saveProfile();loadRemoteQuestions().catch(()=>{});loginScreen.classList.add("hidden");gameScreen.classList.remove("hidden");academyAudio.play().catch(()=>{});begin(0)}
+    function begin(i){if(!unlocked(i)){drawer.classList.remove("open");missionTitle.textContent=T.locked;missionText.textContent=T.ladderLocked;missionStartBtn.textContent=T.close;mission.classList.remove("hidden");state.outcome="locked";return}clearInterval(state.tick);state.ladderRun=null;pendingLadderRecord=null;submitLadderBtn.disabled=false;ladderNameBox.classList.add("hidden");ladderNameStatus.textContent="";Object.assign(state,{levelIndex:i,enemies:[],current:null,bossMode:false,bossHp:0,maxBossHp:bossMaxHp(levels[i]),bossPhase:1,bossPhaseHits:0,bossPhaseStartedAt:0,bossAttackAt:0,bossAttackPending:false,bossAttackCount:0,hp:100,score:0,combo:0,correct:0,attempts:0,running:false,outcome:null,startedAt:Date.now(),waveIndex:0,waves:[],cleared:0,practiceTotal:0,qaShotPending:false});drawer.classList.remove("open");setup();heroGear.dataset.gear=state.profile.gear||"focus";const lv=levels[i];missionTitle.textContent=lv.zone+" "+T.mission;missionText.textContent=lv.mission+"\n\n"+stageMissionNote(lv);missionStartBtn.textContent=isLadder(lv)?"開始天梯":T.startLevel;mission.classList.remove("hidden")}
+    const HERO_ASSET_VERSION="20260824-v2";
+    const versionedHeroAsset=path=>`${path}${path.includes("?")?"&":"?"}v=${HERO_ASSET_VERSION}`;
+    const integratedHeroAssets={male:{1:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-male-lv1-shadow.png"},2:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-male-lv2-shadow.png"},4:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-male-lv4-shadow.png"}},female:{1:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-female-lv1-shadow.png"},2:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-female-lv2-shadow.png"},4:{starlight:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-starlight.png",ice:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-ice.png",fire:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-fire.png",thunder:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-thunder.png",shadow:"assets/generated/hero-weapons-normalized-v2/hero-female-lv4-shadow.png"}}};
+    // Integrated hero PNGs contain mixed source facing. Normalize them to the canonical right-facing pose before target-facing is applied.
+    const HERO_SOURCE_MIRROR={male:Object.freeze({1:-1,2:1,3:1,4:-1,5:1,6:1,7:1,8:1,9:1,10:1}),female:Object.freeze({1:-1,2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1})};
+    const heroSourceMirror=(character,heroLevel)=>HERO_SOURCE_MIRROR[character]?.[Number(heroLevel)]??1;
+    const integratedWeaponSet=(hero,level)=>Object.fromEntries(["starlight","ice","fire","thunder","shadow"].map(weapon=>[weapon,`assets/generated/hero-weapons-normalized-v2/hero-${hero}-lv${level}-${weapon}.png`]));
+    for(let level=1;level<=10;level++){integratedHeroAssets.male[level]=integratedWeaponSet("male",level);integratedHeroAssets.female[level]=integratedWeaponSet("female",level)}
+    // Only use a pose sheet for its exact character, level and weapon combination.
+    const LV1_CAST_CLIP={url:"assets/generated/hero-cast-lv1-v1/cast-strip.png",duration:600,release:252};
+    const FEMALE_LV1_CAST_CLIP={url:"assets/generated/hero-female-cast-lv1-v1/cast-strip.png",duration:600,release:252};
+    const selectedHeroCastClip=()=>Number(state.profile.level)===1&&state.profile.weapon==="starlight"?(state.profile.hero==="female"?FEMALE_LV1_CAST_CLIP:LV1_CAST_CLIP):null;
+    let activeHeroCastClip=null;
+    let heroCastAnimation=null,battleVisualGeneration=0,battleStartPending=false;
+    const battleImageCache=new Map(),readyBattleImages=new Set();
+    function decodeBattleImage(url){
+      if(battleImageCache.has(url))return battleImageCache.get(url);
+      const promise=new Promise((resolve,reject)=>{
+        const img=new Image();
+        const timer=setTimeout(fail,10000);
+        function fail(){clearTimeout(timer);reject(new Error("image-load"))}
+        img.onerror=fail;
+        img.onload=async()=>{
+          try{
+            if(img.decode)await img.decode();
+            if(!img.naturalWidth)throw new Error("empty-image");
+            clearTimeout(timer);readyBattleImages.add(url);resolve(img);
+          }catch{fail()}
+        };
+        img.src=url;
+      }).catch(error=>{battleImageCache.delete(url);throw error});
+      battleImageCache.set(url,promise);
+      return promise;
+    }
+    function prepareBattleVisuals(){
+      const generation=battleVisualGeneration,clip=selectedHeroCastClip();
+      const level=Number(state.profile.level)||1;
+      const image=versionedHeroAsset(integratedHeroAssets[state.profile.hero][level][state.profile.weapon]);
+      const fx=currentWeapon().fx;
+      return Promise.all([
+        decodeBattleImage(image).then(()=>true,()=>false),
+        fx?decodeBattleImage(fx).catch(()=>null):Promise.resolve(),
+        clip?decodeBattleImage(clip.url).then(()=>true,()=>false):Promise.resolve(false),
+        BossMotion.preload(levels[state.levelIndex].id).then(()=>true,()=>false)
+      ]).then(([heroReady,,clipReady,bossReady])=>{
+        if(clipReady&&generation===battleVisualGeneration&&selectedHeroCastClip()===clip){
+          activeHeroCastClip=clip;
+          hero.classList.add("pose-sheet");
+          hero.style.setProperty("--hero-atlas",`url("${clip.url}")`);
+          hero.style.setProperty("--hero-face",heroMotion.style.getPropertyValue("--hero-face")||"1");
+        }
+        return heroReady&&bossReady;
+      });
+    }
+    function stopHeroMotion(){
+      if(heroCastAnimation){heroCastAnimation.cancel();heroCastAnimation=null}
+      heroMotion.classList.remove("playing");
+      heroMotion.style.removeProperty("--motion-frame");
+      hero.classList.remove("motion-hidden","casting");
+    }
+    function startHeroMotion(){
+      if(heroCastAnimation?.playState==="running")return activeHeroCastClip?Math.max(0,activeHeroCastClip.release-(heroCastAnimation.currentTime||0)):0;
+      if(qaMode||window.matchMedia("(prefers-reduced-motion: reduce)").matches||!hero.animate)return 0;
+      if(activeHeroCastClip){
+        const animation=hero.animate([
+          {backgroundPosition:"0% 0",offset:0,easing:"steps(1,end)"},
+          {backgroundPosition:"20% 0",offset:.10,easing:"steps(1,end)"},
+          {backgroundPosition:"40% 0",offset:.25,easing:"steps(1,end)"},
+          {backgroundPosition:"60% 0",offset:.42,easing:"steps(1,end)"},
+          {backgroundPosition:"80% 0",offset:.65,easing:"steps(1,end)"},
+          {backgroundPosition:"100% 0",offset:.82,easing:"steps(1,end)"},
+          {backgroundPosition:"0% 0",offset:1}
+        ],{duration:activeHeroCastClip.duration,easing:"linear"});
+        heroCastAnimation=animation;
+        animation.onfinish=()=>{if(heroCastAnimation===animation)heroCastAnimation=null};
+        return activeHeroCastClip.release;
+      }
+      const direction=Number(heroMotion.style.getPropertyValue("--hero-face"))||1;
+      const animation=hero.animate([
+        {translate:"0px 0px",rotate:"0deg"},
+        {translate:`${-direction*12}px 0px`,rotate:`${-direction*8}deg`,offset:.25},
+        {translate:`${direction*18}px 0px`,rotate:`${direction*10}deg`,offset:.45},
+        {translate:`${direction*8}px 0px`,rotate:`${direction*3}deg`,offset:.68},
+        {translate:"0px 0px",rotate:"0deg"}
+      ],{duration:650,easing:"ease-in-out"});
+      heroCastAnimation=animation;
+      animation.onfinish=()=>{if(heroCastAnimation===animation)heroCastAnimation=null};
+      return 290;
+    }
+    function setup(){const lv=levels[state.levelIndex];gameScreen.style.setProperty("--stage-bg",`url("${ASSET}${lv.bg}")`);gameScreen.style.setProperty("--stage-size",lv.bgSize||"cover");gameScreen.style.setProperty("--stage-pos",lv.bgPos||"center center");gameScreen.style.setProperty("--stage-scale",lv.bgScale||"1");gameScreen.style.setProperty("--hero-x",heroNormal.x+"%");gameScreen.style.setProperty("--hero-y",heroNormal.y+"%");hero.style.setProperty("--hero-face","1");heroWeapon.style.setProperty("--hero-face","1");const heroLevel=Number(state.profile.level)||1,heroSet=integratedHeroAssets[state.profile.hero]?.[heroLevel]||integratedWeaponSet(state.profile.hero,heroLevel),weaponKey=heroSet[state.profile.weapon]?state.profile.weapon:"starlight",heroImage=versionedHeroAsset(heroSet[weaponKey]);state.profile.weapon=weaponKey;saveProfile();hero.classList.add("integrated");hero.style.setProperty("--hero-atlas",`url("${heroImage}")`);hero.style.setProperty("--hero-bg-size","100% 100%");hero.style.setProperty("--hero-bg-position","center bottom");heroWeapon.style.display="none";levelTitle.textContent=`${lv.zone} | ${lv.title}`;roundText.textContent=stageProgress(lv);questionType.textContent=lv.type;difficultyText.textContent=stageLevelLabel(lv);enemyLayer.innerHTML="";effectLayer.innerHTML="";hud()}
+    const setupWithFacing=setup;
+    setup=()=>{stopHeroMotion();activeHeroCastClip=null;hero.classList.remove("pose-sheet");battleVisualGeneration++;battleStartPending=false;missionStartBtn.disabled=false;setupWithFacing();prepareBattleVisuals();const mirror=heroSourceMirror(state.profile.hero,Number(state.profile.level)||1);hero.style.setProperty("--hero-face",mirror);heroWeapon.style.setProperty("--hero-face",mirror);heroMotion.style.setProperty("--hero-face","1")};
+    function spawn(){state.running=true;state.outcome=null;const lv=levels[state.levelIndex],waves=buildWaves(lv);state.practiceTotal=waves.reduce((n,row)=>n+row.length,0);state.waves=waves;state.waveIndex=0;state.cleared=0;nextWave();state.tick=setInterval(loop,120);answerInput.focus()}
+    function buildWaves(lv){const remote=levelWords(lv),sets=((lv.id===7||lv.id===8)&&remote!==lv.words)?chunk(repeatToCount(remote,practiceCount(lv)),Math.ceil(practiceCount(lv)/4)):(lv.waveSets||[remote]);const per=Math.ceil(practiceCount(lv)/sets.length);return sets.map(set=>repeatToCount(set,Math.max(set.length,per)))}
+    function repeatToCount(base,total){const out=[];if(!base.length)return out;for(let i=0;i<total;i++)out.push(base[i%base.length]);return out.sort(()=>Math.random()-.5)}
+    function buildPractice(lv){return buildWaves(lv).flat()}
+    function practiceCount(lv){if(lv.mode==="letters")return 44;if(lv.mode==="words")return 32;if(lv.mode==="zhuyin")return 36;if(lv.mode==="phonics")return 32;if(lv.mode==="chineseChar")return 28;if(lv.mode==="phrases")return 24;if(lv.mode==="sentences")return 12;if(lv.mode==="final")return 32;return 28}
+    function chunk(arr,size){const rows=[];for(let i=0;i<arr.length;i+=size)rows.push(arr.slice(i,i+size));return rows}
+    function nextWave(){if(state.waveIndex>=state.waves.length){boss();hud();return}const lv=levels[state.levelIndex],words=state.waves[state.waveIndex],seen={},spawnSeen={},now=Date.now();state.enemies=words.map((word,i)=>{const lane=spawnLaneKey(word),slot=spawnSeen[lane]||0;spawnSeen[lane]=slot+1;const p=pos(lv,word,i,seen,lane);return{id:`w${state.waveIndex}-e${i}`,word,x:p.x,y:p.y,alive:true,laneKey:lane,spawnLane:lane,spawnSlot:slot,order:i,spawnAt:now+spawnDelay(lv,slot,i)}});state.waveIndex++;questionType.textContent=`${lv.type} | 第 ${state.waveIndex} / ${state.waves.length} 波`;render();pick()}
+    function pos(lv,w,i,seen={},lane){const p=keyPos(w);if(p){const group=lane||spawnLaneKey(w),n=seen[group]||0;seen[group]=n+1;const fixed=directionPos[w]||digitPos[String(w).toUpperCase()];const base=fixed?{x:p[0],y:p[1]}:outerFromKey(p);const spread=[[0,0],[-16,12],[16,-12],[-24,20],[24,-20],[-32,28],[32,-28],[0,36]];const o=fixed?fixedOffset(w,n):spread[n%spread.length];return{x:Math.max(8,Math.min(92,base.x+o[0])),y:Math.max(10,Math.min(86,base.y+o[1]))}}const r=[[12,18],[50,10],[88,18],[92,50],[82,84],[50,89],[18,84],[8,50],[26,18],[74,18],[72,84],[28,84]];return{x:r[i%r.length][0],y:r[i%r.length][1]}}
+    function fixedOffset(w,n){const a=[0,12,-12,22,-22,32,-32],b=[0,14,28,42,56,70,84],i=n%a.length;if(w===UP)return[a[i],b[i]];if(w===DOWN)return[a[i],-b[i]];if(w===LEFT)return[b[i],a[i]];if(w===RIGHT)return[-b[i],a[i]];return[[0,0],[-8,7],[8,7],[-12,14],[12,14],[0,22],[-16,20],[16,20]][n%8]}
+    function outerFromKey(p){const cx=50,cy=58;return{x:Math.max(7,Math.min(93,cx+(p[0]-cx)*1.85)),y:Math.max(9,Math.min(89,cy+(p[1]-cy)*1.62))}}
+    function spawnLaneKey(w){const p=keyPos(w);if(p)return `zone-${Math.round(p[0]/18)}-${Math.round(p[1]/18)}`;const key=keyIdentity(w);return key?`key-${key}`:`fallback-${String(w).slice(0,1)}`}
+    function digitLane(s){if("789".includes(s))return"top";if("456".includes(s))return"middle";if("1230".includes(s))return"bottom";return s}
+     function spawnDelay(lv,slot,i){if(qaMode)return Math.max(i*2,slot*4);const slow=lv.mode==="sentences"||lv.mode==="final",firstGap=slow?5200:3400,laneGap=slow?7600:5400;return Math.max(i*firstGap,slot*laneGap)}
+    function keyIdentity(w){const raw=String(w),first=raw.match(/[\u3105-\u3129A-Z0-9\u4e00-\u9fff]/i);return first?first[0].toUpperCase():raw.slice(0,1)}
+    function keyPos(w){
+      const raw=String(w),s=raw.toUpperCase(),hot=s.match(/CTRL\s*\+\s*[A-Z]/);
+      if(hot)return hotkeyPos.get(hot[0].replace(/\s+/g,""))||[50,88];
+      if(km[s])return km[s];if(digitPos[s])return digitPos[s];if(directionPos[w])return directionPos[w];
+      if(symbolPos.has(raw))return symbolPos.get(raw);
+      const first=raw.match(/[\u3105-\u3129\u4e00-\u9fffA-Za-z0-9]/)?.[0];
+      if(zhuyinPos.has(first))return zhuyinPos.get(first);
+      if(hanInitial.has(first))return zhuyinPos.get(hanInitial.get(first));
+      if(first&&/[A-Za-z0-9]/.test(first))return km[first.toUpperCase()]||digitPos[first];
+      return null;
+    }
+    function isActive(e){if(!e.alive)return false;if(!qaMode&&e.spawnAt&&Date.now()<e.spawnAt)return false;if(qaMode)return true;if(state.bossMode||!e.laneKey)return true;const earlierSameLane=state.enemies.some(o=>o!==e&&o.alive&&o.order<e.order&&o.spawnLane===e.spawnLane);if(earlierSameLane)return false;const min=(levels[state.levelIndex].mode==="sentences"||levels[state.levelIndex].mode==="final")?18:24;return !state.enemies.some(o=>o!==e&&o.alive&&o.order<e.order&&(!o.spawnAt||Date.now()>=o.spawnAt)&&o.spawnLane!==e.spawnLane&&Math.hypot(o.x-e.x,o.y-e.y)<min)}
+    function render(){const lv=levels[state.levelIndex];enemyLayer.innerHTML=state.enemies.filter(isActive).map(e=>`<div class="enemy" data-lane="${esc(e.spawnLane)}" data-order="${e.order}" style="--x:${e.x}%;--y:${e.y}%;--size:${lv.mode==="sentences"||lv.mode==="final"?92:112}px"><div class="${tagClass(e.word)}">${promptHTML(e.word)}</div><img src="${monster(lv,e.word)}" alt="" draggable="false"></div>`).join("");questionText.innerHTML=state.bossMode&&state.current?promptHTML(state.current.word):""}
+    function hashText(s){return [...String(s)].reduce((n,ch)=>((n*31+ch.charCodeAt(0))>>>0),7)}
+    function poolSprite(pool,w){const list=minionPools[pool];return list&&list.length?ASSET+list[hashText(w)%list.length]:"assets/pixel-enemy-right.png"}
+    function monster(lv,w){const id=keyIdentity(w);if(lv.mode==="digits")return img.digits(w);if(lv.mode==="letters")return /^[A-Z]$/.test(id)?img.letters(id):"assets/pixel-enemy-left.png";if(lv.mode==="words")return poolSprite("words",w);if(lv.mode==="zhuyin")return poolSprite("zhuyin",w);if(lv.mode==="phonics")return poolSprite("phonics",w);if(lv.mode==="chineseChar")return poolSprite("chineseChar",w);if(lv.mode==="phrases"){if(/CTRL\s*\+\s*[A-Z]/i.test(String(w)))return "assets/pixel-enemy-down.png";return poolSprite("phrases",w)}if(lv.mode==="sentences")return poolSprite("sentences",w);if(lv.mode==="final")return poolSprite("final",w);return img[lv.mode]?img[lv.mode](w):"assets/pixel-enemy-right.png"} function dist(e){return Math.hypot(e.x-50,e.y-58)}
+    function pick(){const alive=state.enemies.filter(e=>e.alive);if(!state.bossMode){state.current=null;if(!alive.length){nextWave();return}}else{state.current=state.current||alive[0]||null}render();hud()}
+     function boss(){state.bossMode=true;state.bossHp=state.maxBossHp;state.bossPhase=1;state.bossPhaseHits=0;state.bossPhaseStartedAt=Date.now();state.bossAttackCount=0;state.bossAttackPending=false;state.bossAttackAt=qaMode?Number.MAX_SAFE_INTEGER:Date.now()+9000;const lv=levels[state.levelIndex],words=bossPool(lv),word=words[Math.floor(Math.random()*words.length)];gameScreen.style.setProperty("--hero-x",heroBoss.x+"%");gameScreen.style.setProperty("--hero-y",heroBoss.y+"%");faceHeroTo(bossPos.x);enemyLayer.innerHTML=`<div class="boss active" id="bossEntity" style="--boss-x:${bossPos.x}%;--boss-y:${bossPos.y}%;--boss-face:${bossFace(state.levelIndex)};--boss-atlas:url('${ASSET}boss-safe-atlas-20260612-v3/${lv.atlas}');--boss-hp:1"><div class="boss-tag">${lv.boss}｜階段 1</div><div class="boss-hp"><span></span></div><div class="boss-command" id="bossCommand">${promptHTML(word)}</div><div class="boss-sprite"></div></div>`;state.current={word,boss:true};questionText.innerHTML=promptHTML(state.current.word);hud()}
+     function advanceBossPhase(){if(!state.bossMode)return;const lv=levels[state.levelIndex],ratio=state.bossHp/Math.max(1,state.maxBossHp),required=bossMinCorrect(lv.id,state.bossPhase),floor=bossPhaseFloor(lv.id,state.bossPhase);if(state.bossPhase<3&&state.bossPhaseHits>=required&&ratio<=floor){state.bossPhase++;state.bossPhaseHits=0;state.bossPhaseStartedAt=Date.now();state.bossAttackPending=false;state.bossAttackAt=qaMode?Number.MAX_SAFE_INTEGER:Date.now()+2200;const b=$("bossEntity");if(b){const tag=b.querySelector(".boss-tag");if(tag)tag.textContent=lv.boss+"｜階段 "+state.bossPhase;b.classList.remove("boss-phase-change");void b.offsetWidth;b.classList.add("boss-phase-change");setTimeout(()=>b.classList.remove("boss-phase-change"),850)}}}
+     function bossThreat(){
+       if(!state.bossMode)return;
+       const now=Date.now();
+       if(!state.bossAttackPending&&now>=state.bossAttackAt){
+         state.bossAttackPending=true;state.bossAttackAt=now+950;
+         const b=$("bossEntity");
+         if(b){const warning=document.createElement("div");warning.className="boss-warning boss-telegraph";warning.textContent="Boss 準備攻擊！";b.appendChild(warning);setTimeout(()=>warning.remove(),900)}
+         return;
+       }
+       if(!state.bossAttackPending||now<state.bossAttackAt)return;
+       state.bossAttackPending=false;state.bossAttackCount++;
+       const damage=6+state.bossPhase*4,generation=battleVisualGeneration;
+       state.bossAttackAt=now+(state.bossPhase===1?9000:state.bossPhase===2?7500:6000);
+       BossProjectile.fire().then(hit=>{
+         if(!hit||generation!==battleVisualGeneration||!state.running||!state.bossMode)return;
+         state.hp=Math.max(0,state.hp-damage);state.combo=0;hud();
+         if(state.hp<=0)finish(false);
+       });
+     }
+      function loop(){if(!state.bossMode){const lv=levels[state.levelIndex];const step=qaMode?.12:Math.max(.0009,Math.min(.0018,lv.speed*.045));state.enemies.forEach(e=>{if(!isActive(e)||e.pending)return;e.x+=(50-e.x)*step;e.y+=(58-e.y)*step;if(!qaMode&&dist(e)<8){e.alive=false;state.cleared++;const loss=state.profile.gear==="guardian"?8:12;state.hp=Math.max(0,state.hp-loss)}});if(!state.enemies.some(e=>e.alive))pick();render();if(state.hp<=0)finish(false)}else{bossThreat()}hud()}
+    function findTarget(v){if(state.bossMode)return state.current&&!state.current.pending&&v===String(state.current.word).trim()?state.current:null;return state.enemies.filter(e=>!e.pending&&isActive(e)&&String(e.word).trim()===v).sort((a,b)=>dist(a)-dist(b))[0]||null}
+    function submit(raw){
+      if(!state.running||!mission.classList.contains("hidden"))return;
+      const v=String(raw||answerInput.value).trim();if(!v)return;
+      const target=findTarget(v),inFlight=state.bossMode?[state.current]:state.enemies;
+      if(!target&&inFlight.some(e=>e?.pending&&String(e.word).trim()===v)){answerInput.value="";return}
+      state.attempts++;
+      if(target){target.pending=true;state.correct++;state.combo++;const gear=playerGear[state.profile.gear]||playerGear.focus;state.score+=100+state.combo*15+levels[state.levelIndex].id*20+(gear.score||0);cast(target)}
+      else{state.combo=0;state.hp=Math.max(0,state.hp-6)}
+      answerInput.value="";hud();if(state.hp<=0)finish(false);
+    }
+    function singleAutoValue(raw){const v=String(raw||"").trim();if(/^[a-z]$/i.test(v))return v.toUpperCase();if(/^[\u3105-\u3129]$/.test(v))return v;return""}
+    function quickAutoValue(raw){const v=String(raw||"").trim();if(/^[a-z]$/i.test(v))return v.toUpperCase();if(/^[\u3105-\u3129][ˊˇˋ˙]?$/.test(v))return v;return""}
+    function isSingleKeyPractice(){const lv=levels[state.levelIndex];return state.bossMode?!!singleAutoValue(state.current&&state.current.word):["letters","zhuyin"].includes(lv.mode)}
+    function tryAutoSubmit(raw,ev){if(!state.running||!mission.classList.contains("hidden"))return false;if(ev&&(ev.isComposing||composing||(isEditingTarget(ev.target)&&ev.target!==answerInput)))return false;const v=quickAutoValue(raw);if(!v)return false;const target=findTarget(v);if(target||(singleAutoValue(v)&&isSingleKeyPractice())){if(ev){ev.preventDefault();ev.stopPropagation()}submit(v);return true}return false}
+    function currentWeapon(){return playerWeapons[state.profile.weapon]||playerWeapons.starlight}
+    function comboThreshold(w=currentWeapon()){return Math.max(3,w.threshold-Math.floor((Number(state.profile.level)||1)/4)-(state.profile.gear==="combo"?1:0))}
+    function attackStyle(){const w=currentWeapon(),gear=playerGear[state.profile.gear]||playerGear.focus,lv=Number(state.profile.level)||1,tier=lv>=8?3:lv>=4?2:1,threshold=comboThreshold(w),combo=state.combo>0&&state.combo%threshold===0;return{key:state.profile.weapon||"starlight",name:w.name,a:w.a,b:w.b,c:w.c,core:w.core,fx:w.fx,tier,combo,threshold,size:combo?42+tier*8:24+tier*4,spriteSize:combo?144+tier*28:78+tier*12,impact:combo?124+tier*18:74+tier*10,time:qaMode?.05:(combo?1.08:.62),impactTime:qaMode?.05:(combo?.72:.48),damage:combo?2+Math.floor(lv/5)+(state.profile.weapon==="thunder"?1:0)+(gear.damage||0):1}}
+    function fxVars(style,sx,sy,tx,ty){const angle=Math.atan2(ty-sy,tx-sx)*180/Math.PI;return`--sx:${sx}%;--sy:${sy}%;--tx:${tx}%;--ty:${ty}%;--fx-a:${style.a};--fx-b:${style.b};--fx-c:${style.c};--fx-core:${style.core};--fx-size:${style.size}px;--impact-size:${style.impact}px;--fx-time:${style.time}s;--impact-time:${style.impactTime}s;--fx-angle:${angle}deg`}
+    function comboFlash(style,sx,sy){const ring=document.createElement("div"),label=document.createElement("div");ring.className="combo-ring";ring.style.cssText=`--sx:${sx}%;--sy:${sy}%;--ring-size:${150+style.tier*34}px;--fx-a:${style.a};--fx-c:${style.c}`;label.className="combo-callout";label.textContent=`COMBO ${state.combo} 大招`;label.style.cssText=`--sx:${sx}%;--sy:${sy}%;--fx-a:${style.a}`;effectLayer.append(ring,label);setTimeout(()=>{ring.remove();label.remove()},820)}
+    function spriteShot(style,css){if(!style.fx||!readyBattleImages.has(style.fx))return false;const generation=battleVisualGeneration;const wrap=document.createElement("div"),cell=document.createElement("div");wrap.className="sprite-fx";cell.className="sprite-fx-cell";wrap.style.cssText=css+`;--sprite-size:${style.spriteSize}px;--sprite-sheet:url('${style.fx}')`;wrap.appendChild(cell);effectLayer.appendChild(wrap);setTimeout(()=>{wrap.remove();if(generation!==battleVisualGeneration||!state.running)return;const impact=document.createElement("div"),impactCell=document.createElement("div");impact.className="sprite-fx impact-only";impactCell.className="sprite-fx-cell";impact.style.cssText=css+`;--sprite-size:${Math.round(style.spriteSize*(style.combo?1.2:1.05))}px;--sprite-sheet:url('${style.fx}')`;impact.appendChild(impactCell);effectLayer.appendChild(impact);setTimeout(()=>impact.remove(),Math.max(620,style.impactTime*1000+120))},style.time*1000);return true}
+    function faceHeroTo(tx){const targetFace=tx>=heroPoint().x?1:-1,mirror=activeHeroCastClip?1:heroSourceMirror(state.profile.hero,Number(state.profile.level)||1),assetFace=targetFace*mirror;hero.style.setProperty("--hero-face",String(assetFace));heroWeapon.style.setProperty("--hero-face",String(assetFace));heroMotion.style.setProperty("--hero-face",String(targetFace))}
+    function heroPoint(){const x=parseFloat(getComputedStyle(gameScreen).getPropertyValue("--hero-x"))||heroNormal.x,y=parseFloat(getComputedStyle(gameScreen).getPropertyValue("--hero-y"))||heroNormal.y;return{x,y}}
+    function cast(target){
+      const tx=target.boss?bossPos.x:target.x,ty=target.boss?bossPos.y:target.y;
+      faceHeroTo(tx);
+      const releaseDelay=startHeroMotion(),generation=battleVisualGeneration,h=heroPoint(),style=attackStyle();
+      if(qaMode)state.qaShotPending=true;
+      const release=()=>{
+        if(generation!==battleVisualGeneration||!state.running)return;
+        shot(h.x,h.y,tx,ty,style,()=>{
+          if(qaMode)state.qaShotPending=false;
+          if(!state.running||generation!==battleVisualGeneration)return;
+          target.pending=false;
+          if(style.combo)state.score+=250*style.tier;
+          if(target.boss){
+            const lv=levels[state.levelIndex],phase=state.bossPhase,minHits=bossMinCorrect(lv.id,phase),floorHp=Math.floor(state.maxBossHp*bossPhaseFloor(lv.id,phase)),hitsLeft=Math.max(1,minHits-state.bossPhaseHits),phaseBudget=Math.max(0,state.bossHp-floorHp),damage=Math.max(1,Math.floor(phaseBudget/hitsLeft));
+            state.bossHp=Math.max(floorHp,state.bossHp-damage);state.bossPhaseHits++;advanceBossPhase();
+            const b=$("bossEntity");if(b)b.style.setProperty("--boss-hp",Math.max(0,state.bossHp/state.maxBossHp));
+            if(state.bossHp<=0)finish(true);
+            else if(state.current){const words=bossPool(lv);state.current.word=words[Math.floor(Math.random()*words.length)];questionText.innerHTML=promptHTML(state.current.word);const cmd=$("bossCommand");if(cmd)cmd.innerHTML=promptHTML(state.current.word)}
+          }else if(target.alive){target.alive=false;state.cleared++;pick()}
+          hud();
+        });
+      };
+      if(releaseDelay>0)setTimeout(release,releaseDelay);else release();
+    }
+    function shot(sx,sy,tx,ty,style,done){const generation=battleVisualGeneration;if(qaMode){done();return}if(style.combo)comboFlash(style,sx,sy);const css=fxVars(style,sx,sy,tx,ty),hasSprite=spriteShot(style,css);let p=null;if(!hasSprite){const cls=`projectile fx-${style.key}${style.combo?" combo":""}`;p=document.createElement("div");p.className=cls;p.style.cssText=css;effectLayer.appendChild(p)}setTimeout(()=>{if(generation!==battleVisualGeneration||!state.running){if(p)p.remove();return}if(p){p.remove();const im=document.createElement("div");im.className=`impact fx-${style.key}${style.combo?" combo":""}`;im.style.cssText=css;effectLayer.appendChild(im);setTimeout(()=>im.remove(),style.impactTime*1000+120)}done()},style.time*1000)}
+      function xpForLevel(level){return Math.max(300,Number(level||1)*300)}
+      function grantLocalStageReward(lv,accuracy){if(!lv||lv.id>8)return{coins:0,xp:0,leveledUp:false};const first=!hasGem(lv.id-1),base=(first?stageFirstCoins:stageRepeatCoins)[lv.id]||0,bonus=accuracy>=95?1.2:accuracy>=90?1.1:1,comboBonus=Math.min(10,Math.max(0,state.combo))/100,reward=Math.round(base*bonus*(1+comboBonus)),before=Number(state.profile.level)||1;let xp=Number(state.profile.xp)||0;xp+=70+lv.id*25+Math.min(state.correct,250);let level=before;while(level<10&&xp>=xpForLevel(level)){xp-=xpForLevel(level);level++}state.profile.level=level;state.profile.xp=xp;state.profile.coins=(Number(state.profile.coins)||0)+reward;return{coins:reward,xp:70+lv.id*25+Math.min(state.correct,250),leveledUp:level>before}}
+      async function settleStage(record){if(!state.config.gasUrl||!state.auth?.sessionToken)return;const res=await gasPost({action:"finishStage",eventId:record.eventId,stage:record.stage,result:"win",correct:record.correct,attempts:record.attempts,accuracy:record.accuracy,durationSec:record.durationSec,maxCombo:Math.min(100,state.combo)});if(!res.ok)throw new Error(res.error||"雲端結算失敗");state.profile=profileForRemote(res.profile,state.profile.account);saveProfile();hud();menu()}
+      async function startBattle(){
+        if(battleStartPending||state.running)return;
+        battleStartPending=true;
+        const generation=battleVisualGeneration,label=missionStartBtn.textContent;
+        missionStartBtn.disabled=true;
+        missionStartBtn.textContent="正在準備人物與特效…";
+        try{
+          const ready=await prepareBattleVisuals();
+          if(generation!==battleVisualGeneration)return;
+          if(!ready){missionText.textContent="人物素材載入失敗，請檢查連線後重試。";return}
+          const lv=levels[state.levelIndex];
+          if(isLadder(lv)&&!qaMode){
+            if(state.config.gasUrl&&state.auth?.sessionToken){
+              const res=await gasPost({action:"startLadder"});
+              if(generation!==battleVisualGeneration)return;
+              if(!res.ok)throw new Error(res.error||"無法建立天梯挑戰");
+              state.ladderRun=res.run||null;
+            }else state.ladderRun={runId:`local-${Date.now()}-${Math.random().toString(36).slice(2)}`,startedAt:Date.now(),expiresAt:Date.now()+15*60*1000};
+          }
+          mission.classList.add("hidden");spawn();
+        }catch(err){
+          if(generation===battleVisualGeneration)missionText.textContent=err.message;
+        }finally{
+          if(generation===battleVisualGeneration){
+            battleStartPending=false;missionStartBtn.disabled=false;missionStartBtn.textContent=label;
+          }
+        }
+      }
+     function finish(win){clearInterval(state.tick);state.running=false;state.outcome=win?"done":"fail";const lv=levels[state.levelIndex],acc=state.attempts?Math.round(state.correct/state.attempts*100):100,duration=Math.max(1,Math.round((Date.now()-state.startedAt)/1000));if(win){state.bossMode=false;state.current=null;state.bossHp=0;enemyLayer.innerHTML="";effectLayer.innerHTML="";let reward={coins:0,xp:0,leveledUp:false};if(lv.id<=8){state.profile.gems=state.profile.gems||[];reward=grantLocalStageReward(lv,acc);state.profile.gems[lv.id-1]=true}const record=makeRecord(lv,win,acc,duration);state.records.push(record);save(STORE,state.records);save(PROFILE,state.profile);if(lv.id<=8&&state.config.gasUrl&&state.auth?.sessionToken)settleStage(record).catch(err=>console.warn("[Word War] stage settlement",err));if(!qaMode)syncOneRecord(record).catch(()=>{});missionTitle.textContent=T.done;if(isLadder(lv)){pendingLadderRecord={...record,floor:Math.max(1,Math.floor(state.correct/10)),durationMs:duration*1000};ladderNickname.value="";ladderNameStatus.textContent="完成後才能送出公開成績；暱稱會先經過格式與不雅字檢查。";ladderNameBox.classList.remove("hidden");missionText.textContent=`${lv.zone} 天梯挑戰完成！${T.score} ${state.score}，${T.accuracy} ${acc}%。請輸入要顯示在前 50 名的暱稱。`}else{missionText.textContent=`${lv.zone} ${T.done}! ${T.score} ${state.score}, ${T.accuracy} ${acc}%。${T.gem} ${gemCount()} / 8。獲得 ${reward.coins} 金幣，XP +${reward.xp}${reward.leveledUp?"，等級提升！":"。"}`}missionStartBtn.textContent=isLadder(lv)?T.retry:state.levelIndex===7?"前往大橋堂":state.levelIndex<7?T.nextLevel:T.retry}else{missionTitle.textContent=T.fail;missionText.textContent=T.fail;missionStartBtn.textContent=T.retry}hud();mission.classList.remove("hidden")}
+    function makeRecord(lv,win,acc,duration){const a=state.profile.account||"",eventId=typeof crypto!=="undefined"&&crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`;return{eventId,createdAt:new Date().toISOString(),account:a,className:a.slice(0,3),studentName:a,seatNo:a.slice(3),mode:lv.mode,zone:lv.zone,result:win?"win":"fail",level:lv.id,stage:lv.id,score:state.score,correct:state.correct,attempts:state.attempts,accuracy:acc,cpm:Math.round(state.correct/duration*60),wpm:0,durationSec:duration,appVersion:"word-war-core-20260618",userAgent:navigator.userAgent,date:new Date().toLocaleString("zh-TW"),synced:false}}
+    async function submitLadder(){if(!pendingLadderRecord)return;const checked=ladderName(ladderNickname.value);if(!checked.ok){ladderNameStatus.textContent=checked.error;return}submitLadderBtn.disabled=true;ladderNameStatus.textContent="正在送出天梯成績…";try{if(state.config.gasUrl&&state.auth?.sessionToken){const res=await gasPost({action:"finishLadder",runId:state.ladderRun?.runId,nickname:checked.value,floor:pendingLadderRecord.floor,score:pendingLadderRecord.score,accuracy:pendingLadderRecord.accuracy,durationMs:pendingLadderRecord.durationMs,correct:pendingLadderRecord.correct,attempts:pendingLadderRecord.attempts});if(!res.ok)throw new Error(res.error||"天梯成績送出失敗");if(res.entry)state.ladderRecords.push(res.entry)}else{state.ladderRecords.push({nickname:checked.value,floor:pendingLadderRecord.floor,score:pendingLadderRecord.score,accuracy:pendingLadderRecord.accuracy,durationMs:pendingLadderRecord.durationMs,achievedAt:new Date().toISOString(),moderationStatus:"approved",account:state.profile.account});state.ladderRecords=state.ladderRecords.sort((a,b)=>Number(b.floor||0)-Number(a.floor||0)||Number(b.score||0)-Number(a.score||0)).slice(0,50);save(LADDER_STORE,state.ladderRecords)}ladderNameStatus.textContent="已送出，公開榜只顯示暱稱。";pendingLadderRecord=null;submitLadderBtn.disabled=true;rank()}catch(err){ladderNameStatus.textContent=err.message;submitLadderBtn.disabled=false}}
+    async function gasGet(action,params={}){if(!state.config.gasUrl)throw new Error(T.gasMissing);const url=new URL(state.config.gasUrl),query={...params};if(state.auth?.sessionToken&&!query.sessionToken)query.sessionToken=state.auth.sessionToken;url.searchParams.set("action",action);Object.entries(query).forEach(([k,v])=>url.searchParams.set(k,v));const r=await fetch(url);return await r.json()}
+    async function gasPost(payload){if(!state.config.gasUrl)throw new Error(T.gasMissing);const body={...payload};if(state.auth?.sessionToken&&!body.sessionToken)body.sessionToken=state.auth.sessionToken;const r=await fetch(state.config.gasUrl,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});return await r.json()}
+    async function syncProfile(){if(!state.config.gasUrl||!state.auth?.sessionToken)return;const account=state.profile.account,expectedVersion=Number(state.profile.version)||1,res=await gasPost({action:"saveProgress",profile:state.profile,expectedVersion});if(!res.ok)throw new Error(res.error||"Profile sync failed");state.profile=profileForRemote(res.profile,account);saveProfile();hud();menu()}
+    let profileSyncChain=Promise.resolve();
+    function queueProfileSync(){profileSyncChain=profileSyncChain.then(()=>syncProfile()).catch(err=>console.warn("[Word War] profile sync",err));return profileSyncChain}
+    async function loadRemoteQuestions(){if(!state.config.gasUrl)return[];const res=await gasGet("questions");if(res.ok){state.questions=normalizeQuestionList(res.questions||[]);return state.questions}throw new Error(res.error||"Questions error")}
+    async function syncOneRecord(record){if(!state.config.gasUrl||record.synced)return;const res=await gasPost({action:"saveRecord",record});if(res.ok){record.synced=true;save(STORE,state.records)}}
+    async function syncRecords(){settingsStatus.textContent="同步中…";for(const r of state.records){try{await syncOneRecord(r)}catch(err){settingsStatus.textContent=err.message;return}}settingsStatus.textContent=T.syncOk}
+    async function testGas(){settingsStatus.textContent="測試中…";try{const res=await gasGet("ping");if(res.ok)await loadRemoteQuestions();settingsStatus.textContent=res.ok?`${T.gasOk} | \u984c\u5eab ${state.questions.length}`:T.gasFail}catch(err){settingsStatus.textContent=T.gasFail+": "+err.message}}
+    async function addQuestion(){questionStatus.textContent="儲存中…";try{const prompt=normalizeQuestionText(questionPrompt.value);if(!prompt)throw new Error("請先輸入題目。");const stage=questionMode.value==="en"?7:8,question={stage,wave:0,mode:questionMode.value,prompt,answer:prompt,display:prompt,zone:"teacher-bank",difficulty:Number(questionDifficulty.value||1),tags:["teacher-bank"],source:"teacher-authored",license:"teacher-confirmed",version:QUESTION_SCHEMA_VERSION};if(!normalizeQuestion(question))throw new Error("題目格式不正確。");const res=await gasPost({action:"addQuestion",token:state.config.adminToken,createdBy:state.profile.account||"admin",question});if(res.ok)await loadRemoteQuestions();questionStatus.textContent=res.ok?`${T.saved} | \u984c\u5eab ${state.questions.length}`:(res.error||"儲存失敗");if(res.ok)questionPrompt.value=""}catch(err){questionStatus.textContent=err.message}}
+    function cleanDifficulty(v){return Math.max(1,Math.min(5,Number(v)||1))}
+    function parseBulkQuestions(raw,mode){const stage=mode==="en"?7:8;return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const parts=line.split("|").map(x=>x.trim());const prompt=parts[0];return {stage,wave:0,mode,prompt,answer:prompt,display:prompt,difficulty:cleanDifficulty(parts[1]||questionDifficulty.value),zone:parts[2]||"teacher-bank",tags:[parts[2]||"teacher-bank"],source:"teacher-authored",license:"teacher-confirmed",version:QUESTION_SCHEMA_VERSION}}).filter(q=>q.prompt)}
+    async function refreshQuestions(){bulkStatus.textContent="載入中…";try{await loadRemoteQuestions();bulkStatus.textContent=`\u5df2\u8f09\u5165\u984c\u5eab ${state.questions.length} \u984c`}catch(err){bulkStatus.textContent=err.message}}
+    async function bulkAddQuestions(){bulkStatus.textContent="儲存中…";try{if(!state.config.gasUrl)throw new Error(T.gasMissing);const rows=parseBulkQuestions(bulkQuestionsInput.value,questionMode.value);if(!rows.length)throw new Error("目前沒有可新增的題目。");let ok=0,fail=0;for(const question of rows){try{const res=await gasPost({action:"addQuestion",token:state.config.adminToken,createdBy:state.profile.account||"admin",question});res.ok?ok++:fail++}catch(err){fail++}}if(ok)await loadRemoteQuestions();bulkStatus.textContent=`\u65b0\u589e ${ok} \u984c${fail?` | \u5931\u6557 ${fail} \u984c`:""} | \u984c\u5eab ${state.questions.length}`;if(ok&&!fail)bulkQuestionsInput.value=""}catch(err){bulkStatus.textContent=err.message}}
+    function exportQuestions(){try{const rows=state.questions||[];if(!rows.length){bulkStatus.textContent="\u76ee\u524d\u6c92\u6709\u5df2\u8f09\u5165\u984c\u5eab";return}const header=["id","stage","wave","mode","prompt","answer","display","laneKey","zone","difficulty","tags","enabled","source","license","version"];const body=rows.map(q=>header.map(k=>String(k==="tags"?Array.isArray(q[k])?q[k].join(","):q[k]:q[k]??"").replace(/\t/g," ")).join("\t"));const blob=new Blob([[header.join("\t"),...body].join("\n")],{type:"text/tab-separated-values;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="word-war-question-bank-v1.tsv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);bulkStatus.textContent="\u984c\u5eab\u532f\u51fa\u5b8c\u6210"}catch(err){bulkStatus.textContent=err.message}}
+    async function loadStudentProgress(){progressStatus.textContent="載入中…";try{if(state.config.gasUrl){const res=await gasGet("students",{token:state.config.adminToken,limit:100});if(!res.ok)throw new Error(res.error||"讀取學生進度失敗");renderStudentProgress(res.students||[],"GAS")}else renderStudentProgress(summarizeRecords(state.records),"\u672c\u6a5f")}catch(err){progressStatus.textContent=err.message}}
+    function exportRecords(){try{const rows=state.records||[];if(!rows.length){progressStatus.textContent="\u76ee\u524d\u6c92\u6709\u672c\u6a5f\u7d00\u9304";return}const header=["createdAt","account","className","seatNo","zone","result","stage","score","correct","attempts","accuracy","durationSec"];const body=rows.map(r=>header.map(k=>String(r[k]??"").replace(/\t/g," ")).join("\t"));const blob=new Blob([[header.join("\t"),...body].join("\n")],{type:"text/tab-separated-values;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="word-war-local-records.tsv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);progressStatus.textContent="\u672c\u6a5f\u7d00\u9304\u532f\u51fa\u5b8c\u6210"}catch(err){progressStatus.textContent=err.message}}
+    function renderBossLab(){const box=$("bossLab");if(!box)return;const lv=levels[bossLabState.levelIndex]||levels[0],weapon=bossWeapons[bossLabState.weapon]||bossWeapons.ice,power=bossLabState.power,hp=12+bossLabState.levelIndex*3+power*3,size=168+power*18,glow=12+power*8,cycle=Math.max(3.1,5.2-power*.45),cmd=(bossPool(lv)[0]||lv.words[0]||"");const heroLevel=Number(state.profile.level)||1,heroWeaponKey=state.profile.weapon||"starlight",heroIntegrated=integratedHeroAssets[state.profile.hero]?.[heroLevel]?.[heroWeaponKey],heroAtlas=ASSET+"hero-"+state.profile.hero+"-lv"+heroLevel+"-atlas.png",heroIntegratedCss=heroIntegrated?"url('"+heroIntegrated+"')":"none",heroIntegratedSize=heroIntegrated?"100% 100%":"400% 400%",heroIntegratedPosition=heroIntegrated?"center bottom":"0 0";box.innerHTML=`<label><span>選擇 Boss</span><select id="bossLabSelect">${levels.map((l,i)=>`<option value="${i}" ${i===bossLabState.levelIndex?"selected":""}>Lv.${l.id} ${esc(l.boss)}</option>`).join("")}</select></label><div class="boss-option-grid">${[1,2,3].map(n=>`<button class="btn ${n===power?"active":""}" data-boss-power="${n}">強化 ${n}</button>`).join("")}</div><div class="boss-option-grid">${Object.entries(bossWeapons).map(([k,w])=>`<button class="btn ${k===bossLabState.weapon?"active":""}" data-boss-weapon="${k}">${w.name}</button>`).join("")}</div><div class="boss-lab-stage boss-lab-weapon-${bossLabState.weapon}" style="--hero-atlas:url('${heroAtlas}');--hero-integrated:${heroIntegratedCss};--hero-integrated-size:${heroIntegratedSize};--hero-integrated-position:${heroIntegratedPosition};--hero-face:-1;--boss-face:${bossFace(bossLabState.levelIndex)};--boss-atlas:url('${ASSET}boss-safe-atlas-20260612-v3/${lv.atlas}');--boss-lab-size:${size}px;--boss-glow:${glow}px;--boss-cycle:${cycle}s;--weapon-color:${weapon.color}"><div class="boss-lab-command">${promptHTML(cmd)}</div><div class="boss-lab-hero"></div><div class="boss-lab-boss"><div class="boss-lab-sprite"></div></div><div class="boss-lab-shot"></div><div class="boss-lab-impact"></div></div><div class="boss-lab-meta"><div class="boss-chip">血量 ${hp}</div><div class="boss-chip">集氣 x3</div><div class="boss-chip">攻擊 x${power+1}｜階段 3</div></div><p class="note">${weapon.name}：${weapon.desc}<br>Boss 會依血量進入三階段，集氣後反擊；預覽順序固定為：待機 → 集氣 → 攻擊。光波只在攻擊段出現。</p>`;const sel=$("bossLabSelect");if(sel)sel.onchange=()=>{bossLabState.levelIndex=Number(sel.value)||0;renderBossLab()};box.querySelectorAll("[data-boss-power]").forEach(b=>b.onclick=()=>{bossLabState.power=Number(b.dataset.bossPower)||1;renderBossLab()});box.querySelectorAll("[data-boss-weapon]").forEach(b=>b.onclick=()=>{bossLabState.weapon=b.dataset.bossWeapon;renderBossLab()})}
+     const renderBossLabWithFacing=renderBossLab;
+     renderBossLab=()=>{renderBossLabWithFacing();const labHero=$("bossLab")?.querySelector(".boss-lab-hero");if(labHero)labHero.style.setProperty("--hero-face",String(heroSourceMirror(state.profile.hero,Number(state.profile.level)||1)))};
+     function hud(){const total=state.practiceTotal||practiceCount(levels[state.levelIndex]),remaining=Math.max(0,total-state.cleared),acc=state.attempts?Math.round(state.correct/state.attempts*100):100;scoreText.textContent=state.score.toLocaleString();comboText.textContent=state.combo;accuracyText.textContent=acc+"%";enemyCountText.textContent=state.bossMode?`${state.bossHp} / ${state.maxBossHp}`:`${remaining} / ${total}`;hpText.textContent=`${state.hp} / 100`;enemyBar.style.setProperty("--w",(state.bossMode?state.bossHp/state.maxBossHp:remaining/Math.max(1,total))*100+"%");hpBar.style.setProperty("--w",state.hp+"%")}
+    let composing=false;
+    function esc(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+    function isEditingTarget(el){return !!(el&&(el.isContentEditable||["INPUT","TEXTAREA","SELECT"].includes(el.tagName)))}
+    function shouldIgnoreGlobalKey(e){return drawer.classList.contains("open")||e.isComposing||composing||(isEditingTarget(e.target)&&e.target!==answerInput)}
+    function tagClass(v){const s=String(v);return s.length>12||/\s/.test(s)?"tag long":"tag"}
+    function promptHTML(v){const s=String(v),m=s.match(/^([\u3105-\u3129])([ˊˇˋ˙])$/);return m?`<span class="zh-tone">${esc(m[1])}<span class="tone-mark">${esc(m[2])}</span></span>`:esc(s)}
+    document.querySelectorAll("[data-login-tab]").forEach(b=>b.onclick=()=>tabLogin(b.dataset.loginTab));document.querySelectorAll("[data-hero]").forEach(b=>b.onclick=()=>{state.profile.hero=b.dataset.hero;document.querySelectorAll("[data-hero]").forEach(x=>x.classList.toggle("active",x===b));save(PROFILE,state.profile);queueProfileSync()});document.querySelectorAll("[data-menu-tab]").forEach(b=>b.onclick=()=>tabMenu(b.dataset.menuTab));
+     function qaWait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+     function qaPanel(){let p=$("qaFullRun");if(p)return p;p=document.createElement("aside");p.id="qaFullRun";p.setAttribute("aria-live","polite");p.style.cssText="position:fixed;z-index:10000;top:12px;right:12px;width:min(380px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:14px 16px;border:1px solid #5ed9e8;border-radius:12px;background:rgba(3,20,31,.95);color:#e8fbff;font:14px/1.55 system-ui,sans-serif;box-shadow:0 12px 32px rgba(0,0,0,.4);pointer-events:none";p.innerHTML="<strong style='font-size:17px;color:#ffe27a'>Word War 全流程自動驗收</strong><div id='qaFullRunStatus' style='margin-top:6px'>準備開始…</div><ol id='qaFullRunRows' style='margin:8px 0 0;padding-left:22px'></ol>";document.body.appendChild(p);return p}
+     function qaStatus(p,message){const el=p&&$("qaFullRunStatus");if(el)el.textContent=message}
+     function qaRow(p,text,ok){const list=p&&$("qaFullRunRows");if(!list)return;const li=document.createElement("li");li.textContent=text;li.style.color=ok===true?"#8df0b0":ok===false?"#ff9c9c":"#e8fbff";list.appendChild(li)}
+    async function qaRunStage(index,p){const lv=levels[index],wavesSeen=new Set(),phasesSeen=new Set(),deadline=Date.now()+180000;begin(index);if(qaMode)state.hp=1000000;mission.classList.add("hidden");spawn();while(state.running&&Date.now()<deadline){if(state.bossMode){if(state.qaShotPending){loop()}else{loop();phasesSeen.add(state.bossPhase);if(state.current&&state.current.word)submit(state.current.word)}}else{if(state.waveIndex>0)wavesSeen.add(state.waveIndex);const target=state.enemies.find(e=>e.alive&&isActive(e));if(target&&!state.qaShotPending)submit(target.word);else if(!target)loop()}await qaWait(22)}if(state.running)throw new Error(`${lv.zone} 自動驗收逾時`);if(state.outcome!=="done")throw new Error(`${lv.zone} 未完成（${state.outcome||"未知"}）`);if(index===8){if(ladderNameBox.classList.contains("hidden"))throw new Error("大橋堂完成後未顯示暱稱送出介面");const valid=ladderName("星光勇者"),blocked=ladderName("fuck"),zeroWidth=ladderName("星光\u200b勇者");if(!valid.ok||blocked.ok||!zeroWidth.ok)throw new Error("天梯暱稱過濾驗收失敗")}if(wavesSeen.size!==4)throw new Error(`${lv.zone} 波次=${wavesSeen.size}，預期 4`);if(![1,2,3].every(n=>phasesSeen.has(n)))throw new Error(`${lv.zone} Boss 階段=${[...phasesSeen].join(",")}，預期 1,2,3`);qaRow(p,`第 ${lv.id} 關 ${lv.zone}：四波 + Boss 三階段 ✓`,true);return{stage:lv.id,zone:lv.zone,waves:4,bossPhases:[1,2,3],score:state.score,accuracy:state.attempts?Math.round(state.correct/state.attempts*100):100}}
+     async function runFullQa(){if(!qaMode||window.__WORD_WAR_QA_RUNNING__)return;window.__WORD_WAR_QA_RUNNING__=true;const p=qaPanel(),originalProfile=JSON.parse(JSON.stringify(state.profile)),originalRecords=JSON.parse(JSON.stringify(state.records)),reports=[],started=Date.now();try{qaStatus(p,"以快速模式驗收正式流程，學生模式不受影響");state.profile=JSON.parse(JSON.stringify(originalProfile));state.profile.level=1;state.profile.gems=[];state.profile.gear="focus";state.profile.weapon="starlight";state.records=[];save(PROFILE,state.profile);for(let i=0;i<levels.length;i++){qaStatus(p,`正在驗收第 ${i+1} / ${levels.length} 關：${levels[i].zone}`);reports.push(await qaRunStage(i,p))}if(gemCount()!==8)throw new Error(`八顆寶石解鎖數=${gemCount()}，預期 8`);window.__WORD_WAR_QA_RESULT__={status:"passed",durationMs:Date.now()-started,reports,gems:gemCount()};qaStatus(p,`驗收完成：${reports.length} 關全部通過`);qaRow(p,"八顆寶石解鎖大橋堂 ✓",true)}catch(error){window.__WORD_WAR_QA_RESULT__={status:"failed",durationMs:Date.now()-started,reports,error:String(error)};qaStatus(p,"驗收失敗："+error.message);qaRow(p,"請查看瀏覽器主控台與最後一筆報告",false);console.error("[Word War QA]",error)}finally{clearInterval(state.tick);state.profile=originalProfile;state.records=originalRecords;save(PROFILE,state.profile);save(STORE,state.records);state.enemies=[];state.current=null;state.bossMode=false;state.running=false;state.qaShotPending=false;setup();text();rank();menu();window.__WORD_WAR_QA_RUNNING__=false}}
+      startBtn.onclick=start;openGuideBtn.onclick=()=>tabLogin("guide");openRankBtn.onclick=()=>tabLogin("rank");menuBtn.onclick=()=>{menu();tabMenu("levels");drawer.classList.add("open")};closeMenuBtn.onclick=()=>drawer.classList.remove("open");switchHeroBtn.onclick=()=>{state.profile.hero=state.profile.hero==="male"?"female":"male";save(PROFILE,state.profile);setup();menu()};levelGrid.onclick=e=>{const c=e.target.closest("[data-level]");if(c)begin(Number(c.dataset.level))};saveSettingsBtn.onclick=()=>{state.config.gasUrl=gasUrlInput.value.trim();state.config.adminToken=adminTokenInput.value.trim();save(CONFIG,state.config);settingsStatus.textContent=T.saved};testGasBtn.onclick=()=>{state.config.gasUrl=gasUrlInput.value.trim();state.config.adminToken=adminTokenInput.value.trim();save(CONFIG,state.config);testGas()};syncRecordsBtn.onclick=()=>{state.config.gasUrl=gasUrlInput.value.trim();state.config.adminToken=adminTokenInput.value.trim();save(CONFIG,state.config);syncRecords()};loadProgressBtn.onclick=()=>{state.config.gasUrl=gasUrlInput.value.trim();state.config.adminToken=adminTokenInput.value.trim();save(CONFIG,state.config);loadStudentProgress()};exportRecordsBtn.onclick=exportRecords;addQuestionBtn.onclick=()=>{state.config.gasUrl=gasUrlInput.value.trim();state.config.adminToken=adminTokenInput.value.trim();save(CONFIG,state.config);addQuestion()};bulkImportBtn.onclick=()=>{state.config.gasUrl=gasUrlInput.value.trim();state.config.adminToken=adminTokenInput.value.trim();save(CONFIG,state.config);bulkAddQuestions()};loadQuestionsBtn.onclick=()=>{state.config.gasUrl=gasUrlInput.value.trim();state.config.adminToken=adminTokenInput.value.trim();save(CONFIG,state.config);refreshQuestions()};exportQuestionsBtn.onclick=exportQuestions;missionStartBtn.onclick=handleMissionStart;attackBtn.onclick=()=>submit();answerInput.oncompositionstart=()=>{composing=true};answerInput.oncompositionend=()=>{composing=false};answerInput.onkeydown=e=>{if(e.isComposing||composing)return;if(tryAutoSubmit(e.key,e))return;if(e.key==="Enter"){e.preventDefault();e.stopPropagation();submit()}};answerInput.oninput=()=>{if(composing)return;const v=quickAutoValue(answerInput.value);if(v)tryAutoSubmit(v)};window.onkeydown=e=>{if(shouldIgnoreGlobalKey(e))return;const m={ArrowUp:UP,ArrowDown:DOWN,ArrowLeft:LEFT,ArrowRight:RIGHT};const arrowMode=["direction","final"].includes(levels[state.levelIndex].mode);if(m[e.key]&&arrowMode&&!gameScreen.classList.contains("hidden")&&mission.classList.contains("hidden")){e.preventDefault();submit(m[e.key]);return}if(e.key&&e.key.length===1&&!e.ctrlKey&&!e.altKey&&!e.metaKey)tryAutoSubmit(e.key,e)};
+      checkLadderNameBtn.onclick=()=>{const checked=ladderName(ladderNickname.value);ladderNameStatus.textContent=checked.ok?"暱稱格式可以使用。":checked.error};submitLadderBtn.onclick=submitLadder;text();accountInput.value=state.profile.account||"50101";document.querySelectorAll("[data-hero]").forEach(b=>b.classList.toggle("active",b.dataset.hero===state.profile.hero));rank();menu();if(qaMode)setTimeout(runFullQa,300);
+  </script>
+<script>
+  (() => {
+    const missionStartButton = document.getElementById('missionStartBtn');
+    if (missionStartButton && typeof window.handleMissionStart === 'function') missionStartButton.onclick = window.handleMissionStart;
+    const version = '20260713-boss-facing';
+    const refreshBossAtlases = () => document.querySelectorAll('.boss-sprite,.boss-lab-sprite').forEach(node => {
+      const image = getComputedStyle(node).backgroundImage;
+      const match = image.match(/url\(["']?([^"')]+)["']?\)/);
+      if (match && !match[1].includes('?')) node.style.backgroundImage = `url("${match[1]}?v=${version}")`;
+    });
+    new MutationObserver(refreshBossAtlases).observe(document.body, {childList:true, subtree:true});
+    window.addEventListener('load', refreshBossAtlases);
+  })();
+  (() => {
+    const originalFinish = finish;
+    finish = win => { battleVisualGeneration++;stopHeroMotion(); originalFinish(win); };
+  })();
+  document.addEventListener('animationend', event => {
+    if(event.animationName === 'bossAttackCue') event.target.closest('.boss')?.classList.remove('boss-strike');
+  });
+  (() => {
+    const originalBoss=boss, originalThreat=bossThreat, originalLab=renderBossLab;
+    boss=()=>{originalBoss();BossMotion.mount(document.querySelector('#bossEntity .boss-sprite'),levels[state.levelIndex].id).catch(console.error)};
+    bossThreat=()=>{
+      const pending=state.bossAttackPending;
+      originalThreat();
+      if(!pending&&state.bossAttackPending)BossMotion.play(document.querySelector('#bossEntity .boss-sprite'));
+    };
+    renderBossLab=()=>{originalLab();BossMotion.mount(document.querySelector('.boss-lab-sprite'),levels[bossLabState.levelIndex].id,{loop:true}).catch(console.error)};
+    renderBossLab();
+  })();
+</script>
+  <link rel="stylesheet" href="ultimate.css">
+  <link rel="stylesheet" href="cover-variants.css">
+  <script src="typing-input.js"></script>
+  <script src="ultimate.js"></script>
+  <script src="cover-variants.js"></script>
+  <script src="battle-ground.js"></script>
+  <script src="enemy-safe-area.js"></script>
+  <script src="gm-mode.js"></script>
+  <script src="boss-projectile.js"></script>
+  <style>
+    #gameScreen:has(#bossEntity) .hero.integrated:not(.casting){animation:none}
+  </style>
+</body>
+</html>
+

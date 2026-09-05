@@ -1,0 +1,79 @@
+{
+  "version": "word-war-hero-weapon-assets-20260702",
+  "note": "角色本體、武器與攻擊特效分層。Image 2.0 若產出合格 PNG，只要覆蓋同名檔案，遊戲與預覽頁會直接使用。",
+  "heroAtlasPattern": "assets/generated/hero-{gender}-lv{level}-atlas.png",
+  "heroLevels": [
+    {
+      "range": "Lv.1-Lv.3",
+      "tier": "見習學院生",
+      "visual": "平常校園冒險服、短披風、基本皮靴與簡單徽章，適合初學者。"
+    },
+    {
+      "range": "Lv.4-Lv.6",
+      "tier": "守護學徒",
+      "visual": "增加護肩、腰包、手套、魔法紋章與較明顯披風，仍保持可愛比例。"
+    },
+    {
+      "range": "Lv.7-Lv.9",
+      "tier": "星輝法師",
+      "visual": "加入頭飾、項鍊、胸甲、寶石裝飾與更亮的魔法光環。"
+    },
+    {
+      "range": "Lv.10",
+      "tier": "鍵盤勇者",
+      "visual": "完整傳說服裝、皇冠或高階頭飾、華麗披風與寶石光環，但不可遮住手部動作。"
+    }
+  ],
+  "weapons": [
+    {
+      "id": "starlight",
+      "name": "星光法杖",
+      "unlockLevel": 1,
+      "role": "穩定單體光彈，初階學生用。",
+      "asset": "assets/generated/equipment/weapon-starlight-staff.png",
+      "comboFx": "assets/generated/effects/player-fx-starlight.png",
+      "comboThreshold": 6,
+      "palette": ["#65efff", "#ffe071", "#ffffff"]
+    },
+    {
+      "id": "ice",
+      "name": "冰晶法核",
+      "unlockLevel": 4,
+      "role": "冰藍蓄力光球，強調準確率與穩定節奏。",
+      "asset": "assets/generated/equipment/weapon-ice-core.png",
+      "comboFx": "assets/generated/effects/player-fx-ice.png",
+      "comboThreshold": 5,
+      "palette": ["#8ee9ff", "#b9fbff", "#ffffff"]
+    },
+    {
+      "id": "fire",
+      "name": "烈焰戰輪",
+      "unlockLevel": 5,
+      "role": "紅橘旋轉爆裂，Combo 時視覺更有衝擊。",
+      "asset": "assets/generated/equipment/weapon-fire-wheel.png",
+      "comboFx": "assets/generated/effects/player-fx-fire.png",
+      "comboThreshold": 5,
+      "palette": ["#ff7b4d", "#ffe071", "#ffffff"]
+    },
+    {
+      "id": "thunder",
+      "name": "雷鳴星槍",
+      "unlockLevel": 7,
+      "role": "金色高速穿刺，高等級 Boss 戰使用更有壓迫感。",
+      "asset": "assets/generated/equipment/weapon-thunder-spear.png",
+      "comboFx": "assets/generated/effects/player-fx-thunder.png",
+      "comboThreshold": 4,
+      "palette": ["#ffe66d", "#65efff", "#ffffff"]
+    },
+    {
+      "id": "shadow",
+      "name": "暗影魔晶",
+      "unlockLevel": 8,
+      "role": "紫色追蹤魔彈，後期華麗但不能蓋住題目文字。",
+      "asset": "assets/generated/equipment/weapon-shadow-crystal.png",
+      "comboFx": "assets/generated/effects/player-fx-shadow.png",
+      "comboThreshold": 5,
+      "palette": ["#b06cff", "#65efff", "#ffffff"]
+    }
+  ]
+}

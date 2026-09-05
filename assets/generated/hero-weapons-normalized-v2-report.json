@@ -1,0 +1,1612 @@
+{
+  "canvas": [
+    768,
+    648
+  ],
+  "targetHeight": 500,
+  "maxWidth": 720,
+  "baseline": 610,
+  "count": 100,
+  "files": [
+    {
+      "output": "hero-female-lv1-fire.png",
+      "source": "hero-female-lv1-fire.png",
+      "sourceUsed": "hero-female-lv1-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        165,
+        110,
+        603,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv1-ice.png",
+      "source": "hero-female-lv1-ice.png",
+      "sourceUsed": "hero-female-lv1-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        173,
+        110,
+        594,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv1-shadow.png",
+      "source": "hero-female-lv1-shadow.png",
+      "sourceUsed": "hero-female-lv1-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        151,
+        110,
+        616,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv1-starlight.png",
+      "source": "hero-female-lv1-starlight.png",
+      "sourceUsed": "hero-female-lv1-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        163,
+        110,
+        605,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv1-thunder.png",
+      "source": "hero-female-lv1-thunder.png",
+      "sourceUsed": "hero-female-lv1-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        185,
+        110,
+        582,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv10-fire.png",
+      "source": "hero-female-lv10-fire.png",
+      "sourceUsed": "hero-female-lv10-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        167,
+        110,
+        600,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv10-ice.png",
+      "source": "hero-female-lv10-ice.png",
+      "sourceUsed": "hero-female-lv10-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        152,
+        110,
+        616,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv10-shadow.png",
+      "source": "hero-female-lv10-shadow.png",
+      "sourceUsed": "hero-female-lv10-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        167,
+        110,
+        601,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv10-starlight.png",
+      "source": "hero-female-lv10-starlight.png",
+      "sourceUsed": "hero-female-lv10-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        169,
+        110,
+        599,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv10-thunder.png",
+      "source": "hero-female-lv10-thunder.png",
+      "sourceUsed": "hero-female-lv10-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        136,
+        110,
+        632,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv2-fire.png",
+      "source": "hero-female-lv2-fire.png",
+      "sourceUsed": "hero-female-lv2-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        114,
+        110,
+        654,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv2-ice.png",
+      "source": "hero-female-lv2-ice.png",
+      "sourceUsed": "hero-female-lv2-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        131,
+        110,
+        636,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv2-shadow.png",
+      "source": "hero-female-lv2-shadow.png",
+      "sourceUsed": "hero-female-lv2-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        122,
+        110,
+        646,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv2-starlight.png",
+      "source": "hero-female-lv2-starlight.png",
+      "sourceUsed": "hero-female-lv2-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        112,
+        110,
+        655,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv2-thunder.png",
+      "source": "hero-female-lv2-thunder.png",
+      "sourceUsed": "hero-female-lv2-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        102,
+        110,
+        665,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv3-fire.png",
+      "source": "hero-female-lv3-fire.png",
+      "sourceUsed": "hero-female-lv3-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        162,
+        110,
+        605,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv3-ice.png",
+      "source": "hero-female-lv3-ice.png",
+      "sourceUsed": "hero-female-lv3-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        174,
+        110,
+        594,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv3-shadow.png",
+      "source": "hero-female-lv3-shadow.png",
+      "sourceUsed": "hero-female-lv3-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        165,
+        110,
+        603,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv3-starlight.png",
+      "source": "hero-female-lv3-starlight.png",
+      "sourceUsed": "hero-female-lv3-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        154,
+        110,
+        614,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv3-thunder.png",
+      "source": "hero-female-lv3-thunder.png",
+      "sourceUsed": "hero-female-lv3-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        137,
+        110,
+        631,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv4-fire.png",
+      "source": "hero-female-lv4-fire.png",
+      "sourceUsed": "hero-female-lv4-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        121,
+        110,
+        646,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv4-ice.png",
+      "source": "hero-female-lv4-ice.png",
+      "sourceUsed": "hero-female-lv4-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        183,
+        110,
+        585,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv4-shadow.png",
+      "source": "hero-female-lv4-shadow.png",
+      "sourceUsed": "hero-female-lv4-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        138,
+        110,
+        630,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv4-starlight.png",
+      "source": "hero-female-lv4-starlight.png",
+      "sourceUsed": "hero-female-lv4-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        138,
+        110,
+        629,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv4-thunder.png",
+      "source": "hero-female-lv4-thunder.png",
+      "sourceUsed": "hero-female-lv4-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        148,
+        110,
+        620,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv5-fire.png",
+      "source": "hero-female-lv5-fire.png",
+      "sourceUsed": "hero-female-lv5-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        126,
+        110,
+        641,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv5-ice.png",
+      "source": "hero-female-lv5-ice.png",
+      "sourceUsed": "hero-female-lv5-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        123,
+        110,
+        644,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv5-shadow.png",
+      "source": "hero-female-lv5-shadow.png",
+      "sourceUsed": "hero-female-lv5-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        107,
+        110,
+        660,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv5-starlight.png",
+      "source": "hero-female-lv5-starlight.png",
+      "sourceUsed": "hero-female-lv5-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        129,
+        110,
+        639,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv5-thunder.png",
+      "source": "hero-female-lv5-thunder.png",
+      "sourceUsed": "hero-female-lv5-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        115,
+        110,
+        653,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv6-fire.png",
+      "source": "hero-female-lv6-fire.png",
+      "sourceUsed": "hero-female-lv7-fire.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        177,
+        110,
+        590,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv6-ice.png",
+      "source": "hero-female-lv6-ice.png",
+      "sourceUsed": "hero-female-lv7-ice.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        172,
+        110,
+        595,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv6-shadow.png",
+      "source": "hero-female-lv6-shadow.png",
+      "sourceUsed": "hero-female-lv7-shadow.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        177,
+        110,
+        591,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv6-starlight.png",
+      "source": "hero-female-lv6-starlight.png",
+      "sourceUsed": "hero-female-lv7-starlight.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        191,
+        110,
+        577,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv6-thunder.png",
+      "source": "hero-female-lv6-thunder.png",
+      "sourceUsed": "hero-female-lv7-thunder.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        142,
+        110,
+        626,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv7-fire.png",
+      "source": "hero-female-lv7-fire.png",
+      "sourceUsed": "hero-female-lv7-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        177,
+        110,
+        590,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv7-ice.png",
+      "source": "hero-female-lv7-ice.png",
+      "sourceUsed": "hero-female-lv7-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        172,
+        110,
+        595,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv7-shadow.png",
+      "source": "hero-female-lv7-shadow.png",
+      "sourceUsed": "hero-female-lv7-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        177,
+        110,
+        591,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv7-starlight.png",
+      "source": "hero-female-lv7-starlight.png",
+      "sourceUsed": "hero-female-lv7-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        191,
+        110,
+        577,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv7-thunder.png",
+      "source": "hero-female-lv7-thunder.png",
+      "sourceUsed": "hero-female-lv7-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        142,
+        110,
+        626,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv8-fire.png",
+      "source": "hero-female-lv8-fire.png",
+      "sourceUsed": "hero-female-lv8-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        147,
+        110,
+        621,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv8-ice.png",
+      "source": "hero-female-lv8-ice.png",
+      "sourceUsed": "hero-female-lv8-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        164,
+        110,
+        603,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv8-shadow.png",
+      "source": "hero-female-lv8-shadow.png",
+      "sourceUsed": "hero-female-lv8-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        125,
+        110,
+        642,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv8-starlight.png",
+      "source": "hero-female-lv8-starlight.png",
+      "sourceUsed": "hero-female-lv8-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        139,
+        110,
+        629,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv8-thunder.png",
+      "source": "hero-female-lv8-thunder.png",
+      "sourceUsed": "hero-female-lv8-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        136,
+        110,
+        632,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv9-fire.png",
+      "source": "hero-female-lv9-fire.png",
+      "sourceUsed": "hero-female-lv9-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        137,
+        110,
+        630,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv9-ice.png",
+      "source": "hero-female-lv9-ice.png",
+      "sourceUsed": "hero-female-lv9-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        125,
+        110,
+        643,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv9-shadow.png",
+      "source": "hero-female-lv9-shadow.png",
+      "sourceUsed": "hero-female-lv9-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        135,
+        110,
+        633,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv9-starlight.png",
+      "source": "hero-female-lv9-starlight.png",
+      "sourceUsed": "hero-female-lv9-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        144,
+        110,
+        623,
+        610
+      ]
+    },
+    {
+      "output": "hero-female-lv9-thunder.png",
+      "source": "hero-female-lv9-thunder.png",
+      "sourceUsed": "hero-female-lv9-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        104,
+        110,
+        664,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv1-fire.png",
+      "source": "hero-male-lv1-fire.png",
+      "sourceUsed": "hero-male-lv1-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        173,
+        110,
+        594,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv1-ice.png",
+      "source": "hero-male-lv1-ice.png",
+      "sourceUsed": "hero-male-lv1-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        185,
+        110,
+        583,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv1-shadow.png",
+      "source": "hero-male-lv1-shadow.png",
+      "sourceUsed": "hero-male-lv1-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        166,
+        110,
+        601,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv1-starlight.png",
+      "source": "hero-male-lv1-starlight.png",
+      "sourceUsed": "hero-male-lv1-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        165,
+        110,
+        603,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv1-thunder.png",
+      "source": "hero-male-lv1-thunder.png",
+      "sourceUsed": "hero-male-lv1-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        180,
+        110,
+        588,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv10-fire.png",
+      "source": "hero-male-lv10-fire.png",
+      "sourceUsed": "hero-male-lv10-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        161,
+        110,
+        606,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv10-ice.png",
+      "source": "hero-male-lv10-ice.png",
+      "sourceUsed": "hero-male-lv10-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        163,
+        110,
+        604,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv10-shadow.png",
+      "source": "hero-male-lv10-shadow.png",
+      "sourceUsed": "hero-male-lv10-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        154,
+        110,
+        613,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv10-starlight.png",
+      "source": "hero-male-lv10-starlight.png",
+      "sourceUsed": "hero-male-lv10-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        165,
+        110,
+        603,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv10-thunder.png",
+      "source": "hero-male-lv10-thunder.png",
+      "sourceUsed": "hero-male-lv10-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        125,
+        110,
+        643,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv2-fire.png",
+      "source": "hero-male-lv2-fire.png",
+      "sourceUsed": "hero-male-lv2-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        160,
+        110,
+        607,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv2-ice.png",
+      "source": "hero-male-lv2-ice.png",
+      "sourceUsed": "hero-male-lv2-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        170,
+        110,
+        597,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv2-shadow.png",
+      "source": "hero-male-lv2-shadow.png",
+      "sourceUsed": "hero-male-lv2-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        185,
+        110,
+        582,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv2-starlight.png",
+      "source": "hero-male-lv2-starlight.png",
+      "sourceUsed": "hero-male-lv2-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        196,
+        110,
+        571,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv2-thunder.png",
+      "source": "hero-male-lv2-thunder.png",
+      "sourceUsed": "hero-male-lv2-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        24,
+        112,
+        744,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv3-fire.png",
+      "source": "hero-male-lv3-fire.png",
+      "sourceUsed": "hero-male-lv3-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        83,
+        110,
+        685,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv3-ice.png",
+      "source": "hero-male-lv3-ice.png",
+      "sourceUsed": "hero-male-lv3-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        127,
+        110,
+        640,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv3-shadow.png",
+      "source": "hero-male-lv3-shadow.png",
+      "sourceUsed": "hero-male-lv3-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        90,
+        110,
+        677,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv3-starlight.png",
+      "source": "hero-male-lv3-starlight.png",
+      "sourceUsed": "hero-male-lv3-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        98,
+        110,
+        669,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv3-thunder.png",
+      "source": "hero-male-lv3-thunder.png",
+      "sourceUsed": "hero-male-lv3-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        64,
+        110,
+        703,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv4-fire.png",
+      "source": "hero-male-lv4-fire.png",
+      "sourceUsed": "hero-male-lv4-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        128,
+        110,
+        640,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv4-ice.png",
+      "source": "hero-male-lv4-ice.png",
+      "sourceUsed": "hero-male-lv4-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        155,
+        110,
+        612,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv4-shadow.png",
+      "source": "hero-male-lv4-shadow.png",
+      "sourceUsed": "hero-male-lv4-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        134,
+        110,
+        633,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv4-starlight.png",
+      "source": "hero-male-lv4-starlight.png",
+      "sourceUsed": "hero-male-lv4-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        140,
+        110,
+        627,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv4-thunder.png",
+      "source": "hero-male-lv4-thunder.png",
+      "sourceUsed": "hero-male-lv4-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        156,
+        110,
+        611,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv5-fire.png",
+      "source": "hero-male-lv5-fire.png",
+      "sourceUsed": "hero-male-lv5-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        98,
+        110,
+        669,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv5-ice.png",
+      "source": "hero-male-lv5-ice.png",
+      "sourceUsed": "hero-male-lv5-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        130,
+        110,
+        638,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv5-shadow.png",
+      "source": "hero-male-lv5-shadow.png",
+      "sourceUsed": "hero-male-lv5-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        122,
+        110,
+        645,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv5-starlight.png",
+      "source": "hero-male-lv5-starlight.png",
+      "sourceUsed": "hero-male-lv5-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        132,
+        110,
+        636,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv5-thunder.png",
+      "source": "hero-male-lv5-thunder.png",
+      "sourceUsed": "hero-male-lv5-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        76,
+        110,
+        691,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv6-fire.png",
+      "source": "hero-male-lv6-fire.png",
+      "sourceUsed": "hero-male-lv6-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        198,
+        110,
+        570,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv6-ice.png",
+      "source": "hero-male-lv6-ice.png",
+      "sourceUsed": "hero-male-lv6-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        160,
+        110,
+        608,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv6-shadow.png",
+      "source": "hero-male-lv6-shadow.png",
+      "sourceUsed": "hero-male-lv6-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        169,
+        110,
+        598,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv6-starlight.png",
+      "source": "hero-male-lv6-starlight.png",
+      "sourceUsed": "hero-male-lv6-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        171,
+        110,
+        597,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv6-thunder.png",
+      "source": "hero-male-lv6-thunder.png",
+      "sourceUsed": "hero-male-lv6-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        151,
+        110,
+        616,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv7-fire.png",
+      "source": "hero-male-lv7-fire.png",
+      "sourceUsed": "hero-male-lv8-fire.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        173,
+        110,
+        594,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv7-ice.png",
+      "source": "hero-male-lv7-ice.png",
+      "sourceUsed": "hero-male-lv8-ice.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        162,
+        110,
+        606,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv7-shadow.png",
+      "source": "hero-male-lv7-shadow.png",
+      "sourceUsed": "hero-male-lv8-shadow.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        138,
+        110,
+        630,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv7-starlight.png",
+      "source": "hero-male-lv7-starlight.png",
+      "sourceUsed": "hero-male-lv8-starlight.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        157,
+        110,
+        610,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv7-thunder.png",
+      "source": "hero-male-lv7-thunder.png",
+      "sourceUsed": "hero-male-lv8-thunder.png",
+      "replacement": true,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        124,
+        110,
+        644,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv8-fire.png",
+      "source": "hero-male-lv8-fire.png",
+      "sourceUsed": "hero-male-lv8-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        173,
+        110,
+        594,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv8-ice.png",
+      "source": "hero-male-lv8-ice.png",
+      "sourceUsed": "hero-male-lv8-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        162,
+        110,
+        606,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv8-shadow.png",
+      "source": "hero-male-lv8-shadow.png",
+      "sourceUsed": "hero-male-lv8-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        138,
+        110,
+        630,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv8-starlight.png",
+      "source": "hero-male-lv8-starlight.png",
+      "sourceUsed": "hero-male-lv8-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        157,
+        110,
+        610,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv8-thunder.png",
+      "source": "hero-male-lv8-thunder.png",
+      "sourceUsed": "hero-male-lv8-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        124,
+        110,
+        644,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv9-fire.png",
+      "source": "hero-male-lv9-fire.png",
+      "sourceUsed": "hero-male-lv9-fire.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        130,
+        110,
+        638,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv9-ice.png",
+      "source": "hero-male-lv9-ice.png",
+      "sourceUsed": "hero-male-lv9-ice.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        160,
+        110,
+        608,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv9-shadow.png",
+      "source": "hero-male-lv9-shadow.png",
+      "sourceUsed": "hero-male-lv9-shadow.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        133,
+        110,
+        635,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv9-starlight.png",
+      "source": "hero-male-lv9-starlight.png",
+      "sourceUsed": "hero-male-lv9-starlight.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        120,
+        110,
+        647,
+        610
+      ]
+    },
+    {
+      "output": "hero-male-lv9-thunder.png",
+      "source": "hero-male-lv9-thunder.png",
+      "sourceUsed": "hero-male-lv9-thunder.png",
+      "replacement": false,
+      "canvas": [
+        768,
+        648
+      ],
+      "alphaBBox": [
+        143,
+        110,
+        625,
+        610
+      ]
+    }
+  ]
+}

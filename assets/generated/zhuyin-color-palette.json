@@ -1,0 +1,371 @@
+{
+  "description": "Word War Zhuyin color classification based on teacher reference chart.",
+  "groups": {
+    "initial": {
+      "name": "聲母",
+      "family": "藍綠色系",
+      "colors": [
+        "#198fca",
+        "#0c79b3",
+        "#93b72e",
+        "#75a035",
+        "#5d9336",
+        "#438539",
+        "#2f7434"
+      ]
+    },
+    "medial": {
+      "name": "介音",
+      "family": "黑灰色系",
+      "colors": [
+        "#4d4946",
+        "#3f3d3b",
+        "#57514f"
+      ]
+    },
+    "final": {
+      "name": "韻母",
+      "family": "粉紅橘暖色系",
+      "colors": [
+        "#d85a86",
+        "#df5a2c",
+        "#d9853d"
+      ]
+    }
+  },
+  "symbols": [
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄅ",
+      "slug": "b",
+      "color": "#198fca",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-b.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄆ",
+      "slug": "p",
+      "color": "#0c79b3",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-p.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄇ",
+      "slug": "m",
+      "color": "#93b72e",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-m.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄈ",
+      "slug": "f",
+      "color": "#75a035",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-f.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄉ",
+      "slug": "d",
+      "color": "#5d9336",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-d.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄊ",
+      "slug": "t",
+      "color": "#438539",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-t.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄋ",
+      "slug": "n",
+      "color": "#2f7434",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-n.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄌ",
+      "slug": "l",
+      "color": "#198fca",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-l.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄍ",
+      "slug": "g",
+      "color": "#0c79b3",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-g.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄎ",
+      "slug": "k",
+      "color": "#93b72e",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-k.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄏ",
+      "slug": "h",
+      "color": "#75a035",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-h.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄐ",
+      "slug": "j",
+      "color": "#5d9336",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-j.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄑ",
+      "slug": "q",
+      "color": "#438539",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-q.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄒ",
+      "slug": "x",
+      "color": "#2f7434",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-x.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄓ",
+      "slug": "zh",
+      "color": "#198fca",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-zh.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄔ",
+      "slug": "ch",
+      "color": "#0c79b3",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-ch.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄕ",
+      "slug": "sh",
+      "color": "#93b72e",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-sh.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄖ",
+      "slug": "r",
+      "color": "#75a035",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-r.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄗ",
+      "slug": "z",
+      "color": "#5d9336",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-z.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄘ",
+      "slug": "c",
+      "color": "#438539",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-c.png"
+    },
+    {
+      "group": "initial",
+      "groupName": "聲母",
+      "symbol": "ㄙ",
+      "slug": "s",
+      "color": "#2f7434",
+      "colorFamily": "藍綠聲母",
+      "sprite": "assets/generated/zhuyin-initial-s.png"
+    },
+    {
+      "group": "medial",
+      "groupName": "介音",
+      "symbol": "ㄧ",
+      "slug": "yi",
+      "color": "#4d4946",
+      "colorFamily": "黑灰介音",
+      "sprite": "assets/generated/zhuyin-medial-yi.png"
+    },
+    {
+      "group": "medial",
+      "groupName": "介音",
+      "symbol": "ㄨ",
+      "slug": "wu",
+      "color": "#3f3d3b",
+      "colorFamily": "黑灰介音",
+      "sprite": "assets/generated/zhuyin-medial-wu.png"
+    },
+    {
+      "group": "medial",
+      "groupName": "介音",
+      "symbol": "ㄩ",
+      "slug": "yu",
+      "color": "#57514f",
+      "colorFamily": "黑灰介音",
+      "sprite": "assets/generated/zhuyin-medial-yu.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄚ",
+      "slug": "a",
+      "color": "#d85a86",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-a.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄛ",
+      "slug": "o",
+      "color": "#df5a2c",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-o.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄜ",
+      "slug": "e",
+      "color": "#d9853d",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-e.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄝ",
+      "slug": "eh",
+      "color": "#d85a86",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-eh.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄞ",
+      "slug": "ai",
+      "color": "#df5a2c",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-ai.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄟ",
+      "slug": "ei",
+      "color": "#d9853d",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-ei.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄠ",
+      "slug": "ao",
+      "color": "#d85a86",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-ao.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄡ",
+      "slug": "ou",
+      "color": "#df5a2c",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-ou.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄢ",
+      "slug": "an",
+      "color": "#d9853d",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-an.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄣ",
+      "slug": "en",
+      "color": "#d85a86",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-en.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄤ",
+      "slug": "ang",
+      "color": "#df5a2c",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-ang.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄥ",
+      "slug": "eng",
+      "color": "#d9853d",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-eng.png"
+    },
+    {
+      "group": "final",
+      "groupName": "韻母",
+      "symbol": "ㄦ",
+      "slug": "er",
+      "color": "#d85a86",
+      "colorFamily": "暖色韻母",
+      "sprite": "assets/generated/zhuyin-final-er.png"
+    }
+  ]
+}
