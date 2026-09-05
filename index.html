@@ -691,7 +691,27 @@
     function makeRecord(lv,win,acc,duration){const a=state.profile.account||"",eventId=typeof crypto!=="undefined"&&crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`;return{eventId,createdAt:new Date().toISOString(),account:a,className:a.slice(0,3),studentName:a,seatNo:a.slice(3),mode:lv.mode,zone:lv.zone,result:win?"win":"fail",level:lv.id,stage:lv.id,score:state.score,correct:state.correct,attempts:state.attempts,accuracy:acc,cpm:Math.round(state.correct/duration*60),wpm:0,durationSec:duration,appVersion:"word-war-core-20260618",userAgent:navigator.userAgent,date:new Date().toLocaleString("zh-TW"),synced:false}}
     async function submitLadder(){if(!pendingLadderRecord)return;const checked=ladderName(ladderNickname.value);if(!checked.ok){ladderNameStatus.textContent=checked.error;return}submitLadderBtn.disabled=true;ladderNameStatus.textContent="正在送出天梯成績…";try{if(state.config.gasUrl&&state.auth?.sessionToken){const res=await gasPost({action:"finishLadder",runId:state.ladderRun?.runId,nickname:checked.value,floor:pendingLadderRecord.floor,score:pendingLadderRecord.score,accuracy:pendingLadderRecord.accuracy,durationMs:pendingLadderRecord.durationMs,correct:pendingLadderRecord.correct,attempts:pendingLadderRecord.attempts});if(!res.ok)throw new Error(res.error||"天梯成績送出失敗");if(res.entry)state.ladderRecords.push(res.entry)}else{state.ladderRecords.push({nickname:checked.value,floor:pendingLadderRecord.floor,score:pendingLadderRecord.score,accuracy:pendingLadderRecord.accuracy,durationMs:pendingLadderRecord.durationMs,achievedAt:new Date().toISOString(),moderationStatus:"approved",account:state.profile.account});state.ladderRecords=state.ladderRecords.sort((a,b)=>Number(b.floor||0)-Number(a.floor||0)||Number(b.score||0)-Number(a.score||0)).slice(0,50);save(LADDER_STORE,state.ladderRecords)}ladderNameStatus.textContent="已送出，公開榜只顯示暱稱。";pendingLadderRecord=null;submitLadderBtn.disabled=true;rank()}catch(err){ladderNameStatus.textContent=err.message;submitLadderBtn.disabled=false}}
     async function gasGet(action,params={}){if(!state.config.gasUrl)throw new Error(T.gasMissing);const url=new URL(state.config.gasUrl),query={...params};if(state.auth?.sessionToken&&!query.sessionToken)query.sessionToken=state.auth.sessionToken;url.searchParams.set("action",action);Object.entries(query).forEach(([k,v])=>url.searchParams.set(k,v));const r=await fetch(url);return await r.json()}
-    async function gasPost(payload){if(!state.config.gasUrl)throw new Error(T.gasMissing);const body={...payload};if(state.auth?.sessionToken&&!body.sessionToken)body.sessionToken=state.auth.sessionToken;const r=await fetch(state.config.gasUrl,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});return await r.json()}
+    async function gasPost(payload){
+      if(!state.config.gasUrl)throw new Error(T.gasMissing);
+      const body={...payload};
+      if(state.auth?.sessionToken&&!body.sessionToken)body.sessionToken=state.auth.sessionToken;
+      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),45000);
+      try{
+        const r=await fetch(state.config.gasUrl,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body),signal:controller.signal});
+        if(!r.ok)throw new Error(`雲端服務暫時無法使用（${r.status}）。請先重新載入存檔確認結果，再重試。`);
+        let result;
+        try{result=await r.json()}catch(error){
+          if(controller.signal.aborted)throw error;
+          throw new Error('雲端服務回應異常。請先重新載入存檔確認結果，再重試。');
+        }
+        if(!result||typeof result.ok!=='boolean')throw new Error('雲端回應格式不正確。請確認服務設定，並重新載入存檔。');
+        return result;
+      }catch(error){
+        if(controller.signal.aborted)throw new Error('雲端連線逾時，結果尚未確認。請先重新載入存檔，避免重複購買。');
+        if(error instanceof TypeError)throw new Error('無法連線至雲端。請檢查網路並重新載入存檔確認結果。');
+        throw error;
+      }finally{clearTimeout(timer)}
+    }
     async function syncProfile(){if(!state.config.gasUrl||!state.auth?.sessionToken)return;const account=state.profile.account,expectedVersion=Number(state.profile.version)||1,res=await gasPost({action:"saveProgress",profile:state.profile,expectedVersion});if(!res.ok)throw new Error(res.error||"Profile sync failed");state.profile=profileForRemote(res.profile,account);saveProfile();hud();menu()}
     let profileSyncChain=Promise.resolve();
     function queueProfileSync(){profileSyncChain=profileSyncChain.then(()=>syncProfile()).catch(err=>console.warn("[Word War] profile sync",err));return profileSyncChain}
