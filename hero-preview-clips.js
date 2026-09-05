@@ -31,8 +31,10 @@
   };
   const previousGrid=renderGrid;
   renderGrid=()=>{
+    const focusedLevel=grid.contains(document.activeElement)?document.activeElement.closest('[data-lv]')?.dataset.lv:null;
     previousGrid();
     grid.querySelectorAll('[data-lv]').forEach(card=>{
+      card.setAttribute('aria-pressed',String(Number(card.dataset.lv)===level));
       const clip=clips[`${hero}:${card.dataset.lv}:${weapon}`];
       if(!clip)return;
       const sprite=card.querySelector('.sprite'),url=clip.url.replace(/cast-strip\.png$/,'idle.png');
@@ -46,6 +48,7 @@
         sprite.dataset.clipIdle=url;
       }).catch(()=>{});
     });
+    if(focusedLevel)grid.querySelector(`[data-lv="${focusedLevel}"]`)?.focus({preventScroll:true});
   };
   window.addEventListener('resize',()=>{renderGrid();setHero()});
   renderGrid();
