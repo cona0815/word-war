@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {chromium}=require('C:/Users/cona0/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
@@ -19,7 +20,8 @@ try{
    const remaining=state.bossAttackAt-now;submit(state.current.word);now+=5000;bossThreat();
    results.push({name:'animation cannot launch pending warning',ok:state.bossAttackPending&&state.bossAttackCount===0});
    await new Promise(resolve=>setTimeout(resolve,1100));
-   results.push({name:'warning remains during cast',ok:!!document.querySelector('.boss-telegraph')});
+   const warning=document.querySelector('.boss-telegraph');
+   results.push({name:'warning remains visible during cast',ok:!!warning&&Number(getComputedStyle(warning).opacity)===1});
    impact();results.push({name:'warning countdown preserved',ok:state.bossAttackAt===now+remaining});
    now+=remaining;bossThreat();results.push({name:'expired warning launches attack',ok:state.bossAttackCount===1});
    results.push({name:'launch removes warning',ok:!document.querySelector('.boss-telegraph')});
@@ -28,5 +30,7 @@ try{
   return results;
  });
  for(const r of result)assert.equal(r.ok,true,r.name);
+ await page.evaluate(()=>{state.current.pending=false;state.bossAttackPending=false;state.bossAttackAt=Date.now();bossThreat()});
+ fs.mkdirSync('docs/qa-boss-pressure',{recursive:true});await page.screenshot({path:'docs/qa-boss-pressure/warning.png'});
  console.log('PASS 9 Boss response-clock checks: cast waits excluded, warnings retained, idle deadlines and phase hits preserved');
 }finally{await browser.close()}
