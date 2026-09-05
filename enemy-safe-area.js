@@ -4,9 +4,8 @@
     if (state.bossMode || gameScreen.classList.contains('hidden')) return;
     const screen = gameScreen.getBoundingClientRect(), gap = 12;
     const rect = selector => gameScreen.querySelector(selector)?.getBoundingClientRect();
-    const top = Math.max(screen.top, rect('.hud')?.bottom || 0, rect('#menuBtn')?.bottom || 0) + gap;
-    const bottom = Math.min(screen.bottom, rect('.play-panel')?.top || screen.bottom,
-      rect('#ultimateMeter')?.top || screen.bottom) - gap;
+    const upper = [rect('.hud'), rect('#menuBtn')].filter(Boolean);
+    const lower = [rect('.play-panel'), rect('#ultimateMeter')].filter(Boolean);
     enemyLayer.querySelectorAll('.enemy').forEach(node => {
       const tag = node.querySelector('.tag');
       if (!tag) return;
@@ -19,6 +18,11 @@
       tag.style.bottom = 'calc(100% + 6px)';
       tag.style.marginLeft = '0px';
       const body = node.getBoundingClientRect(), label = tag.getBoundingClientRect();
+      const labelLeft=Math.max(screen.left+gap,Math.min(screen.right-gap-label.width,label.left));
+      const overlapsX=p=>Math.min(body.left,labelLeft)<p.right+gap&&Math.max(body.right,labelLeft+label.width)>p.left-gap;
+      // Reserve only the columns actually occupied by controls, preserving the lower keyboard lane.
+      const top=Math.max(screen.top,...upper.filter(overlapsX).map(p=>p.bottom))+gap;
+      const bottom=Math.min(screen.bottom,...lower.filter(overlapsX).map(p=>p.top))-gap;
       const minCenter = top + label.height + 6 + body.height / 2;
       const maxCenter = bottom - body.height / 2;
       const center = body.top + body.height / 2;
