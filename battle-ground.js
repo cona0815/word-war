@@ -30,6 +30,15 @@
   }
   async function align() {
     const request = ++generation;
+    const screen=gameScreen.getBoundingClientRect(),panel=gameScreen.querySelector('.play-panel');
+    if(screen.height&&panel){
+      const height=parseFloat(getComputedStyle(hero).height)||0;
+      const base=(state.bossMode?heroBoss.y:heroNormal.y)*screen.height/100;
+      const bottom=panel.getBoundingClientRect().top-screen.top-12;
+      const center=Math.max(height/2,Math.min(base,bottom-height/2));
+      const position=(center/screen.height*100).toFixed(4)+'%';
+      if(gameScreen.style.getPropertyValue('--hero-y')!==position)gameScreen.style.setProperty('--hero-y',position);
+    }
     const bossNode = document.getElementById('bossEntity');
     const sprite = bossNode?.querySelector('[data-boss-clip]');
     if (!sprite || !state.bossMode) return;
@@ -46,10 +55,19 @@
       if (bossNode.style.top !== value) bossNode.style.top = value;
       bossPos.y = center / gameScreen.clientHeight * 100;
       bossNode.dataset.groundY = ground.toFixed(3);
+      const tag=bossNode.querySelector('.boss-tag');
+      if(tag){
+        Object.assign(tag.style,{maxWidth:`${Math.min(400,screen.width-24)}px`,minWidth:'0',width:'max-content',whiteSpace:'normal',overflowWrap:'anywhere',top:'auto',bottom:'calc(100% + 22px)',marginLeft:'0px'});
+        const bounds=tag.getBoundingClientRect();
+        const dx=bounds.left<screen.left+12?screen.left+12-bounds.left:bounds.right>screen.right-12?screen.right-12-bounds.right:0;
+        tag.style.marginLeft=dx+'px';
+      }
     } catch (error) { console.warn('Battle ground alignment:', error.message); }
   }
   new ResizeObserver(align).observe(gameScreen);
   new ResizeObserver(align).observe(hero);
+  const panel=gameScreen.querySelector('.play-panel');
+  if(panel)new ResizeObserver(align).observe(panel);
   new MutationObserver(align).observe(enemyLayer, {childList:true,subtree:true,attributes:true,attributeFilter:['data-boss-clip']});
   new MutationObserver(align).observe(hero, {attributes:true,attributeFilter:['class','style']});
   window.BattleGround = Object.freeze({align});
