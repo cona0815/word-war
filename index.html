@@ -597,7 +597,7 @@
          if(state.hp<=0)finish(false);
        });
      }
-      function loop(){if(!state.bossMode){const lv=levels[state.levelIndex];const step=qaMode?.12:Math.max(.0009,Math.min(.0018,lv.speed*.045));state.enemies.forEach(e=>{if(!isActive(e)||e.pending)return;e.x+=(50-e.x)*step;e.y+=(58-e.y)*step;if(!qaMode&&dist(e)<8){e.alive=false;state.cleared++;const loss=state.profile.gear==="guardian"?8:12;state.hp=Math.max(0,state.hp-loss)}});if(!state.enemies.some(e=>e.alive))pick();render();if(state.hp<=0)finish(false)}else{bossThreat()}hud()}
+      function loop(){if(!state.bossMode){const lv=levels[state.levelIndex];const step=(qaMode?.12:Math.max(.0009,Math.min(.0018,lv.speed*.045)))*(window.Consumables?.slowFactor()??1);state.enemies.forEach(e=>{if(!isActive(e)||e.pending)return;e.x+=(50-e.x)*step;e.y+=(58-e.y)*step;if(!qaMode&&dist(e)<8){e.alive=false;state.cleared++;const loss=state.profile.gear==="guardian"?8:12;state.hp=Math.max(0,state.hp-loss)}});if(!state.enemies.some(e=>e.alive))pick();render();if(state.hp<=0)finish(false)}else{bossThreat()}hud()}
     function findTarget(v){if(state.bossMode)return state.current&&!state.current.pending&&v===String(state.current.word).trim()?state.current:null;return state.enemies.filter(e=>!e.pending&&isActive(e)&&String(e.word).trim()===v).sort((a,b)=>dist(a)-dist(b))[0]||null}
     function submit(raw){
       if(!state.running||!mission.classList.contains("hidden"))return;
@@ -606,7 +606,7 @@
       if(!target&&inFlight.some(e=>e?.pending&&String(e.word).trim()===v)){answerInput.value="";return}
       state.attempts++;
       if(target){target.pending=true;state.correct++;state.combo++;const gear=playerGear[state.profile.gear]||playerGear.focus;state.score+=100+state.combo*15+levels[state.levelIndex].id*20+(gear.score||0);cast(target)}
-      else{state.combo=0;state.hp=Math.max(0,state.hp-6)}
+      else{state.combo=0;state.hp=Math.max(0,state.hp-(window.Consumables?.mistake()??6))}
       answerInput.value="";hud();if(state.hp<=0)finish(false);
     }
     function singleAutoValue(raw){const v=String(raw||"").trim();if(/^[a-z]$/i.test(v))return v.toUpperCase();if(/^[\u3105-\u3129]$/.test(v))return v;return""}
@@ -659,6 +659,8 @@
           const ready=await prepareBattleVisuals();
           if(generation!==battleVisualGeneration)return;
           if(!ready){missionText.textContent="人物素材載入失敗，請檢查連線後重試。";return}
+          await window.Consumables?.prepare();
+          if(generation!==battleVisualGeneration)return;
           const lv=levels[state.levelIndex];
           if(isLadder(lv)&&!qaMode){
             if(state.config.gasUrl&&state.auth?.sessionToken){
@@ -758,6 +760,8 @@
   <script src="enemy-safe-area.js"></script>
   <script src="gm-mode.js"></script>
   <script src="boss-projectile.js"></script>
+  <link rel="stylesheet" href="consumables.css">
+  <script src="consumables.js"></script>
   <style>
     #gameScreen:has(#bossEntity) .hero.integrated:not(.casting){animation:none}
   </style>

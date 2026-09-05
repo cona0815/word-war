@@ -205,6 +205,15 @@ function doPost(e) {
       return json_({ ok: true, profile: purchase_(accountId, payload.itemId, payload.expectedVersion) });
     }
 
+    if (action === "startItemRun") {
+      const accountId = requireSession_(payload.sessionToken);
+      return json_({ ok: true, profile: startItemRun_(accountId, payload) });
+    }
+    if (action === "consumeItem") {
+      const accountId = requireSession_(payload.sessionToken);
+      return json_({ ok: true, profile: consumeItem_(accountId, payload) });
+    }
+
     if (action === "finishStage") {
       const accountId = requireSession_(payload.sessionToken);
       return json_({ ok: true, profile: finishStage_(accountId, payload) });
@@ -479,7 +488,62 @@ function parseInventory_(value) {
   const safeGear = base.gear.concat(gear.filter(function(id) {
     return SHOP_CATALOG[id] && SHOP_CATALOG[id].kind === "gear";
   })).filter(function(id, index, list) { return list.indexOf(id) === index; });
-  return { weapons: safeWeapons, gear: safeGear, items: safeItems };
+  const result = { weapons: safeWeapons, gear: safeGear, items: safeItems };
+  // This metadata is only accepted from the stored profile, never saveProgress input.
+  const run = source.itemRun;
+  if (run && typeof run === "object" && typeof run.id === "string") {
+    const used = {};
+    Object.keys(safeItems).forEach(function(id) {
+      if (typeof run.used?.[id] === "string") used[id] = run.used[id].slice(0,100);
+    });
+    result.itemRun = { id: run.id.slice(0,100), stage: Number(run.stage), expiresAt: Number(run.expiresAt), closed:!!run.closed, used: used };
+  }
+  return result;
+}
+
+function startItemRun_(accountId, payload) {
+  const id = clean_(payload.runId,100), stage = Number(payload.stage);
+  if (!/^[A-Za-z0-9-]{8,100}$/.test(id) || !Number.isInteger(stage) || stage < 1 || stage > 9) throw new Error("Invalid item run.");
+  const lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    const current = getProfile_(accountId), inventory = parseInventory_(current.inventory);
+    if (inventory.itemRun?.id === id) {
+      if (inventory.itemRun.stage !== stage) throw new Error("Run stage mismatch.");
+      return current;
+    }
+    if (Number(payload.expectedVersion) !== current.version) throw new Error("Profile changed. Reload before starting.");
+    const gems = normalizeGems_(current.gems);
+    if (stage > 1 && !gems[stage-2]) throw new Error("Complete the previous stage first.");
+    if (stage === 9 && (gems.length < 8 || gems.some(function(gem) { return !gem; }))) throw new Error("Collect all eight gems first.");
+    inventory.itemRun = {id:id,stage:stage,expiresAt:Date.now()+30*60*1000,used:{}};
+    current.inventory = inventory;current.version += 1;
+    current.updatedAt = new Date().toISOString();
+    return persistProfile_(accountId,current);
+  } finally { lock.releaseLock(); }
+}
+
+function consumeItem_(accountId, payload) {
+  const id = String(payload.itemId || ""), eventId = clean_(payload.eventId,100);
+  if (!Object.prototype.hasOwnProperty.call(SHOP_CATALOG,id) || SHOP_CATALOG[id].kind !== "item" || !/^[A-Za-z0-9-]{8,100}$/.test(eventId)) throw new Error("Invalid consumable event.");
+  const lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    const current = getProfile_(accountId), inventory = parseInventory_(current.inventory), run = inventory.itemRun;
+    if (!run || run.id !== payload.runId) throw new Error("Item run is no longer active.");
+    if (run.used[id] === eventId) return current;
+    if (run.closed) throw new Error("Item run is closed.");
+    if (run.expiresAt < Date.now()) throw new Error("Item run expired.");
+    if (Object.values(run.used).indexOf(eventId) >= 0) throw new Error("Event already belongs to another item.");
+    if (run.used[id]) throw new Error("This item was already used in this run.");
+    if (Number(payload.expectedVersion) !== current.version) throw new Error("Profile changed. Reload before using.");
+    if (!(inventory.items[id] > 0)) throw new Error("No item in inventory.");
+    inventory.items[id] -= 1;run.used[id] = eventId;
+    current.inventory = inventory;current.version += 1;
+    current.updatedAt = new Date().toISOString();
+    // The inventory and receipt occupy one row write, so retries see both or neither.
+    return persistProfile_(accountId,current);
+  } finally { lock.releaseLock(); }
 }
 
 function persistProfile_(accountId, profile) {
@@ -523,6 +587,7 @@ function purchase_(accountId, itemId, expectedVersion) {
     if (current.level < item.unlockLevel) throw new Error("Level is too low for this item.");
     if (item.kind === "weapon" && inventory.weapons.indexOf(id) >= 0) throw new Error("This weapon is already owned.");
     if (item.kind === "gear" && inventory.gear.indexOf(id) >= 0) throw new Error("This gear is already owned.");
+    if (item.kind === "item" && inventory.items[id] >= 99) throw new Error("道具已達持有上限 99 個。");
     if (current.coins < item.price) throw new Error("Not enough coins.");
     current.coins -= item.price;
     if (item.kind === "weapon") {
@@ -570,7 +635,12 @@ function finishStage_(accountId, payload) {
     const base = firstClear ? FIRST_CLEAR_COINS[stage] : REPEAT_CLEAR_COINS[stage];
     const accuracyBonus = accuracy >= 95 ? 1.2 : accuracy >= 90 ? 1.1 : 1;
     const comboBonus = Math.min(10, Math.max(0, number_(payload.maxCombo)));
-    const reward = Math.round(base * accuracyBonus * (1 + comboBonus / 100));
+    const inventory = parseInventory_(current.inventory), itemRun = inventory.itemRun;
+    const validRun = itemRun && itemRun.id === payload.itemRunId && itemRun.stage === stage && !itemRun.closed && itemRun.expiresAt >= Date.now();
+    const ordinaryReward = Math.round(base * accuracyBonus * (1 + comboBonus / 100));
+    const reward = ordinaryReward + (validRun && itemRun.used.comboStar ? Math.round(ordinaryReward*.1) : 0);
+    if (validRun) itemRun.closed = true;
+    current.inventory = inventory;
     const xpGain = 70 + stage * 25 + Math.min(correct, 250);
     let level = Math.max(1, current.level);
     let xp = Math.max(0, current.xp) + xpGain;

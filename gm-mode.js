@@ -28,6 +28,13 @@
   style.textContent = '#gmPanel{width:min(420px,90vw);max-height:88dvh;overflow:auto;background:#142b2b;color:#fff;border:1px solid #72d8b6;border-radius:8px;padding:20px}#gmPanel::backdrop{background:#000b}#gmPanel h2{font-size:22px;margin:0 0 10px}#gmPanel label{display:grid;grid-template-columns:100px 1fr;align-items:center;margin:8px 0}#gmPanel input,#gmPanel select{width:100%;min-width:0;padding:6px;background:#fff;color:#152c29}#gmPanel button{padding:9px;border:1px solid #82cfb2;background:#205648;color:white;cursor:pointer}.gmActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}#gmPanel p{font-size:13px}#gmToggle{position:fixed;right:8px;top:80px;z-index:30;padding:8px;background:#205648;color:white;border:1px solid #82cfb2}';
   document.head.append(style); document.body.append(panel);
   const q = id => panel.querySelector('#'+id);
+  const refillItems=document.createElement('button');refillItems.id='gmItems';refillItems.textContent='消耗品各補 5 個';
+  panel.querySelector('.gmActions').appendChild(refillItems);
+  refillItems.onclick=()=>{
+    if(!active)return;
+    state.profile.inventory.items=Object.fromEntries(Object.keys(playerItemCatalog).map(id=>[id,5]));
+    hud();q('gmStatus').textContent='消耗品已補充；每關每種仍限用一次。';
+  };
   const toggle = document.createElement('button'); toggle.id='gmToggle';toggle.textContent='GM 測試';toggle.hidden=true;document.body.append(toggle);
   let resume = false;
   function open(){resume=state.running;clearInterval(state.tick);panel.showModal()}
