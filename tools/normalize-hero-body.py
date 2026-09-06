@@ -36,7 +36,10 @@ for r in records:
     result.save(out/'cast-strip.png');frames[0].save(out/'idle.png')
     region=source/'body-region.json'
     if region.exists():
-        (out/'body-region.json').write_text(region.read_text())
+        mapped=json.loads(region.read_text())
+        mapped['left']*=factor
+        mapped['right']*=factor
+        (out/'body-region.json').write_text(json.dumps(mapped,indent=2))
     record={**r,'factor':factor,'targetBodyHeight':460,'output':out.name}
     (out/'body-scale.json').write_text(json.dumps(record,indent=2))
     reports.append(record)

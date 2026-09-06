@@ -1,0 +1,12 @@
+{
+  "key": "candidate",
+  "folder": "hero-male-shadow-cast-lv10-v2",
+  "width": 1152,
+  "top": 202,
+  "bottom": 610,
+  "footx": 576.5,
+  "bodyHeight": 408,
+  "factor": 1.1274509803921569,
+  "targetBodyHeight": 460,
+  "output": "hero-male-shadow-cast-lv10-v2-body-v2"
+}

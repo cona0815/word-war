@@ -1,0 +1,12 @@
+{
+  "key": "candidate",
+  "folder": "hero-female-shadow-cast-lv10-v1",
+  "width": 1152,
+  "top": 195,
+  "bottom": 610,
+  "footx": 576.5,
+  "bodyHeight": 415,
+  "factor": 1.108433734939759,
+  "targetBodyHeight": 460,
+  "output": "hero-female-shadow-cast-lv10-v1-body-v2"
+}
