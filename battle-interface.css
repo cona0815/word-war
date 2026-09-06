@@ -1,0 +1,124 @@
+/* Battle-only presentation; educational inputs and combat timing stay unchanged. */
+#gameScreen{--battle-glass:rgba(17,48,60,.78);--battle-edge:rgba(188,224,228,.65)}
+#gameScreen .aura,#gameScreen .hero-gear{display:none}
+#gameScreen .hero-gear{--gear-color:#72d7ff}
+#gameScreen[data-aura]:not([data-aura=""]) .hero-gear,#gameScreen:has(.hero.casting) .hero-gear{display:block}
+#gameScreen[data-aura="heal"] .hero-gear{--gear-color:#66e896}
+#gameScreen[data-aura="shield"] .hero-gear{--gear-color:#ffce64}
+#gameScreen[data-aura="slow"] .hero-gear{--gear-color:#7d9fff}
+#gameScreen[data-aura="hint"] .hero-gear{--gear-color:#63eadc}
+#gameScreen[data-aura="reward"] .hero-gear{--gear-color:#df90d7}
+#gameScreen[data-aura="charge"] .hero-gear{--gear-color:#f0c571}
+#gameScreen[data-aura="ultimate"] .hero-gear{--gear-color:#fff2c5}
+.battle-foot-marker{position:absolute;z-index:2;width:36px;height:10px;border:1px solid #dcece38c;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;background:#051b2629}
+#gameScreen .hud{gap:3px}
+#gameScreen .hud-card{padding:4px 7px;min-width:55px}
+#gameScreen .hud-title{font-size:13px}
+#gameScreen .hud-label{font-size:10px}
+#gameScreen .hud-value{font-size:18px}
+#gameScreen .menu-btn{padding:6px 12px;font-size:13px;min-height:32px}
+#gameScreen .hud-card{border-radius:1px;border-color:var(--battle-edge);background:rgba(21,46,54,.65);box-shadow:inset 0 0 0 2px rgba(9,25,35,.5);backdrop-filter:blur(4px)}
+#gameScreen .hud-card.level{border-left:3px solid #dbcc91}
+#gameScreen .hud-title{color:#fff1c3}
+#gameScreen .hud-value{font-variant-numeric:tabular-nums;font-weight:600}
+#gameScreen .menu-btn{border-radius:1px;border:1px solid var(--battle-edge);background:var(--battle-glass);box-shadow:inset 0 0 0 3px rgba(7,26,35,.6)}
+#gameScreen .play-panel{width:min(430px,calc(100vw - 20px));border-radius:1px;border:1px solid var(--battle-edge);background:linear-gradient(105deg,rgba(16,47,61,.88),rgba(31,53,67,.68));box-shadow:inset 0 0 0 3px rgba(5,19,30,.55),0 4px 16px #0004;backdrop-filter:blur(4px)}
+.battle-identity{padding:9px 12px 7px;display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:1px solid #b6dee34d}
+.battle-identity strong{color:#ffe28b;font-size:17px;font-weight:700}
+.battle-identity span{color:#c8eced;font-size:12px;text-align:right;overflow-wrap:anywhere}
+#gameScreen .q-head{background:rgba(9,28,38,.3);min-height:26px;padding:4px 12px;font-size:11px;border:0}
+#gameScreen .bars{gap:8px;padding:10px 12px}
+#gameScreen .bar-meta{font-size:13px;font-weight:500;margin-bottom:3px;font-variant-numeric:tabular-nums}
+#gameScreen #hpLabel{color:#98f3c5}
+#gameScreen .bar{height:7px;border-radius:0;border:1px solid #c2e2e587;background:#03111999;padding:1px}
+#gameScreen .bar span{border-radius:0;box-shadow:0 0 5px var(--c)}
+#gameScreen .question{font-size:26px;font-weight:700;padding:8px 12px;line-height:1.25;text-shadow:0 0 12px #64d5e56b}
+#gameScreen .question:empty{padding:0;min-height:0}
+#gameScreen .input-row{padding:3px 12px 10px;grid-template-columns:minmax(0,1fr) 78px;gap:5px}
+#gameScreen .input-row input{min-width:0;border-radius:0;background:#091d29ad;border-color:#9bbcc4}
+#gameScreen .input-row .btn{border-radius:0;color:#fff4cc;background:linear-gradient(90deg,#426c76,#224854);border:1px solid #a3e4e9;box-shadow:inset 0 0 12px #69e2e333}
+#gameScreen .input-row .btn:hover,#gameScreen button:focus-visible{outline:2px solid #fff0b0;outline-offset:2px}
+#gameScreen #battleItems{margin:0;padding:6px 12px 8px;border-top:1px solid #a1ced14d}
+#gameScreen #battleItems .item-buttons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}
+#gameScreen #battleItems button{border-radius:0;padding:5px 2px;border-color:#92bcc57d;background:#193c49;font-size:11px;min-width:0}
+#gameScreen #battleItems output:empty{display:none}
+#gameScreen #ultimateMeter{width:220px;padding:10px;border-radius:1px;border:1px solid var(--battle-edge);background:linear-gradient(110deg,rgba(16,60,73,.88),rgba(28,48,66,.78));box-shadow:inset 0 0 0 3px #0c223c66;backdrop-filter:blur(4px)}
+#gameScreen #ultimateMeter strong{color:#ffdf8a;font-size:16px;font-weight:600}
+#gameScreen #ultimateMeter progress{height:9px;accent-color:#e5a2da;border:1px solid #bce0e7;border-radius:0;background:#071827}
+#gameScreen #ultimateMeter progress::-webkit-progress-bar{background:#071827}
+#gameScreen #ultimateMeter progress::-webkit-progress-value{background:linear-gradient(90deg,#b668bb,#f2bde8)}
+#gameScreen .ultimate-actions{display:grid;gap:3px;margin-top:9px}
+#gameScreen .ultimate-actions button{position:relative;text-align:left;padding:8px 12px 8px 27px;border-radius:0;border:1px solid #89b5c45c;background:#255262a8;font-size:15px;line-height:1.25;min-height:36px}
+#gameScreen .ultimate-actions button::before{content:'';position:absolute;left:11px;top:14px;width:6px;height:6px;border:1px solid #c1edf0;transform:rotate(45deg)}
+#gameScreen .ultimate-actions button:not(:disabled):hover,#gameScreen .ultimate-actions button:focus-visible{background:#347d8ea8;box-shadow:inset 0 0 0 1px #8bebf1,inset 0 -7px 12px #64d4df44}
+#gameScreen #ultimateMeter.ready{border-color:#ffe69c;box-shadow:inset 0 0 0 2px #d7b96d70,0 0 14px #e1ce7c40}
+#gameScreen .boss-tag,#gameScreen .boss-command,#gameScreen .enemy .tag{border-radius:1px;background:#0b2638b5;border-color:#b1dfe6a6;box-shadow:inset 3px 0 #b3e8ef80}
+#gameScreen .boss-hp{border-radius:0;border:1px solid #cce9e5;padding:1px;background:#031623b3}
+#gameScreen .boss-hp span{border-radius:0;background:linear-gradient(90deg,#c84e89,#f19cab)}
+.battle-progress{position:absolute;z-index:5;top:10px;left:50%;width:260px;transform:translateX(-50%);color:#d9eff0;pointer-events:none}
+.battle-progress p{margin:0 0 6px;font-size:10px;text-align:center;text-shadow:0 1px 3px #000}
+.battle-progress ol{display:flex;list-style:none;justify-content:space-between;margin:0;padding:0 12px;position:relative}
+.battle-progress ol::before{content:'';position:absolute;left:18px;right:18px;top:10px;height:2px;background:#bedddd85}
+.battle-progress li{width:21px;height:21px;background:#24444ee8;border:1px solid #b1d8df;transform:rotate(45deg);position:relative;box-shadow:0 0 0 3px #17363f55}
+.battle-progress li.done{background:#71b4bc}
+.battle-progress li.current{background:#d7bd76;border-color:#fff4cc;box-shadow:0 0 12px #e6d19199}
+.battle-progress li.boss-step{border-color:#e4abc8}
+@media(max-width:1299px){.battle-progress{display:none}}
+@media(min-width:601px){
+ #gameScreen .play-panel{width:min(320px,calc(100vw - 210px))}
+ #gameScreen .battle-identity{padding:4px 8px}
+ #gameScreen .battle-identity strong{font-size:13px}
+ #gameScreen .q-head{padding:2px 8px;min-height:20px}
+ #gameScreen .bars{padding:5px 8px;gap:4px}
+ #gameScreen .bar-meta{font-size:11px;margin-bottom:1px}
+ #gameScreen .question{padding:3px 8px;font-size:22px}
+ #gameScreen .input-row{padding:3px 8px 6px;grid-template-columns:minmax(0,1fr) 58px}
+ #gameScreen .input-row input{font-size:12px;padding:7px;min-height:32px}
+ #gameScreen .input-row .btn{font-size:13px;padding:6px;min-height:32px}
+ #gameScreen #ultimateMeter{width:180px;padding:6px}
+ #gameScreen #ultimateMeter strong{font-size:13px}
+ #gameScreen #battleItems{position:absolute;right:10px;bottom:110px;width:180px;padding:5px;background:var(--battle-glass);border:1px solid var(--battle-edge);backdrop-filter:blur(4px);z-index:6}
+ #gameScreen #battleItems .item-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #gameScreen #battleItems button{min-height:26px;text-align:left;padding:2px;font-size:11px}
+ #gameScreen #battleItems output{font-size:12px;overflow-wrap:anywhere}
+ #gameScreen .ultimate-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+ #gameScreen .ultimate-actions button{padding:5px 2px;text-align:center;font-size:12px}
+ #gameScreen .ultimate-actions button::before{display:none}
+}
+#gameScreen button[data-shortcut]::after{content:attr(data-shortcut);display:inline-block;margin-left:5px;padding:0 4px;border:1px solid #b9dadd8a;color:#fff0bc;font-size:11px;line-height:16px}
+@media(min-width:601px) and (max-height:600px){
+ #gmToggle{left:8px;right:auto;top:70px}
+ #gameScreen .boss{width:min(22vw,130px)}
+ #gameScreen .boss-tag{font-size:12px;padding:3px 6px}
+ #gameScreen .boss-command{font-size:20px;padding:4px 8px}
+ .battle-identity{display:none}
+ #gameScreen .q-head{min-height:20px;padding:2px 10px}
+ #gameScreen .question{font-size:20px;padding:3px 10px}
+ #gameScreen .bars{padding:4px 10px;gap:3px}
+ #gameScreen .bar-meta{font-size:11px;margin-bottom:1px}
+ #gameScreen .input-row{padding:3px 10px 6px}
+ #gameScreen #battleItems{bottom:110px;padding:4px}
+ #gameScreen #battleItems button{min-height:22px;padding:1px}
+ #gameScreen #ultimateMeter{padding:6px}
+ #gameScreen .ultimate-actions{margin-top:4px}
+}
+@media(max-width:600px){
+ #gameScreen .play-panel{width:calc(100vw - 20px)}
+ .battle-identity{display:none}
+ #gameScreen .q-head{min-height:30px;padding:6px 10px;font-size:13px;border-bottom:1px solid #a1ced14d}
+ #gameScreen .bars{padding:8px 10px;gap:4px}
+ #gameScreen .bar-meta{font-size:12px;line-height:1;margin:0;font-weight:900}
+ #gameScreen .bar{height:8px}
+ #gameScreen .question{font-size:20px;padding:6px 10px;line-height:1.12}
+ #gameScreen .input-row{padding:0 10px 10px;grid-template-columns:minmax(0,1fr) 82px;gap:7px}
+ #gameScreen #battleItems{padding:6px 0 0;margin-top:6px}
+ #gameScreen #battleItems .item-buttons{display:flex;gap:4px;flex-wrap:wrap}
+ #gameScreen #battleItems button{min-height:32px;padding:4px 7px;font-size:12px}
+ #gameScreen #battleItems output:empty{display:block}
+ #gameScreen .play-panel #ultimateMeter{width:100%;position:static;display:grid;grid-template-columns:1fr 1fr;padding:4px 0;margin-top:5px;border:0;border-top:1px solid #a1ced14d;background:transparent;box-shadow:none;backdrop-filter:none}
+ #gameScreen .play-panel #ultimateMeter strong{font-size:12px;min-height:16px}
+ #gameScreen .play-panel #ultimateMeter progress{height:8px}
+ #gameScreen .play-panel #ultimateMeter .ultimate-actions{display:flex;margin:0;gap:4px}
+ #gameScreen .play-panel #ultimateMeter button{min-width:0;min-height:0;text-align:center;font-size:12px;padding:3px;line-height:normal}
+ #gameScreen .play-panel #ultimateMeter button::before{display:none}
+}

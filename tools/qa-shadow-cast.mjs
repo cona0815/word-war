@@ -12,7 +12,7 @@ try{
  const page=await browser.newPage({viewport:{width:1366,height:768}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(base+'/index.html?gm=1');await page.locator('#gmPassword').fill('0088');await page.locator('#gmLogin button').click();
  await page.locator('#gmHero').selectOption(gender);
- await page.locator('#gmLevel').fill(String(level));
+ await page.locator('#gmLevel').selectOption(String(level));
  await page.locator('#gmWeapon').selectOption(weapon);await page.locator('#gmBoss').click();await page.waitForFunction(()=>!document.querySelector('#gmPanel').open);
  const result=await page.evaluate(async()=>{
   clearInterval(state.tick);await prepareBattleVisuals();await BattleGround.align();

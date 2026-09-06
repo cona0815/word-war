@@ -8,7 +8,7 @@
   narrow.addEventListener('change',placeMeter);placeMeter();
   const buttons=panel.firstElementChild,status=panel.lastElementChild;
   const labels={potion:'補血',shield:'護盾',hourglass:'慢速',hint:'提示',comboStar:'獎勵'};
-  let run=null,pendingRun=null,busy=false,shield=false,slowUntil=0,hintUntil=0,star=false,epoch=0;
+  let run=null,pendingRun=null,busy=false,shield=false,slowUntil=0,hintUntil=0,healUntil=0,star=false,epoch=0;
   const cloud=()=>!!(state.config.gasUrl&&state.auth?.sessionToken);
   const uid=()=>crypto.randomUUID();
   const closing=new Set();
@@ -33,7 +33,7 @@
   function retire(){const candidate=run||pendingRun;if(candidate)closeCandidate(candidate).catch(error=>{if(candidate.context&&sameContext(candidate.context))status.textContent='道具紀錄尚未同步，開始下一場時會重試。';console.warn('[Word War] item closure',error.message)})}
   let pausedAt=null;
   const effectNow=()=>pausedAt??Date.now();
-  function reset(){retire();epoch++;pausedAt=null;run=null;pendingRun=null;busy=false;shield=false;slowUntil=0;hintUntil=0;star=false;status.textContent='';paint()}
+  function reset(){retire();epoch++;pausedAt=null;run=null;pendingRun=null;busy=false;shield=false;slowUntil=0;hintUntil=0;healUntil=0;star=false;status.textContent='';paint()}
   function paint(){
     panel.hidden=!state.running;
     if(!buttons.children.length){
@@ -83,7 +83,7 @@
       }else state.profile.inventory.items[id]--;
       saveProfile();currentRun.used[id]=true;
       if(!state.running)return;
-      if(id==='potion')state.hp=Math.min(100,state.hp+25);
+      if(id==='potion'){state.hp=Math.min(100,state.hp+25);healUntil=effectNow()+1200}
       if(id==='shield')shield=true;
       if(id==='hourglass')slowUntil=effectNow()+10000;
       if(id==='hint')hintUntil=effectNow()+10000;
@@ -128,8 +128,9 @@
     return originalBuy(id);
   };
   window.Consumables={prepare,use,reset,slowFactor:()=>effectNow()<slowUntil?.5:1,
+    aura:()=>effectNow()<healUntil?'heal':shield?'shield':effectNow()<slowUntil?'slow':effectNow()<hintUntil?'hint':star?'reward':'',
     pause:()=>{pausedAt??=Date.now()},
-    resume:()=>{if(pausedAt===null)return;const elapsed=Date.now()-pausedAt;if(slowUntil)slowUntil+=elapsed;if(hintUntil)hintUntil+=elapsed;pausedAt=null},
+    resume:()=>{if(pausedAt===null)return;const elapsed=Date.now()-pausedAt;if(slowUntil)slowUntil+=elapsed;if(hintUntil)hintUntil+=elapsed;if(healUntil)healUntil+=elapsed;pausedAt=null},
     mistake:()=>{if(shield){shield=false;status.textContent='護盾抵銷失誤';return 0}return 6},
     inspect:()=>({run:run?.id,used:{...run?.used},busy,shield,star,slowUntil,closing:closing.size})};
   paint();

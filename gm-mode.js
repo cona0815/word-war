@@ -19,7 +19,7 @@
     <section id="gmControls" hidden><h2>GM 測試</h2><p>測試資料不存檔、不上傳排行榜。</p>
     <label>關卡<select id="gmStage">${levels.map((lv,i)=>`<option value="${i}">${lv.id} ${lv.zone}</option>`).join('')}</select></label>
     <label>人物<select id="gmHero"><option value="male">男主角</option><option value="female">女主角</option></select></label>
-    <label>等級<input id="gmLevel" type="number" min="1" max="10" value="1"></label>
+    <label>等級<select id="gmLevel">${Array.from({length:10},(_,i)=>`<option value="${i+1}">Lv.${i+1}${i===9?'（最高等級）':''}</option>`).join('')}</select></label>
     <label>武器<select id="gmWeapon">${Object.entries(playerWeapons).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('')}</select></label>
     <label>裝備道具<select id="gmGear">${Object.entries(playerGear).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('')}</select></label>
     <label>Boss 階段<select id="gmPhase"><option>1</option><option>2</option><option>3</option></select></label>

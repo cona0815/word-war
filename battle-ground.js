@@ -2,6 +2,7 @@
 (() => {
   const feet = new Map();
   let generation = 0;
+  const markers=['hero','boss'].map(kind=>{const node=document.createElement('div');node.className='battle-foot-marker';node.dataset.kind=kind;node.setAttribute('aria-hidden','true');gameScreen.append(node);return node});
   async function foot(node, columns) {
     const src = getComputedStyle(node).backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1];
     if (!src) throw new Error('Missing battle sprite');
@@ -36,7 +37,7 @@
       const base=(state.bossMode?heroBoss.y:heroNormal.y)*screen.height/100;
       const panelBounds=panel.getBoundingClientRect();
       const bottom=panelBounds.top-screen.top-12;
-      const heroX=screen.left+screen.width/2;
+      const heroX=screen.left+screen.width*(state.bossMode?heroBoss.x:heroNormal.x)/100;
       const coversCenter=panelBounds.left<=heroX&&panelBounds.right>=heroX;
       // A full-width control panel must leave a lower spawn lane, not just room for the hero.
       const clearance=!state.bossMode&&coversCenter?Math.max(height/2,56+screen.height*.21):height/2;
@@ -46,7 +47,11 @@
     }
     const bossNode = document.getElementById('bossEntity');
     const sprite = bossNode?.querySelector('[data-boss-clip]');
-    if (!sprite || !state.bossMode) return;
+    markers[1].hidden=!state.bossMode;
+    if (!sprite || !state.bossMode) {
+      try{const f=await foot(hero,hero.classList.contains('pose-sheet')?6:1);if(request!==generation)return;markers[0].style.left=heroNormal.x+'%';markers[0].style.top=(hero.offsetTop+parseFloat(getComputedStyle(hero).height)*(f-.5))+'px'}catch{}
+      return;
+    }
     try {
       const [heroFoot, bossFoot] = await Promise.all([
         foot(hero, hero.classList.contains('pose-sheet') ? 6 : 1), foot(sprite, 6)
@@ -55,6 +60,7 @@
       const heroHeight = parseFloat(getComputedStyle(hero).height);
       const bossHeight = parseFloat(getComputedStyle(sprite).height);
       const ground = hero.offsetTop + heroHeight * (heroFoot - .5);
+      markers.forEach((marker,i)=>{marker.style.left=(i?bossPos.x:heroBoss.x)+'%';marker.style.top=ground+'px'});
       const center = ground - bossHeight * (bossFoot - .5);
       const value = `${center.toFixed(3)}px`;
       if (bossNode.style.top !== value) bossNode.style.top = value;

@@ -4,8 +4,8 @@
     if (state.bossMode || gameScreen.classList.contains('hidden')) return;
     const screen = gameScreen.getBoundingClientRect(), gap = 12;
     const rect = selector => gameScreen.querySelector(selector)?.getBoundingClientRect();
-    const upper = [rect('.hud'), rect('#menuBtn')].filter(Boolean);
-    const lower = [rect('.play-panel'), rect('#ultimateMeter')].filter(Boolean);
+    const upper = [rect('.hud'), rect('#menuBtn'), rect('.battle-progress')].filter(Boolean);
+    const lower = [rect('.play-panel'), rect('#ultimateMeter'), rect('#battleItems')].filter(Boolean);
     enemyLayer.querySelectorAll('.enemy').forEach(node => {
       const tag = node.querySelector('.tag');
       if (!tag) return;

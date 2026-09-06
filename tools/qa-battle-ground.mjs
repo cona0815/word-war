@@ -10,8 +10,8 @@ try {
   const page = await browser.newPage();
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto((process.argv[2]||'http://127.0.0.1:8767')+'/index.html?qa=visual&cover=a');
-  await page.locator('#accountInput').fill('50101');
-  await page.locator('#passwordInput').fill('50101');
+  await page.locator('#accountInput').fill('99099');
+  await page.locator('#passwordInput').fill('99099');
   await page.locator('#startBtn').click();
   await page.waitForFunction(()=>!gameScreen.classList.contains('hidden'));
   for (const viewport of [{width:1920,height:1080},{width:1366,height:768},{width:800,height:900},{width:390,height:844},{width:320,height:780}]) {
@@ -43,7 +43,8 @@ try {
       },stage);
       assert.ok(result.difference<1,JSON.stringify(result));
       assert.equal(result.labelInBounds,true,JSON.stringify(result));
-      assert.equal(result.heroCentered,true,JSON.stringify(result));
+      assert.equal(result.heroCentered,false,JSON.stringify(result));
+      assert.equal(await page.evaluate(()=>Math.abs(parseFloat(getComputedStyle(gameScreen).getPropertyValue('--hero-x'))-32)<.01&&bossPos.x===68),true,'Boss positions must be 32% and 68%');
       assert.equal(result.bossInBounds,true,JSON.stringify(result));
       assert.equal(result.bossCoordinateMatches,true,JSON.stringify(result));
       assert.equal(result.controlsInBounds,true,JSON.stringify(result));
