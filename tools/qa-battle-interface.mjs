@@ -26,12 +26,13 @@ try{
  await page.waitForFunction(()=>!UltimateBattle.snapshot().busy&&UltimateBattle.snapshot().energy===0);
  for(const [width,height] of [[1366,768],[800,844],[390,844],[320,844],[1024,600],[800,600],[640,480]]){
    await page.setViewportSize({width,height});
+   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    await page.evaluate(async()=>{await BattleGround.align();hud()});
    const safe=await page.evaluate(()=>{
      const rect=e=>e.getBoundingClientRect();
      return [...document.querySelectorAll('.ultimate-actions button,#battleItems button,#answerInput,#attackBtn')].every(e=>{const r=rect(e);return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight});
    });assert.equal(safe,true,`controls ${width}`);
-   if(width>600)assert.equal(await page.locator('#battleItems').evaluate(e=>e.getBoundingClientRect().left>innerWidth/2),true,'items belong on right');
+   if(width>600)assert.equal(await page.locator('#battleItems').evaluate(e=>e.getBoundingClientRect().left>innerWidth/2),true,`items belong on right at ${width}x${height}`);
    await page.screenshot({path:`${out}/${width}-${height}.png`});
    assert.equal(await page.locator('.boss-tag').evaluate(e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight}),true,'Boss title visible');
    assert.deepEqual(await page.evaluate(()=>{

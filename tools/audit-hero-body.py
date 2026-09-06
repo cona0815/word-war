@@ -8,6 +8,11 @@ from PIL import Image, ImageDraw
 
 root = Path(__file__).resolve().parents[1]
 entries = re.findall(r"\['([^']+)','([^']+)',(\d+),(\d+)\]", (root/'hero-cast-clips.js').read_text())
+if '--candidate' in sys.argv:
+    folder=sys.argv[sys.argv.index('--candidate')+1]
+    if Path(folder).name!=folder:
+        raise ValueError('Candidate must be an asset folder name')
+    entries.append(('candidate',folder,'1152','650'))
 out = root/'docs/qa-body-scale'
 out.mkdir(parents=True, exist_ok=True)
 sheet = Image.new('RGB', (280*4, 330*((len(entries)+3)//4)), '#30464c')
@@ -22,7 +27,9 @@ for i,(key,folder,width,duration) in enumerate(entries):
     bottom = int(ys.max())+1
     fy,fx = np.where(a[max(0,bottom-10):bottom]>128)
     footx = float((fx.min()+fx.max())/2)
-    lo,hi = round(footx-width*.06),round(footx+width*.06)
+    region_file=root/'assets/generated'/folder/'body-region.json'
+    region=json.loads(region_file.read_text()) if region_file.exists() else {'left':-.06,'right':.06}
+    lo,hi = round(footx+width*region['left']),round(footx+width*region['right'])
     cy,cx = np.where(a[:,max(0,lo):min(width,hi)]>128)
     top = int(cy.min())
     record = dict(key=key,folder=folder,width=width,top=top,bottom=bottom,footx=footx,bodyHeight=bottom-top)

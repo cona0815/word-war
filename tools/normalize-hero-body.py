@@ -1,6 +1,7 @@
 """Rescale reviewed body silhouettes, retaining the source art and joint poses."""
 from pathlib import Path
 import json
+import sys
 import numpy as np
 from PIL import Image
 
@@ -8,6 +9,8 @@ root = Path(__file__).resolve().parents[1]
 records = json.loads((root/'docs/qa-body-scale/measurements.json').read_text())
 reports = []
 for r in records:
+    if len(sys.argv)>1 and r['folder']!=sys.argv[1]:
+        continue
     if r['folder'].endswith('-body-v2'):
         r = json.loads((root/'assets/generated'/r['folder']/'body-scale.json').read_text())
     source = root/'assets/generated'/r['folder']
@@ -31,6 +34,9 @@ for r in records:
         frames.append(cell);result.alpha_composite(cell,(i*1152,0))
     out=source.with_name(source.name+'-body-v2');out.mkdir(exist_ok=True)
     result.save(out/'cast-strip.png');frames[0].save(out/'idle.png')
+    region=source/'body-region.json'
+    if region.exists():
+        (out/'body-region.json').write_text(region.read_text())
     record={**r,'factor':factor,'targetBodyHeight':460,'output':out.name}
     (out/'body-scale.json').write_text(json.dumps(record,indent=2))
     reports.append(record)
