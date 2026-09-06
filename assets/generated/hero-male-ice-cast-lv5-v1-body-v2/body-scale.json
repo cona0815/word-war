@@ -1,0 +1,12 @@
+{
+  "key": "candidate",
+  "folder": "hero-male-ice-cast-lv5-v1",
+  "width": 1152,
+  "top": 110,
+  "bottom": 609,
+  "footx": 576.0,
+  "bodyHeight": 499,
+  "factor": 0.9218436873747495,
+  "targetBodyHeight": 460,
+  "output": "hero-male-ice-cast-lv5-v1-body-v2"
+}
