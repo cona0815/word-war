@@ -43,5 +43,7 @@ window.HeroCastClips=Object.freeze(Object.fromEntries([
  ['male:1:ice','hero-male-ice-cast-lv1-v1-body-v2',1152,650],
  ['female:1:ice','hero-female-ice-cast-lv1-v1-body-v2',1152,650],
  ['male:2:ice','hero-male-ice-cast-lv2-v1-body-v2',1152,650],
- ['female:2:ice','hero-female-ice-cast-lv2-v1-body-v2',1152,650]
+ ['female:2:ice','hero-female-ice-cast-lv2-v1-body-v2',1152,650],
+ ['male:3:ice','hero-male-ice-cast-lv3-v1-body-v2',1152,650],
+ ['female:3:ice','hero-female-ice-cast-lv3-v1-body-v2',1152,650]
 ].map(([key,folder,width,duration])=>[key,Object.freeze({url:`assets/generated/${folder}/cast-strip.png`,width,duration,release:Math.round(duration*.42),wide:width===1152})])));
