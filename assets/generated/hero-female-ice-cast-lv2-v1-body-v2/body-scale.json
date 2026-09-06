@@ -1,0 +1,12 @@
+{
+  "key": "candidate",
+  "folder": "hero-female-ice-cast-lv2-v1",
+  "width": 1152,
+  "top": 148,
+  "bottom": 610,
+  "footx": 576.5,
+  "bodyHeight": 462,
+  "factor": 0.9956709956709957,
+  "targetBodyHeight": 460,
+  "output": "hero-female-ice-cast-lv2-v1-body-v2"
+}
