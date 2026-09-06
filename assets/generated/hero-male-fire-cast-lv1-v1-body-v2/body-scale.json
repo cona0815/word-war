@@ -1,0 +1,12 @@
+{
+  "key": "candidate",
+  "folder": "hero-male-fire-cast-lv1-v1",
+  "width": 1152,
+  "top": 110,
+  "bottom": 610,
+  "footx": 575.0,
+  "bodyHeight": 500,
+  "factor": 0.92,
+  "targetBodyHeight": 460,
+  "output": "hero-male-fire-cast-lv1-v1-body-v2"
+}

@@ -1,0 +1,12 @@
+{
+  "key": "candidate",
+  "folder": "hero-female-fire-cast-lv1-v3",
+  "width": 1152,
+  "top": 145,
+  "bottom": 610,
+  "footx": 576.0,
+  "bodyHeight": 465,
+  "factor": 0.989247311827957,
+  "targetBodyHeight": 460,
+  "output": "hero-female-fire-cast-lv1-v3-body-v2"
+}
