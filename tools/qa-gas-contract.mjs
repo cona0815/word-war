@@ -195,6 +195,9 @@ const deletedQuestion = post({ action: "deleteQuestion", token: "contract-test-a
 check("管理者刪除題目使用停用語義", deletedQuestion.ok && !get("questions").questions.some(question => question.id === questionId));
 let profile = post({ action: "loadProfile", sessionToken: token }).profile;
 check("登入後可載入初始存檔", profile.version === 1 && profile.level === 1 && profile.weapon === "starlight");
+const savedErrorRecord = post({ action: "saveRecord", sessionToken: token, record: { stage: 5, mode: "chineseChar", zone: "大橋國小", result: "win", score: 120, correct: 8, attempts: 10, accuracy: 80, errors: { "chineseChar:學": 3, "chineseChar:橋": 1 } } });
+const studentSummary = get("students", { token: "contract-test-admin", limit: 10 });
+check("學習紀錄可回傳常錯題型摘要", savedErrorRecord.ok && studentSummary.ok && studentSummary.students.some(student => student.studentName === "50101" && student.topErrors?.[0]?.key === "chineseChar:學" && student.topErrors[0].count === 3));
 const synced = post({ action: "saveProgress", sessionToken: token, expectedVersion: profile.version, profile: { hero: "female", level: 10, coins: 99999, weapon: "shadow", gear: "crown" } });
 check("saveProgress 只同步外觀不接收作弊進度", synced.ok && synced.profile.hero === "female" && synced.profile.level === 1 && synced.profile.coins === 0 && synced.profile.weapon === "starlight");
 profile = synced.profile;

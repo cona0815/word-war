@@ -114,7 +114,8 @@ const RECORD_HEADERS = [
   "durationSec",
   "stage",
   "appVersion",
-  "userAgent"
+  "userAgent",
+  "errorsJson"
 ];
 
 const QUESTION_HEADERS = [
@@ -1001,7 +1002,8 @@ function saveRecord_(record, accountId) {
     durationSec: number_(record.durationSec),
     stage: number_(record.stage),
     appVersion: clean_(record.appVersion),
-    userAgent: clean_(record.userAgent, 300)
+    userAgent: clean_(record.userAgent, 300),
+    errorsJson: JSON.stringify(normalizeErrorCounts_(record.errors))
   };
   sheet.appendRow(RECORD_HEADERS.map(function(header) {
     return safe[header];
@@ -1113,7 +1115,8 @@ function getStudents_(limit) {
       correct: 0,
       attempts: 0,
       plays: 0,
-      lastAt: ""
+      lastAt: "",
+      errors: {}
     };
 
     const stage = number_(record.stage);
@@ -1126,12 +1129,22 @@ function getStudents_(limit) {
     current.attempts += number_(record.attempts);
     current.plays += 1;
     current.lastAt = record.createdAt || current.lastAt;
+    let errors = {};
+    try { errors = JSON.parse(record.errorsJson || "{}"); } catch (error) { errors = {}; }
+    Object.keys(errors || {}).forEach(function(key) {
+      const count = Math.min(Math.max(number_(errors[key]), 0), 999);
+      if (count) current.errors[key] = (current.errors[key] || 0) + count;
+    });
     students[studentName] = current;
   });
 
   const rows = Object.keys(students).map(function(key) {
     const student = students[key];
     student.accuracy = student.attempts ? Math.round(student.correct / student.attempts * 100) : 100;
+    student.topErrors = Object.keys(student.errors || {}).map(function(errorKey) {
+      return { key: errorKey, count: student.errors[errorKey] };
+    }).sort(function(a, b) { return b.count - a.count || a.key.localeCompare(b.key); }).slice(0, 5);
+    delete student.errors;
     return student;
   });
 
@@ -1355,6 +1368,17 @@ function cleanQuestionText_(value, maxLength) {
 function number_(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : 0;
+}
+
+function normalizeErrorCounts_(value) {
+  const source = value && typeof value === "object" ? value : {};
+  const result = {};
+  Object.keys(source).slice(0, 100).forEach(function(key) {
+    const safeKey = clean_(key, 160);
+    const count = Math.min(Math.max(Math.floor(number_(source[key])), 0), 999);
+    if (safeKey && count) result[safeKey] = count;
+  });
+  return result;
 }
 
 function json_(data) {

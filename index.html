@@ -225,6 +225,7 @@
         <p id="settingsStatus" class="status"></p>
         <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
         <strong id="studentProgressLabel"></strong>
+        <div class="two"><label><span>班級篩選</span><input id="progressClassFilter" inputmode="numeric" maxlength="3" placeholder="全部班級"></label><label><span>最高關卡至少</span><select id="progressStageFilter"><option value="0">全部</option><option value="1">第 1 關</option><option value="2">第 2 關</option><option value="3">第 3 關</option><option value="4">第 4 關</option><option value="5">第 5 關</option><option value="6">第 6 關</option><option value="7">第 7 關</option><option value="8">第 8 關</option></select></label></div>
         <div class="two">
           <button id="loadProgressBtn" class="btn primary"></button>
           <button id="exportRecordsBtn" class="btn"></button>
@@ -368,6 +369,7 @@
     const loginScreen=$("loginScreen"),gameScreen=$("gameScreen"),loginAccount=$("loginAccount"),loginGuide=$("loginGuide"),loginRank=$("loginRank"),subtitle=$("subtitle"),tabAccount=$("tabAccount"),tabGuide=$("tabGuide"),tabRank=$("tabRank"),accountLabel=$("accountLabel"),passwordLabel=$("passwordLabel"),accountInput=$("accountInput"),passwordInput=$("passwordInput"),maleBtn=$("maleBtn"),femaleBtn=$("femaleBtn"),startBtn=$("startBtn"),openGuideBtn=$("openGuideBtn"),openRankBtn=$("openRankBtn"),menuBtn=$("menuBtn"),levelTitle=$("levelTitle"),roundText=$("roundText"),scoreLabel=$("scoreLabel"),scoreText=$("scoreText"),comboLabel=$("comboLabel"),comboText=$("comboText"),accLabel=$("accLabel"),accuracyText=$("accuracyText"),enemyLabel=$("enemyLabel"),enemyCountText=$("enemyCountText"),enemyBar=$("enemyBar"),hpLabel=$("hpLabel"),hpText=$("hpText"),hpBar=$("hpBar"),questionType=$("questionType"),difficultyText=$("difficultyText"),questionText=$("questionText"),answerInput=$("answerInput"),attackBtn=$("attackBtn"),mission=$("mission"),missionTitle=$("missionTitle"),missionText=$("missionText"),missionStartBtn=$("missionStartBtn"),drawer=$("drawer"),closeMenuBtn=$("closeMenuBtn"),drawerTitle=$("drawerTitle"),menuTabLevels=$("menuTabLevels"),menuTabAvatar=$("menuTabAvatar"),menuTabRecords=$("menuTabRecords"),menuTabSettings=$("menuTabSettings"),avatarLabel=$("avatarLabel"),avatarInfo=$("avatarInfo"),weaponLabel=$("weaponLabel"),weaponInfo=$("weaponInfo"),skillLabel=$("skillLabel"),skillInfo=$("skillInfo"),switchHeroBtn=$("switchHeroBtn"),gemProgress=$("gemProgress"),walletInfo=$("walletInfo"),levelGrid=$("levelGrid"),recordList=$("recordList"),gasUrlLabel=$("gasUrlLabel"),gasUrlInput=$("gasUrlInput"),adminTokenLabel=$("adminTokenLabel"),adminTokenInput=$("adminTokenInput"),saveSettingsBtn=$("saveSettingsBtn"),testGasBtn=$("testGasBtn"),syncRecordsBtn=$("syncRecordsBtn"),settingsStatus=$("settingsStatus"),studentProgressLabel=$("studentProgressLabel"),studentProgressList=$("studentProgressList"),progressStatus=$("progressStatus"),loadProgressBtn=$("loadProgressBtn"),exportRecordsBtn=$("exportRecordsBtn"),questionBankLabel=$("questionBankLabel"),questionPrompt=$("questionPrompt"),questionDifficulty=$("questionDifficulty"),questionMode=$("questionMode"),questionStatus=$("questionStatus"),addQuestionBtn=$("addQuestionBtn"),bulkQuestionsLabel=$("bulkQuestionsLabel"),bulkQuestionsInput=$("bulkQuestionsInput"),bulkImportBtn=$("bulkImportBtn"),loadQuestionsBtn=$("loadQuestionsBtn"),exportQuestionsBtn=$("exportQuestionsBtn"),bulkStatus=$("bulkStatus"),guideList=$("guideList"),rankList=$("rankList"),shopInfo=$("shopInfo"),shopStatus=$("shopStatus"),gearInfo=$("gearInfo"),hero=$("hero"),heroMotion=$("heroMotion"),heroWeapon=$("heroWeapon"),enemyLayer=$("enemyLayer"),effectLayer=$("effectLayer"),ladderNameBox=$("ladderNameBox"),ladderNickname=$("ladderNickname"),ladderNameStatus=$("ladderNameStatus"),submitLadderBtn=$("submitLadderBtn"),checkLadderNameBtn=$("checkLadderNameBtn"),academyAudio=$("academyAudio");
     const heroGear=$("heroGear");
     const accountAdminId=$("accountAdminId"),accountAdminName=$("accountAdminName"),accountAdminPassword=$("accountAdminPassword"),accountAdminStatus=$("accountAdminStatus"),loadAccountsBtn=$("loadAccountsBtn"),saveAccountBtn=$("saveAccountBtn"),clearAccountBtn=$("clearAccountBtn"),accountAdminList=$("accountAdminList"),accountAdminStatusText=$("accountAdminStatusText"),questionAdminSearch=$("questionAdminSearch"),questionAdminStage=$("questionAdminStage"),questionAdminStatus=$("questionAdminStatus");
+    const progressClassFilter=$("progressClassFilter"),progressStageFilter=$("progressStageFilter");
     const BATTLE_LINE_Y=62;
     const heroNormal={x:50,y:58}, heroBoss={x:32,y:58}, bossPos={x:68,y:BATTLE_LINE_Y};
     const bossLabState={levelIndex:0,power:2,weapon:"ice"};
@@ -406,7 +408,7 @@
      const state={profile:loadAccountProfile("50101"),config:load(CONFIG,{gasUrl:"",adminToken:""}),records:loadAccountRecords("50101"),ladderRecords:load(LADDER_STORE,[]),auth:loadAccountAuth("50101"),questions:[],levelIndex:0,enemies:[],current:null,bossMode:false,bossHp:0,maxBossHp:3,bossPhase:1,bossPhaseHits:0,bossPhaseStartedAt:0,bossAttackAt:0,bossAttackPending:false,bossAttackCount:0,hp:100,score:0,combo:0,correct:0,attempts:0,tick:null,startedAt:Date.now(),waveIndex:0,waves:[],cleared:0,practiceTotal:0,qaShotPending:false,ladderRun:null};
      const qaMode=new URLSearchParams(location.search).get("qa")==="full";
     const visualQaMode=new URLSearchParams(location.search).get("qa")==="visual";
-    state.questionAdminRows=[];state.questionEditingId="";state.accountAdminRows=[];
+    state.questionAdminRows=[];state.questionEditingId="";state.accountAdminRows=[];state.studentProgressRows=[];state.errorCounts={};
     let pendingLadderRecord=null;
     let pendingStageSettlement=null;
     let stageSettlementBusy=false;
@@ -1003,6 +1005,21 @@
         return originalSwitchAccount(...args);
       };
       const originalStart = start;
+      const originalBeginForErrors = begin;
+      begin = (...args) => { state.errorCounts = {}; return originalBeginForErrors(...args); };
+      const originalSubmitForErrors = submit;
+      submit = raw => {
+        const beforeAttempts = state.attempts, beforeCorrect = state.correct;
+        const expected = state.bossMode ? state.current?.word : state.enemies.find(enemy => enemy.alive && isActive(enemy))?.word;
+        const result = originalSubmitForErrors(raw);
+        if (state.attempts === beforeAttempts + 1 && state.correct === beforeCorrect && expected) {
+          const key = `${levels[state.levelIndex].mode}:${String(expected).trim()}`;
+          state.errorCounts[key] = (state.errorCounts[key] || 0) + 1;
+        }
+        return result;
+      };
+      const originalMakeRecordForErrors = makeRecord;
+      makeRecord = (...args) => ({ ...originalMakeRecordForErrors(...args), errors: { ...state.errorCounts } });
       start = async (...args) => {
         await originalStart(...args);
         if (state.config.gasUrl && state.auth?.sessionToken) {
@@ -1054,6 +1071,18 @@
           button.onclick = () => deleteQuestionAdmin(button.dataset.questionDelete);
         });
         questionStatus.textContent = `顯示 ${filtered.length} / ${rows.length} 題（含停用題目）`;
+      };
+      renderStudentProgress = (rows, source) => {
+        state.studentProgressRows = Array.isArray(rows) ? rows : [];
+        const classCode = String(progressClassFilter?.value || "").trim();
+        const minimumStage = Number(progressStageFilter?.value || 0);
+        const filtered = state.studentProgressRows.filter(row => (!classCode || String(row.className || "") === classCode) && Number(row.bestStage || 0) >= minimumStage);
+        studentProgressList.innerHTML = filtered.length ? filtered.slice(0, 40).map(row => {
+          const errors = Array.isArray(row.topErrors) ? row.topErrors : [];
+          const errorText = errors.length ? `常錯 ${errors.map(error => `${esc(error.key)} ×${Number(error.count) || 0}`).join("、")}` : "尚無錯誤分類紀錄";
+          return `<div class="summary-card"><strong>${esc(row.className || "")} ${esc(row.seatNo || "")} ${esc(row.studentName || "")}</strong><span>最高關卡 ${row.bestStage || 0}｜寶石 ${row.gems || 0}/8｜最佳分數 ${Number(row.bestScore || 0).toLocaleString()}｜正確率 ${row.accuracy || 100}%｜完成題數 ${row.correct || 0}｜${errorText}</span></div>`;
+        }).join("") : `<p class="note">${state.studentProgressRows.length ? "沒有符合篩選條件的學生。" : "尚無學生進度紀錄。"}</p>`;
+        progressStatus.textContent = source ? `來源：${source}｜顯示 ${filtered.length} / ${state.studentProgressRows.length} 位學生` : "";
       };
       function resetAccountAdmin() {
         accountAdminId.value = "";
@@ -1117,6 +1146,8 @@
       questionAdminSearch.oninput = renderQuestionAdminList;
       questionAdminStage.onchange = renderQuestionAdminList;
       questionAdminStatus.onchange = renderQuestionAdminList;
+      progressClassFilter.oninput = () => renderStudentProgress(state.studentProgressRows, "目前資料");
+      progressStageFilter.onchange = () => renderStudentProgress(state.studentProgressRows, "目前資料");
       renderAccountAdminList();
       renderQuestionAdminList();
       menu();

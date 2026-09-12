@@ -41,6 +41,7 @@ check("題庫管理清單支援搜尋、關卡與狀態篩選", /questionAdminSe
 check("GAS 跨表結算具 pending 與 event marker 恢復", gas.includes('"settlementEventsJson"') && gas.includes('status: "pending"') && /function updateSettlementStatus_\(eventId, status\)/.test(gas) && /normalizeSettlementEvents_/.test(gas));
 check("GAS 建立 Accounts、Profiles、Sessions 三張表", /ensureSheet_\(SHEETS\.accounts, ACCOUNT_HEADERS\)/.test(gas) && /ensureSheet_\(SHEETS\.profiles, PROFILE_HEADERS\)/.test(gas) && /ensureSheet_\(SHEETS\.sessions, SESSION_HEADERS\)/.test(gas));
 check("GAS 帳號格式固定五碼", /function parseAccount_\(value\)/.test(gas) && /\/\^\\d\{5\}\$\//.test(gas));
+check("GAS 學習紀錄保存常錯題型", /"errorsJson"/.test(gas) && /function normalizeErrorCounts_\(value\)/.test(gas) && /topErrors/.test(gas));
 check("GAS 登入會建立工作階段", /action === "login"/.test(gas) && /createSession_\(identity\.accountId\)/.test(gas));
 check("GAS 受保護 API 需要工作階段", /action === "loadProfile"/.test(gas) && /action === "saveProgress"/.test(gas) && /action === "saveRecord"/.test(gas) && /requireSession_\(payload\.sessionToken\)/.test(gas));
 check("GAS Profile 使用版本衝突保護", /expectedVersion/.test(gas) && /Profile changed on another device/.test(gas) && /LockService\.getScriptLock\(\)/.test(gas));
@@ -51,6 +52,7 @@ check("前端登入 GAS 後保存 session", /action:"login"/.test(html) && /sess
 check("前端 GAS 請求自動帶 session", /state\.auth\?\.sessionToken/.test(html) && /body\.sessionToken=state\.auth\.sessionToken/.test(html));
 check("前端角色與裝備變更會同步 Profile", /function syncProfile\(\)/.test(html) && /function queueProfileSync\(\)/.test(html) && /queueProfileSync\(\)/.test(html));
 check("前端有角色商店目錄", /const playerItemCatalog=/.test(html) && /const playerWeaponPrices=/.test(html) && /const playerGearPrices=/.test(html));
+check("前端教師報表支援班級／關卡篩選與常錯摘要", /progressClassFilter/.test(html) && /progressStageFilter/.test(html) && /row\.topErrors/.test(html) && /state\.errorCounts/.test(html));
 check("前端商店會依擁有權與等級禁用購買", /function renderShop\(\)/.test(html) && /data-shop-id/.test(html) && /需要 Lv\./.test(html));
 check("前端關卡完成會顯示金幣與 XP 獎勵", /function grantLocalStageReward\(lv,accuracy\)/.test(html) && /獲得 \$\{reward\.coins\} 金幣/.test(html));
 check("前端完成關卡會呼叫伺服器結算", /action:"finishStage"/.test(html) && /function settleStage\(record\)/.test(html));
