@@ -379,6 +379,7 @@
     // only one preview or one battle renderer.
     const BOSS_FACE_BY_STAGE=Object.freeze({1:1,2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1});
     const BOSS_MIN_CORRECT_BY_STAGE=Object.freeze({1:[10,10,12],2:[6,6,7],3:[10,10,12],4:[10,10,12],5:[7,7,8],6:[6,6,7],7:[4,4,5],8:[4,4,5],9:[6,6,6,4,4]});
+    const BOSS_PHASE_WAVES=Object.freeze({1:[[0],[1],[2,3]],2:[[0],[1],[2]],3:[[0,1],[2],[3]],4:[[0,1],[2],[3]],5:[[0],[2],[3]],6:[[0,1],[2],[3]],7:[[0,1],[2],[3]],8:[[0,1],[2],[3]]});
     function bossFace(index){const stage=Number(levels[index]?.id)||index+1;return BOSS_FACE_BY_STAGE[stage]??1}
     function bossPhaseCount(stage){return Number(stage)===9?5:3}
     function bossMinCorrect(stage,phase){const rules=BOSS_MIN_CORRECT_BY_STAGE[Number(stage)]||BOSS_MIN_CORRECT_BY_STAGE[9];return rules[Math.max(1,Math.min(rules.length,Number(phase)||1))-1]}
@@ -417,7 +418,8 @@
     function saveAuth(){if(state.auth)save(authStorageKey(state.profile.account),state.auth);else localStorage.removeItem(authStorageKey(state.profile.account))}
     function switchAccount(account,remoteProfile=null){const id=accountValue(account),local=loadAccountProfile(id);state.profile=normalizeProfile({...local,...(remoteProfile||{}),account:id},id);if(visualQaMode){state.config={gasUrl:"",adminToken:""};state.profile=normalizeProfile({...state.profile,level:10,coins:5000,weapon:"starlight",gear:"focus",inventory:{weapons:["starlight"],gear:["focus"],items:{}}},id)}heroGear.dataset.gear=state.profile.gear;state.records=loadAccountRecords(id);state.auth=loadAccountAuth(id);state.questions=[];saveProfile()}
      function profileForRemote(raw,account){const id=accountValue(account),base=defaultProfile(id),remote=raw&&typeof raw==="object"?raw:{};return normalizeProfile({...base,...remote,account:id},id)}
-    function normalizeQuestionText(value){return String(value??"").normalize("NFC").replace(/[\u0000-\u001f\u007f]/g,"").trim().slice(0,800)}
+   function normalizeQuestionText(value){return String(value??"").normalize("NFC").replace(/[\u0000-\u001f\u007f]/g,"").trim().slice(0,800)}
+    function difficultyValue(raw){const text=String(raw??"").toLowerCase().trim(),aliases={easy:1,簡單:1,簡易:1,basic:1,normal:2,medium:2,普通:2,一般:2,hard:4,challenge:4,challenging:4,困難:4,挑戰:4};if(Object.prototype.hasOwnProperty.call(aliases,text))return aliases[text];return Math.max(1,Math.min(5,Number(raw)||1))}
     function normalizeQuestion(raw){
       if(!raw||typeof raw!=="object")return null;
       const rawMode=String(raw.mode||"").toLowerCase().trim(),mode=rawMode==="en"||rawMode==="zh"?rawMode:"";
@@ -428,7 +430,7 @@
       if(!rule||mode!==rule.mode||!prompt||!answer||!enabled)return null;
       const wave=Math.max(0,Math.min(4,Number(raw.wave)||0));
       const tags=Array.isArray(raw.tags)?raw.tags.map(normalizeQuestionText).filter(Boolean):String(raw.tags||"").split(",").map(normalizeQuestionText).filter(Boolean);
-      return{schemaVersion:Number(raw.version)||QUESTION_SCHEMA_VERSION,id:normalizeQuestionText(raw.id)||`${stage}-${hashText(answer)}`,stage,wave,mode,prompt,answer,display:normalizeQuestionText(raw.display)||prompt,laneKey:normalizeQuestionText(raw.laneKey)||spawnLaneKey(answer),difficulty:Math.max(1,Math.min(5,Number(raw.difficulty)||1)),tags,enabled:true,source:normalizeQuestionText(raw.source)||"gas",license:normalizeQuestionText(raw.license)||"teacher-authored",version:Number(raw.version)||1};
+      return{schemaVersion:Number(raw.version)||QUESTION_SCHEMA_VERSION,id:normalizeQuestionText(raw.id)||`${stage}-${hashText(answer)}`,stage,wave,mode,prompt,answer,display:normalizeQuestionText(raw.display)||prompt,laneKey:normalizeQuestionText(raw.laneKey)||spawnLaneKey(answer),difficulty:difficultyValue(raw.difficulty),tags,enabled:true,source:normalizeQuestionText(raw.source)||"gas",license:normalizeQuestionText(raw.license)||"teacher-authored",version:Number(raw.version)||1};
     }
     function normalizeQuestionList(rows){
       const seen=new Set();
@@ -443,8 +445,21 @@
     function stageMenuNumber(lv){return isLadder(lv)?"天梯":`${lv.id}.`}
     function stageMissionNote(lv){return isLadder(lv)?"大橋堂是集滿八顆寶石後開放的綜合天梯挑戰，會混合前八關題型並留下最高紀錄。":"本關分成 4 波練習，約 3 分鐘。小兵位置會對應鍵盤區位。"}
     function levelWords(lv){const qs=state.questions||[],en=qs.filter(q=>q.stage===7&&q.mode==="en").map(q=>q.answer||q.prompt).filter(Boolean),zh=qs.filter(q=>q.stage===8&&q.mode==="zh").map(q=>q.answer||q.prompt).filter(Boolean);if(lv.id===7&&en.length)return en;if(lv.id===8&&zh.length)return zh;if(lv.id===9&&(en.length||zh.length))return lv.words.concat(en,zh);return lv.words}
+    function remoteQuestionRows(lv){return(lv.id===7||lv.id===8)?(state.questions||[]).filter(q=>q.stage===lv.id&&q.mode===(lv.id===7?"en":"zh")&&q.answer):[]}
+    function questionValues(rows){return rows.map(q=>q.answer||q.prompt).filter(Boolean)}
+    function teacherWaveSets(lv){
+      const rows=remoteQuestionRows(lv);
+      if(!rows.length)return null;
+      const explicit=rows.filter(q=>Number(q.wave)>=1&&Number(q.wave)<=4);
+      if(explicit.length){
+        const buckets=[1,2,3,4].map(wave=>questionValues(explicit.filter(q=>Number(q.wave)===wave)));
+        if(buckets.every(bucket=>bucket.length))return buckets;
+      }
+      const all=questionValues(rows),easy=questionValues(rows.filter(q=>Number(q.difficulty)<=1&&String(q.answer||q.prompt).length<20)),normal=questionValues(rows.filter(q=>Number(q.difficulty)>=2&&Number(q.difficulty)<=3&&String(q.answer||q.prompt).length<20)),challenge=questionValues(rows.filter(q=>Number(q.difficulty)>=4||String(q.answer||q.prompt).length>=20));
+      const first=easy.length?easy:normal.length?normal:all,second=easy.concat(normal).length?easy.concat(normal):first,third=normal.length?normal:challenge.length?challenge:first,fourth=challenge.length?challenge:normal.length?normal:first;
+      return[first,second,third,fourth];
+    }
     function bossPool(lv){
-      if(lv.id===4)return state.bossPhase===1?lv.waveSets[0].concat(lv.waveSets[1]):lv.waveSets[state.bossPhase===2?2:3];
       if(lv.id===9){
         const phase=state.bossPhase;
         if(phase===1)return [...levelWords(levels[0]),...levelWords(levels[1])];
@@ -453,6 +468,21 @@
         if(phase===4)return ['Ctrl+C','Ctrl+V','Ctrl+Z','Ctrl+A'];
         return [...levelWords(levels[6]),...levelWords(levels[7])];
       }
+      const phase=Math.max(1,Math.min(3,Number(state.bossPhase)||1));
+     if(lv.id===7||lv.id===8){
+        const rows=remoteQuestionRows(lv);
+        const explicitWave=rows.filter(q=>Number(q.wave)>0);
+        if(explicitWave.length){
+          const waveRows=explicitWave.filter(q=>phase===1?Number(q.wave)<=2:phase===2?Number(q.wave)===3:Number(q.wave)>=4);
+          if(waveRows.length)return waveRows.map(q=>q.answer||q.prompt).filter(Boolean);
+        }
+        if(rows.length){
+          const difficultyRows=rows.filter(q=>phase===1?Number(q.difficulty)<=1:phase===2?Number(q.difficulty)>=2&&Number(q.difficulty)<=3:Number(q.difficulty)>=4||/[.!?。？！]/.test(q.answer||q.prompt||"")||(q.answer||q.prompt||"").length>=20);
+          if(difficultyRows.length)return difficultyRows.map(q=>q.answer||q.prompt).filter(Boolean);
+        }
+      }
+      const groups=BOSS_PHASE_WAVES[lv.id]?.[phase-1];
+      if(groups)return groups.flatMap(index=>lv.waveSets[index]||[]);
       const remote=levelWords(lv);if((lv.id===7||lv.id===8)&&remote!==lv.words)return remote;return lv.bossWords||remote;
     }
     function text(){subtitle.textContent=T.subtitle;tabAccount.textContent=T.account;tabGuide.textContent=T.guide;tabRank.textContent=T.rank;accountLabel.textContent=T.accountLabel;passwordLabel.textContent=T.passwordLabel;maleBtn.textContent=T.male;femaleBtn.textContent=T.female;startBtn.textContent=T.start;openGuideBtn.textContent=T.guide;openRankBtn.textContent=T.rank;menuBtn.textContent=T.menu;scoreLabel.textContent=T.score;comboLabel.textContent=T.combo;accLabel.textContent=T.accuracy;enemyLabel.textContent=T.enemy;hpLabel.textContent=T.hp;answerInput.placeholder=T.inputHint;attackBtn.textContent=T.attack;missionStartBtn.textContent=T.startLevel;closeMenuBtn.textContent=T.close;drawerTitle.textContent=T.menu;menuTabLevels.textContent=T.levels;menuTabAvatar.textContent=T.avatar;menuTabRecords.textContent=T.records;menuTabSettings.textContent=T.settings;avatarLabel.textContent=T.avatar;weaponLabel.textContent=T.weapon;skillLabel.textContent=T.skill;weaponInfo.textContent=T.weaponInfo;skillInfo.textContent=T.skillInfo;switchHeroBtn.textContent=T.switchHero;gasUrlLabel.textContent=T.gasUrl;adminTokenLabel.textContent=T.adminToken;saveSettingsBtn.textContent=T.saveSettings;testGasBtn.textContent=T.testGas;syncRecordsBtn.textContent=T.syncRecords;studentProgressLabel.textContent=T.studentProgress;loadProgressBtn.textContent=T.loadProgress;exportRecordsBtn.textContent=T.exportRecords;questionBankLabel.textContent=T.questionBank;addQuestionBtn.textContent=T.addQuestion;bulkQuestionsLabel.textContent=T.bulkQuestions;bulkImportBtn.textContent=T.bulkImport;loadQuestionsBtn.textContent=T.loadQuestions;exportQuestionsBtn.textContent=T.exportQuestions;bulkQuestionsInput.placeholder="I am happy.|1|Unit 1\nThis is my pen.|1|Unit 2\n我會打字。|1|資訊課";settingsNote.textContent="GAS \u672a\u8a2d\u5b9a\u6642\u6703\u5148\u7528\u672c\u6a5f\u7d00\u9304\uff1b\u7b2c 7\u30018 \u95dc\u984c\u5eab\u53ef\u5f9e\u9019\u88e1\u65b0\u589e\u5230 GAS\u3002\u6279\u6b21\u683c\u5f0f\uff1a\u6bcf\u884c\u4e00\u984c\uff0c\u53ef\u7528\u300c\u984c\u76ee|\u96e3\u5ea6|\u4e3b\u984c\u300d\u3002";guideList.innerHTML=["使用班級加座號登入；GAS 模式預設密碼與帳號相同，例如 50101。本機示範帳號 50101 可用 1234。","主線共有八關，每關對應一個 DCPS 校園景點。","小兵會依鍵盤位置從畫面對應方向靠近，單一字母與單一注音打到就會自動攻擊。","單字、詞語與句子輸入完成後按 Enter 攻擊。","每關通過後取得一顆寶石，集滿八顆後開放大橋堂天梯試練。","未設定 GAS 時紀錄保存在本機；連線 GAS 後會以帳號隔離同步進度。"].map(x=>`<li>${x}</li>`).join("")}
@@ -567,7 +597,7 @@
     const setupWithFacing=setup;
     setup=()=>{stopHeroMotion();activeHeroCastClip=null;hero.classList.remove("pose-sheet");battleVisualGeneration++;battleStartPending=false;missionStartBtn.disabled=false;setupWithFacing();prepareBattleVisuals();const mirror=heroSourceMirror(state.profile.hero,Number(state.profile.level)||1);hero.style.setProperty("--hero-face",mirror);heroWeapon.style.setProperty("--hero-face",mirror);heroMotion.style.setProperty("--hero-face","1")};
     function spawn(){state.running=true;state.outcome=null;const lv=levels[state.levelIndex],waves=buildWaves(lv);state.practiceTotal=waves.reduce((n,row)=>n+row.length,0);state.waves=waves;state.waveIndex=0;state.cleared=0;nextWave();state.tick=setInterval(loop,120);answerInput.focus()}
-    function buildWaves(lv){const remote=levelWords(lv),sets=((lv.id===7||lv.id===8)&&remote!==lv.words)?chunk(repeatToCount(remote,practiceCount(lv)),Math.ceil(practiceCount(lv)/4)):(lv.waveSets||[remote]);const per=Math.ceil(practiceCount(lv)/sets.length);return sets.map(set=>repeatToCount(set,Math.max(set.length,per)))}
+    function buildWaves(lv){const remote=levelWords(lv),teacherSets=teacherWaveSets(lv),sets=teacherSets||(lv.waveSets||[remote]);const per=Math.ceil(practiceCount(lv)/sets.length);return sets.map(set=>repeatToCount(set,Math.max(set.length,per)))}
     function repeatToCount(base,total){const out=[];if(!base.length)return out;for(let i=0;i<total;i++)out.push(base[i%base.length]);return out.sort(()=>Math.random()-.5)}
     function buildPractice(lv){return buildWaves(lv).flat()}
     function practiceCount(lv){if(lv.mode==="letters")return 44;if(lv.mode==="words")return 32;if(lv.mode==="zhuyin")return 36;if(lv.mode==="phonics")return 32;if(lv.mode==="chineseChar")return 28;if(lv.mode==="phrases")return 24;if(lv.mode==="sentences")return 12;if(lv.mode==="final")return 32;return 28}
@@ -804,7 +834,7 @@
     async function syncRecords(){settingsStatus.textContent="同步中…";for(const r of state.records){try{await syncOneRecord(r)}catch(err){settingsStatus.textContent=err.message;return}}settingsStatus.textContent=T.syncOk}
     async function testGas(){settingsStatus.textContent="測試中…";try{const res=await gasGet("ping");if(res.ok)await loadRemoteQuestions();settingsStatus.textContent=res.ok?`${T.gasOk} | \u984c\u5eab ${state.questions.length}`:T.gasFail}catch(err){settingsStatus.textContent=T.gasFail+": "+err.message}}
     async function addQuestion(){questionStatus.textContent="儲存中…";try{const prompt=normalizeQuestionText(questionPrompt.value);if(!prompt)throw new Error("請先輸入題目。");const stage=questionMode.value==="en"?7:8,question={stage,wave:0,mode:questionMode.value,prompt,answer:prompt,display:prompt,zone:"teacher-bank",difficulty:Number(questionDifficulty.value||1),tags:["teacher-bank"],source:"teacher-authored",license:"teacher-confirmed",version:QUESTION_SCHEMA_VERSION};if(!normalizeQuestion(question))throw new Error("題目格式不正確。");const res=await gasPost({action:"addQuestion",token:state.config.adminToken,createdBy:state.profile.account||"admin",question});if(res.ok)await loadRemoteQuestions();questionStatus.textContent=res.ok?`${T.saved} | \u984c\u5eab ${state.questions.length}`:(res.error||"儲存失敗");if(res.ok)questionPrompt.value=""}catch(err){questionStatus.textContent=err.message}}
-    function cleanDifficulty(v){return Math.max(1,Math.min(5,Number(v)||1))}
+    function cleanDifficulty(v){return difficultyValue(v)}
     function parseBulkQuestions(raw,mode){const stage=mode==="en"?7:8;return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const parts=line.split("|").map(x=>x.trim());const prompt=parts[0];return {stage,wave:0,mode,prompt,answer:prompt,display:prompt,difficulty:cleanDifficulty(parts[1]||questionDifficulty.value),zone:parts[2]||"teacher-bank",tags:[parts[2]||"teacher-bank"],source:"teacher-authored",license:"teacher-confirmed",version:QUESTION_SCHEMA_VERSION}}).filter(q=>q.prompt)}
     async function refreshQuestions(){bulkStatus.textContent="載入中…";try{await loadRemoteQuestions();bulkStatus.textContent=`\u5df2\u8f09\u5165\u984c\u5eab ${state.questions.length} \u984c`}catch(err){bulkStatus.textContent=err.message}}
     async function bulkAddQuestions(){bulkStatus.textContent="儲存中…";try{if(!state.config.gasUrl)throw new Error(T.gasMissing);const rows=parseBulkQuestions(bulkQuestionsInput.value,questionMode.value);if(!rows.length)throw new Error("目前沒有可新增的題目。");let ok=0,fail=0;for(const question of rows){try{const res=await gasPost({action:"addQuestion",token:state.config.adminToken,createdBy:state.profile.account||"admin",question});res.ok?ok++:fail++}catch(err){fail++}}if(ok)await loadRemoteQuestions();bulkStatus.textContent=`\u65b0\u589e ${ok} \u984c${fail?` | \u5931\u6557 ${fail} \u984c`:""} | \u984c\u5eab ${state.questions.length}`;if(ok&&!fail)bulkQuestionsInput.value=""}catch(err){bulkStatus.textContent=err.message}}

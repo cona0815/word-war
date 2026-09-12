@@ -64,6 +64,7 @@
 - `node tools/qa-game.mjs http://127.0.0.1:8767`：加上本機伺服器頁面與素材 HTTP 檢查。
 - `node tools/qa-question-contract.mjs`：檢查題庫 schema v1、英文／中文關卡分流與 GAS 題庫欄位契約。
 - `node tools/qa-progress-gate.mjs http://127.0.0.1:8767`：檢查前端依序解鎖、雲端通關延遲時的進度鎖定、失敗提示、同事件重試後解鎖，以及重新登入後恢復未同步通關紀錄。
+- `node tools/qa-boss-phase-pools.mjs http://127.0.0.1:8767`：逐關檢查八個主線 Boss 的三階段題型，以及第 7、8 關教師題庫的 wave／難度分流。
 - `node tools/qa-gas-contract.mjs`：在本機模擬 Apps Script 試算表，驗證登入、存檔版本、關卡結算、最低題數、購買、天梯與暱稱過濾。
 - `node tools/qa-hero-assets.mjs`：驗證男／女各 Lv.1-Lv.10、五武器共 100 張整合 PNG 的存在、`768x648` 畫布、RGBA 透明通道、前端引用與四種道具效果預覽契約。
 - `node tools/qa-gas-endpoint.mjs`：對已部署的 GAS Web App 做線上冒煙測試；必須明確提供隔離 QA 帳號與 `GAS_ALLOW_MUTATION=YES`，不會使用預設學生帳號。

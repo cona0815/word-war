@@ -1,12 +1,30 @@
 # Word War Handoff
 
+## 2026-09-13 教師題庫驅動第 7、8 關四波
+
+- `teacherWaveSets()` 現在讓第 7、8 關一般小怪使用教師題庫的 `wave`；若未提供完整 1～4 波，則依 easy／normal／hard（含簡單／普通／挑戰）建立四波 fallback。Boss 與一般小怪共用正規化後題目資料。
+- `difficultyValue()` 已將文字難度轉為 1～5，避免匯入的 `normal`、`hard` 或中文難度被錯當成 easy。既有內建題與無題庫時的四波不變。
+- `tools/qa-boss-phase-pools.mjs` 增加明確 wave 與難度 fallback 測試；`qa-question-contract` 增加題庫波次契約。
+- 驗證：`qa-boss-phase-pools` PASS；`qa-game` 110/110；`qa-question-contract` 51/51；`node --check` 與 `git diff --check` 通過。尚未 push。
+- 尚未完成：教師完整編輯／啟停介面、跨表同步中斷恢復、原生中文 IME、最新線上 GAS 部署驗收與 37 套施法素材。
+- 下一個最安全任務：補教師題庫編輯／啟停流程，先完成前端管理介面與 GAS `update/delete/enable` 的整合 QA。
+
+## 2026-09-13 主線 Boss 三階段題池
+
+- 新增 `BOSS_PHASE_WAVES` 與 `bossPool()` 分流：第 1 關依左右手字母、第 2 關依 2／3／4 字母、第 3 關依聲母／韻母／混合、第 4 關依拼音／聲調／標點、第 5 關依生活／校園／大橋主題、第 6 關依詞語／熱鍵、第 7、8 關依句子難度。
+- 第 7、8 關遠端題庫若提供 `wave`，按波次分流；沒有指定波次時，使用文字難度 easy／normal／hard 或簡單／普通／挑戰。新增 `difficultyValue()`，避免文字難度被當成 1。
+- 新增 `tools/qa-boss-phase-pools.mjs`，Chrome 逐關驗證八個主線 Boss 三階段及遠端題庫分流。
+- 驗證：`qa-boss-phase-pools` PASS；`qa-game` 109/109；`qa-question-contract` 50/50；`node --check tools/qa-boss-phase-pools.mjs` 通過。尚未 push。
+- 當時尚未完成的一般小怪題庫 wave／difficulty 分波已在上方里程碑補上；教師完整編輯／啟停介面、跨表同步中斷恢復、原生中文 IME、最新線上 GAS 部署驗收與 37 套施法素材仍待處理。
+- 下一個最安全任務：補教師題庫編輯／啟停流程，維持第 7、8 關題型與權限邊界。
+
 ## 2026-09-13 重新登入恢復未同步通關
 
 - 新增 `pendingStageRecords()` 與 `recoverPendingStageSettlements()`：登入後掃描目前帳號本機 `Records` 中尚未同步的前八關勝利紀錄，依關卡順序呼叫既有 `settleStage()`，沿用原 `eventId`，成功後才套用 GAS Profile、標記 `synced` 並恢復後續解鎖。
 - 新增登入流程包裝與 `qa-progress-gate` reload case；若恢復失敗，畫面保留「重試雲端同步」狀態，不讓學生跳過待確認關卡。既有手動重試與換帳號清除 pending 行為維持不變。
 - 驗證：`qa-progress-gate` PASS（含重新登入恢復）；`qa-game` 108/108；`qa-question-contract` 49/49；`qa-gas-contract` 0 failures；`node --check tools/qa-progress-gate.mjs` 與 `git diff --check` 通過。
-- 尚未完成：跨表寫入中斷恢復、多數主線 Boss 題池分流、原生中文 IME、線上 GAS 最新部署驗收。未 push。
-- 下一個最安全任務：補主線 Boss 分階段題池，先從第 1、2、3、5、6、7、8 關建立明確 phase pool 與行為 QA，不改八景教學順序。
+- 當時尚未完成的主線 Boss 分階段題池已在上方里程碑補上；跨表寫入中斷恢復、原生中文 IME、線上 GAS 最新部署驗收與美術缺口仍待處理。未 push。
+- 下一個最安全任務：讓第 7、8 關一般小怪也依教師題庫的 `wave`／difficulty 出題，補四波與題庫契約 QA。
 
 ## 2026-09-13 依序解鎖與雲端通關重試
 
