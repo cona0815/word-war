@@ -1116,7 +1116,8 @@ function getStudents_(limit) {
       attempts: 0,
       plays: 0,
       lastAt: "",
-      errors: {}
+      errors: {},
+      bestStages: {}
     };
 
     const stage = number_(record.stage);
@@ -1129,6 +1130,12 @@ function getStudents_(limit) {
     current.attempts += number_(record.attempts);
     current.plays += 1;
     current.lastAt = record.createdAt || current.lastAt;
+    if (stage >= 1 && stage <= 8) {
+      const stageKey = String(stage);
+      const candidate = { score: number_(record.score), accuracy: number_(record.accuracy), correct: number_(record.correct), attempts: number_(record.attempts), lastAt: record.createdAt || "" };
+      const previous = current.bestStages[stageKey];
+      if (!previous || candidate.score > previous.score || (candidate.score === previous.score && candidate.accuracy > previous.accuracy)) current.bestStages[stageKey] = candidate;
+    }
     let errors = {};
     try { errors = JSON.parse(record.errorsJson || "{}"); } catch (error) { errors = {}; }
     Object.keys(errors || {}).forEach(function(key) {

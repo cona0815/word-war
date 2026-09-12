@@ -53,6 +53,7 @@ check("前端 GAS 請求自動帶 session", /state\.auth\?\.sessionToken/.test(h
 check("前端角色與裝備變更會同步 Profile", /function syncProfile\(\)/.test(html) && /function queueProfileSync\(\)/.test(html) && /queueProfileSync\(\)/.test(html));
 check("前端有角色商店目錄", /const playerItemCatalog=/.test(html) && /const playerWeaponPrices=/.test(html) && /const playerGearPrices=/.test(html));
 check("前端教師報表支援班級／關卡篩選與常錯摘要", /progressClassFilter/.test(html) && /progressStageFilter/.test(html) && /row\.topErrors/.test(html) && /state\.errorCounts/.test(html));
+check("前端學生報表可匯出逐關摘要 TSV", /exportStudentProgressBtn/.test(html) && /function exportStudentProgress\(\)/.test(html) && /word-war-student-progress\.tsv/.test(html));
 check("前端商店會依擁有權與等級禁用購買", /function renderShop\(\)/.test(html) && /data-shop-id/.test(html) && /需要 Lv\./.test(html));
 check("前端關卡完成會顯示金幣與 XP 獎勵", /function grantLocalStageReward\(lv,accuracy\)/.test(html) && /獲得 \$\{reward\.coins\} 金幣/.test(html));
 check("前端完成關卡會呼叫伺服器結算", /action:"finishStage"/.test(html) && /function settleStage\(record\)/.test(html));

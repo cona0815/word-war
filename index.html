@@ -230,6 +230,7 @@
           <button id="loadProgressBtn" class="btn primary"></button>
           <button id="exportRecordsBtn" class="btn"></button>
         </div>
+        <button id="exportStudentProgressBtn" class="btn" type="button" style="width:100%">匯出目前學生報表</button>
         <div id="studentProgressList" class="summary-list"></div>
         <p id="progressStatus" class="status"></p>
         <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
@@ -370,6 +371,7 @@
     const heroGear=$("heroGear");
     const accountAdminId=$("accountAdminId"),accountAdminName=$("accountAdminName"),accountAdminPassword=$("accountAdminPassword"),accountAdminStatus=$("accountAdminStatus"),loadAccountsBtn=$("loadAccountsBtn"),saveAccountBtn=$("saveAccountBtn"),clearAccountBtn=$("clearAccountBtn"),accountAdminList=$("accountAdminList"),accountAdminStatusText=$("accountAdminStatusText"),questionAdminSearch=$("questionAdminSearch"),questionAdminStage=$("questionAdminStage"),questionAdminStatus=$("questionAdminStatus");
     const progressClassFilter=$("progressClassFilter"),progressStageFilter=$("progressStageFilter");
+    const exportStudentProgressBtn=$("exportStudentProgressBtn");
     const BATTLE_LINE_Y=62;
     const heroNormal={x:50,y:58}, heroBoss={x:32,y:58}, bossPos={x:68,y:BATTLE_LINE_Y};
     const bossLabState={levelIndex:0,power:2,weapon:"ice"};
@@ -1072,18 +1074,41 @@
         });
         questionStatus.textContent = `顯示 ${filtered.length} / ${rows.length} 題（含停用題目）`;
       };
-      renderStudentProgress = (rows, source) => {
-        state.studentProgressRows = Array.isArray(rows) ? rows : [];
+      const progressRowsForView = () => {
         const classCode = String(progressClassFilter?.value || "").trim();
         const minimumStage = Number(progressStageFilter?.value || 0);
-        const filtered = state.studentProgressRows.filter(row => (!classCode || String(row.className || "") === classCode) && Number(row.bestStage || 0) >= minimumStage);
+        return state.studentProgressRows.filter(row => (!classCode || String(row.className || "") === classCode) && Number(row.bestStage || 0) >= minimumStage);
+      };
+      renderStudentProgress = (rows, source) => {
+        state.studentProgressRows = Array.isArray(rows) ? rows : [];
+        const filtered = progressRowsForView();
         studentProgressList.innerHTML = filtered.length ? filtered.slice(0, 40).map(row => {
           const errors = Array.isArray(row.topErrors) ? row.topErrors : [];
           const errorText = errors.length ? `常錯 ${errors.map(error => `${esc(error.key)} ×${Number(error.count) || 0}`).join("、")}` : "尚無錯誤分類紀錄";
-          return `<div class="summary-card"><strong>${esc(row.className || "")} ${esc(row.seatNo || "")} ${esc(row.studentName || "")}</strong><span>最高關卡 ${row.bestStage || 0}｜寶石 ${row.gems || 0}/8｜最佳分數 ${Number(row.bestScore || 0).toLocaleString()}｜正確率 ${row.accuracy || 100}%｜完成題數 ${row.correct || 0}｜${errorText}</span></div>`;
+          const stageText = Object.entries(row.bestStages || {}).sort((a, b) => Number(a[0]) - Number(b[0])).map(([stage, best]) => `第${stage}關 ${Number(best.score || 0).toLocaleString()}`).join("、") || "尚無逐關最佳紀錄";
+          return `<div class="summary-card"><strong>${esc(row.className || "")} ${esc(row.seatNo || "")} ${esc(row.studentName || "")}</strong><span>最高關卡 ${row.bestStage || 0}｜寶石 ${row.gems || 0}/8｜最佳分數 ${Number(row.bestScore || 0).toLocaleString()}｜正確率 ${row.accuracy || 100}%｜完成題數 ${row.correct || 0}</span><span>逐關最佳：${stageText}</span><span>${errorText}</span></div>`;
         }).join("") : `<p class="note">${state.studentProgressRows.length ? "沒有符合篩選條件的學生。" : "尚無學生進度紀錄。"}</p>`;
         progressStatus.textContent = source ? `來源：${source}｜顯示 ${filtered.length} / ${state.studentProgressRows.length} 位學生` : "";
       };
+      function exportStudentProgress() {
+        const rows = progressRowsForView();
+        if (!rows.length) { progressStatus.textContent = "目前沒有符合篩選條件的學生報表。"; return; }
+        const header = ["studentName", "className", "seatNo", "bestStage", "gems", "bestScore", "accuracy", "correct", "attempts", "plays", "topErrors", "bestStages"];
+        const body = rows.map(row => header.map(key => {
+          if (key === "topErrors") return (row.topErrors || []).map(error => `${error.key} x${error.count}`).join(", ");
+          if (key === "bestStages") return Object.entries(row.bestStages || {}).map(([stage, best]) => `${stage}:${best.score}/${best.accuracy}%`).join(", ");
+          return row[key] ?? "";
+        }).map(value => String(value).replace(/[\t\r\n]/g, " ")).join("\t"));
+        const blob = new Blob([[header.join("\t"), ...body].join("\n")], { type: "text/tab-separated-values;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "word-war-student-progress.tsv";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        progressStatus.textContent = `已匯出 ${rows.length} 位學生報表。`;
+      }
       function resetAccountAdmin() {
         accountAdminId.value = "";
         accountAdminName.value = "";
@@ -1143,6 +1168,7 @@
       loadAccountsBtn.onclick = loadAccountsAdmin;
       saveAccountBtn.onclick = saveAccountAdmin;
       clearAccountBtn.onclick = resetAccountAdmin;
+      exportStudentProgressBtn.onclick = exportStudentProgress;
       questionAdminSearch.oninput = renderQuestionAdminList;
       questionAdminStage.onchange = renderQuestionAdminList;
       questionAdminStatus.onchange = renderQuestionAdminList;
