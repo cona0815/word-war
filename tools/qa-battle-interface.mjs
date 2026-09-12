@@ -33,6 +33,11 @@ try{
      return [...document.querySelectorAll('.ultimate-actions button,#battleItems button,#answerInput,#attackBtn')].every(e=>{const r=rect(e);return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight});
    });assert.equal(safe,true,`controls ${width}`);
    if(width>600)assert.equal(await page.locator('#battleItems').evaluate(e=>e.getBoundingClientRect().left>innerWidth/2),true,`items belong on right at ${width}x${height}`);
+   if(width>600){
+     for(const [selector,maxWidth] of [['.play-panel',322],['#battleItems',182],['#ultimateMeter',182]]){
+       assert.ok(await page.locator(selector).evaluate((e,max)=>e.getBoundingClientRect().width<=max,maxWidth),`compact ${selector} at ${width}x${height}`);
+     }
+   }
    await page.screenshot({path:`${out}/${width}-${height}.png`});
    assert.equal(await page.locator('.boss-tag').evaluate(e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight}),true,'Boss title visible');
    assert.deepEqual(await page.evaluate(()=>{
@@ -44,5 +49,19 @@ try{
  await page.evaluate(()=>{state.levelIndex=8;state.bossPhase=5;hud()});
  assert.equal(await page.locator('.battle-progress li').count(),9);
  assert.equal(await page.locator('.battle-progress [aria-current]').getAttribute('aria-label'),'Boss 階段 5');
+ await page.setViewportSize({width:1366,height:768});
+ await page.evaluate(async()=>{
+   document.querySelector('#drawer').classList.remove('open');
+   begin(0);clearInterval(state.tick);mission.classList.add('hidden');
+   await prepareBattleVisuals();await BattleGround.align();hud();
+ });
+ assert.equal(await page.evaluate(()=>{
+   const r=hero.getBoundingClientRect(),s=gameScreen.getBoundingClientRect();
+   return !state.bossMode&&Math.abs(r.left+r.width/2-(s.left+s.width/2))<1;
+ }),true,'mob battle restores horizontal center');
+ assert.equal(await page.locator('.hero-gear').evaluate(e=>getComputedStyle(e).display),'none','no passive aura');
+ assert.equal(await page.locator('.battle-foot-marker[data-kind="boss"]').evaluate(e=>e.hidden),true,'hide Boss marker in mob battle');
+ assert.equal(await page.locator('.battle-foot-marker[data-kind="hero"]').evaluate(e=>getComputedStyle(e).display!=='none'),true,'hero ground marker remains');
+ await page.screenshot({path:`${out}/mob-center.png`});
  assert.deepEqual(errors,[]);console.log('PASS RPG identity, phase timeline, charge/cancel/release, menu and seven viewport controls');
 }finally{await browser.close()}

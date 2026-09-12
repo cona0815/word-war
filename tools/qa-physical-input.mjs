@@ -14,9 +14,22 @@ try{
  await page.waitForFunction(()=>state.running&&!document.querySelector('#gmPanel').open);
  // Isolate input routing from animation timers; all inputs below use browser keyboard events.
  await page.evaluate(()=>{clearInterval(state.tick);cast=()=>{};state.bossMode=true});
+ const phonics=await page.evaluate(()=>{
+   const lv=levels[3];
+   const pools=[1,2,3].map(phase=>{state.bossPhase=phase;return bossPool(lv)});
+   state.bossPhase=1;
+   return {waves:buildWaves(lv),pools,directions:lv.waveSets.slice(0,3).flat().every(w=>JSON.stringify(keyPos(w))===JSON.stringify(keyPos(w[0])))};
+ });
+ assert.equal(phonics.waves.length,4);
+ assert.equal(phonics.waves.flat().length,32,'keep settlement practice count');
+ assert.ok(phonics.pools[0].every(w=>/^[ㄅ-ㄩ]{2,3}$/.test(w)),'phase 1 compounds');
+ assert.ok(phonics.pools[1].every(w=>/^[ㄅ-ㄩ]{2,3}[ˊˇˋ˙]$/.test(w)),'phase 2 tones');
+ assert.ok(phonics.pools[2].every(w=>/^[，。？！：、「」]+$/.test(w)),'phase 3 punctuation');
+ assert.ok(phonics.directions,'compounds follow first phonetic key');
  const cases=[...Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ',word=>({stage:0,word,presses:[word.toLowerCase()]})),...Array.from(symbols,(word,i)=>({stage:2,word,presses:[keys[i]]})),
    ...[['ㄅㄚˊ',['1','8','6']],['ㄇㄚˇ',['a','8','3']],['ㄉㄚˋ',['2','8','4']],['ㄌㄧ˙',['x','u','7']],['，',[',']],['。',['.']],['？',['Shift+?']],['！',['Shift+!']],['：',['Shift+:']],['、',['\\']],['「」',['[',']']]].map(([word,presses])=>({stage:3,word,presses})),
    ...['C','V','Z','A'].map(key=>({stage:5,word:`CTRL+${key}`,presses:[`Control+${key.toLowerCase()}`],hotkey:key}))];
+ for(const [word,presses] of [['ㄅㄚ',['1','8']],['ㄇㄚ',['a','8']],['ㄉㄚ',['2','8']],['ㄌㄧ',['x','u']],['ㄓㄨ',['5','j']],['ㄒㄧ',['v','u']],['ㄅㄠ',['1','l']],['ㄇㄟ',['a','o']],['ㄅㄚˋ',['1','8','4']],['ㄇㄚˊ',['a','8','6']],['ㄉㄚˇ',['2','8','3']],['ㄒㄧˇ',['v','u','3']]])cases.push({stage:3,word,presses});
  for(const c of cases){
    const before=await page.evaluate(c=>{
      state.levelIndex=c.stage;state.current={word:c.word,boss:true};answerInput.value='';

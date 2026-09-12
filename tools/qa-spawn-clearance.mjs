@@ -9,6 +9,30 @@ try{
  await page.goto((process.argv[2]||'http://127.0.0.1:8767')+'/index.html?test=spawn-clearance');
  await page.locator('#accountInput').fill('99099');await page.locator('#passwordInput').fill('99099');await page.locator('#startBtn').click();
  await page.waitForFunction(()=>!gameScreen.classList.contains('hidden'));
+ const pacing=await page.evaluate(()=>levels.map(lv=>({mode:lv.mode,first:spawnDelay(lv,0,0),gap:spawnDelay(lv,0,1),lane:spawnDelay(lv,1,1)})));
+ for(const p of pacing){
+   const single=['letters','zhuyin'].includes(p.mode),slow=['sentences','final'].includes(p.mode);
+   assert.equal(p.first,0);
+   assert.equal(p.gap,single?2200:slow?5200:3400,p.mode);
+   assert.equal(p.lane,single?3600:slow?7600:5400,p.mode);
+ }
+ for(const stage of [0,2]){
+   const timing=await page.evaluate(index=>{
+     clearInterval(state.tick);state.levelIndex=index;state.bossMode=false;
+     const originalNow=Date.now,base=originalNow();let now=base;Date.now=()=>now;
+     try{
+       const lane=spawnLaneKey(levels[index].words[0]);
+       state.enemies=[{alive:true,order:0,x:10,y:30,laneKey:lane,spawnLane:lane,spawnAt:base},
+         {alive:true,order:1,x:90,y:30,laneKey:'other',spawnLane:'other',spawnAt:base+spawnDelay(levels[index],0,1)}];
+       now=base+2199;const before=isActive(state.enemies[1]);now++;
+       const due=isActive(state.enemies[1]);
+       state.enemies[1].spawnLane=lane;
+       const blocked=isActive(state.enemies[1]);state.enemies[0].alive=false;
+       return {before,due,blocked,after:isActive(state.enemies[1])};
+     }finally{Date.now=originalNow}
+   },stage);
+   assert.deepEqual(timing,{before:false,due:true,blocked:false,after:true},`single-key scheduling stage ${stage+1}`);
+ }
  const repeat=await page.evaluate(()=>{
    const seen={},lv=levels[4];return Array.from({length:16},(_,i)=>pos(lv,'\u6821',i,seen));
  });
