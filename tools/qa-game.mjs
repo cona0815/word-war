@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const htmlPath = path.join(root, "index.html");
 const html = fs.readFileSync(htmlPath, "utf8");
+const typingInput = fs.readFileSync(path.join(root, "typing-input.js"), "utf8");
 const failures = [];
 const checks = [];
 
@@ -87,6 +88,7 @@ check("教師題庫 wave／難度驅動第 7、8 關四波", /function teacherWa
 check("任務開始按鈕有明確事件入口", /id="missionStartBtn"[^>]+type="button"/.test(html) && /onclick="handleMissionStart\(\)"/.test(html) && /function handleMissionStart/.test(html) && /missionStartBtn\.onclick=handleMissionStart/.test(html) && !/__WORD_WAR_START_MISSION__/.test(html));
 check("角色裝備有獨立視覺層", /id="heroGear"/.test(html) && /heroGear\.dataset\.gear=key/.test(html) && /\.hero-gear\[data-gear="guardian"\]/.test(html));
 check("整合武器不會疊加舊武器圖層", /\.hero-weapon\{display:none\}/.test(html) && /heroWeapon\.style\.display="none"/.test(html));
+check("IME 組字與 keyCode 229 不會誤觸發攻擊", typingInput.includes("event.keyCode===229") && html.includes("e.keyCode===229") && html.includes("e.isComposing||e.keyCode===229||composing"));
 
 const baseUrl = process.argv[2]?.replace(/\/$/, "");
 if (baseUrl) {

@@ -1,5 +1,13 @@
 # Word War Handoff
 
+## 2026-09-13 IME 組字與 legacy keyCode 229 防護
+
+- `typing-input.js`、`index.html` 的所有鍵盤提交入口現在同時檢查 `event.isComposing`、組字狀態與 `keyCode=229`；組字候選選字期間不會被注音／全域快捷鍵攔截，組字完成後仍由 Enter 提交中文題。
+- 新增 `tools/qa-ime-input.mjs`：Chrome 合成 compositionstart／input／compositionend 與 legacy keyCode 229，驗證中文句子只在組字完成後結算一次，以及候選數字鍵不誤攻擊。
+- 驗證：`qa-ime-input` PASS；`qa-game` 123/123；inline `node --check` PASS。這是瀏覽器合成事件驗收，尚未取代真實 Windows 注音輸入法與教室設備測試；尚未 push。
+- 尚未完成：教師帳號建立／重設頁、批次題庫篩選與版本衝突提示、真實 Windows IME 實機驗收、最新線上 GAS 部署驗收與 37 套施法素材。
+- 下一個最安全任務：補教師帳號建立／重設與題庫批次篩選流程，維持管理密碼只在受保護 API 驗證。
+
 ## 2026-09-13 教師題庫管理 CRUD 與啟停
 
 - `index.html` 新增管理題庫清單與編輯器：可載入第 7／8 關問題目，編輯 prompt、answer、display、wave、difficulty、laneKey，儲存後重新載入；可停用、重新啟用與軟刪除，清除編輯會恢復新增狀態。
