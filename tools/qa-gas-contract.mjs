@@ -168,6 +168,8 @@ check("GAS 建立九張資料表", ["Records", "Questions", "Accounts", "Profile
 
 const admin = post({ action: "adminUpsertAccount", token: "contract-test-admin", account: { accountId: "50101", displayName: "測試學生" } });
 check("管理者建立五碼帳號", admin.ok && admin.account.accountId === "50101");
+const accounts = get("accounts", { token: "contract-test-admin", limit: 10 });
+check("管理者可讀取學生帳號清單且不回傳密碼雜湊", accounts.ok && accounts.accounts.some(account => account.accountId === "50101") && accounts.accounts.every(account => !Object.prototype.hasOwnProperty.call(account, "passwordVerifier")));
 const login = post({ action: "login", account: "50101", password: "50101" });
 check("登入回傳 session", login.ok && login.sessionToken && login.profile.accountId === "50101");
 expectError("錯誤密碼被拒絕", { action: "login", account: "50101", password: "50102" }, /incorrect|incorrect/i);
@@ -181,6 +183,7 @@ const listedQuestions = post({ action: "listQuestions", token: "contract-test-ad
 check("管理者可讀取含停用題目的題庫", listedQuestions.ok && listedQuestions.questions.some(question => question.id === questionId && question.enabled === true));
 const updatedQuestion = post({ action: "updateQuestion", token: "contract-test-admin", id: questionId, updatedBy: "teacher", question: { prompt: "QA edit two.", answer: "QA edit two.", display: "QA display two.", difficulty: "normal", wave: 3, laneKey: "qa-lane" } });
 check("管理者可編輯題目與波次", updatedQuestion.ok && updatedQuestion.question.prompt === "QA edit two." && updatedQuestion.question.difficulty === 2 && updatedQuestion.question.wave === 3 && updatedQuestion.question.version === 2);
+expectError("題目版本衝突被拒絕", { action: "updateQuestion", token: "contract-test-admin", id: questionId, updatedBy: "teacher", question: { version: 1, prompt: "過期編輯", answer: "過期編輯" } }, /Question changed|Reload before editing/);
 const disabledQuestion = post({ action: "setQuestionEnabled", token: "contract-test-admin", id: questionId, enabled: false });
 const activeQuestionsAfterDisable = get("questions");
 check("管理者可停用題目且學生題庫不再載入", disabledQuestion.ok && disabledQuestion.question.enabled === false && !activeQuestionsAfterDisable.questions.some(question => question.id === questionId));

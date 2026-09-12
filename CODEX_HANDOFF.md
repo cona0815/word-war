@@ -1,5 +1,13 @@
 # Word War Handoff
 
+## 2026-09-13 教師帳號管理、題庫篩選與版本衝突保護
+
+- `gas_code.gs` 新增受管理密碼保護的 `accounts` 清單 API；設定頁新增學生帳號讀取、建立／更新、五碼密碼重設、啟用／停用與清除編輯流程，清單不回傳密碼雜湊。
+- 題庫管理清單新增搜尋、關卡與啟用狀態篩選；`updateQuestion_` 會檢查編輯時帶回的題目版本，過期版本回傳 `Question changed. Reload before editing.`，避免教師互相覆蓋。
+- 新增 `tools/qa-account-admin.mjs`，並擴充 GAS／題庫契約 QA。驗證：`qa-account-admin` PASS、`qa-gas-contract` 0 failures、`qa-question-contract` 57/57、`qa-question-admin` PASS、`qa-game` 123/123；inline `node --check` PASS。
+- 尚未完成：真實 Windows IME 實機驗收、跨班級完整報表與常錯內容分析、最新線上 GAS 部署驗收與 37 套施法素材；學生各關最高成績儀表板仍待補齊。
+- 下一個最安全任務：補教師跨班級報表／常錯題型統計，先以唯讀彙整與匯出驗收，維持學生資料只由登入帳號決定。
+
 ## 2026-09-13 IME 組字與 legacy keyCode 229 防護
 
 - `typing-input.js`、`index.html` 的所有鍵盤提交入口現在同時檢查 `event.isComposing`、組字狀態與 `keyCode=229`；組字候選選字期間不會被注音／全域快捷鍵攔截，組字完成後仍由 Enter 提交中文題。

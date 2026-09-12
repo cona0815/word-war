@@ -232,11 +232,23 @@
         <div id="studentProgressList" class="summary-list"></div>
         <p id="progressStatus" class="status"></p>
         <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
+        <strong id="accountAdminLabel">學生帳號管理</strong>
+        <label><span>帳號</span><input id="accountAdminId" inputmode="numeric" maxlength="5" placeholder="50101"></label>
+        <label><span>顯示名稱</span><input id="accountAdminName" maxlength="40" placeholder="學生姓名或座號"></label>
+        <label><span>新密碼（留白保留原密碼）</span><input id="accountAdminPassword" type="password" inputmode="numeric" maxlength="5" placeholder="預設為帳號"></label>
+        <label><span>帳號狀態</span><select id="accountAdminStatus"><option value="active">啟用</option><option value="disabled">停用</option></select></label>
+        <div class="two"><button id="loadAccountsBtn" class="btn" type="button">讀取帳號</button><button id="saveAccountBtn" class="btn primary" type="button">儲存帳號</button></div>
+        <button id="clearAccountBtn" class="btn" type="button" style="width:100%">清除帳號編輯</button>
+        <div id="accountAdminList" class="summary-list"></div>
+        <p id="accountAdminStatusText" class="status"></p>
+        <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
         <strong>Boss 強化預覽</strong>
         <div id="bossLab" class="boss-lab"></div>
         <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
         <strong id="questionBankLabel"></strong>
         <label><span>模式</span><select id="questionMode"><option value="en">英文</option><option value="zh">中文</option></select></label>
+        <label><span>搜尋題目</span><input id="questionAdminSearch" type="search" placeholder="題目、答案或題號"></label>
+        <div class="two"><label><span>篩選關卡</span><select id="questionAdminStage"><option value="">第 7／8 關</option><option value="7">第 7 關</option><option value="8">第 8 關</option></select></label><label><span>篩選狀態</span><select id="questionAdminStatus"><option value="">全部</option><option value="active">啟用中</option><option value="disabled">已停用</option></select></label></div>
         <label><span>題目</span><textarea id="questionPrompt"></textarea></label>
         <label><span>答案</span><textarea id="questionAnswer"></textarea></label>
         <label><span>顯示文字</span><textarea id="questionDisplay"></textarea></label>
@@ -355,6 +367,7 @@
     const $=id=>document.getElementById(id);
     const loginScreen=$("loginScreen"),gameScreen=$("gameScreen"),loginAccount=$("loginAccount"),loginGuide=$("loginGuide"),loginRank=$("loginRank"),subtitle=$("subtitle"),tabAccount=$("tabAccount"),tabGuide=$("tabGuide"),tabRank=$("tabRank"),accountLabel=$("accountLabel"),passwordLabel=$("passwordLabel"),accountInput=$("accountInput"),passwordInput=$("passwordInput"),maleBtn=$("maleBtn"),femaleBtn=$("femaleBtn"),startBtn=$("startBtn"),openGuideBtn=$("openGuideBtn"),openRankBtn=$("openRankBtn"),menuBtn=$("menuBtn"),levelTitle=$("levelTitle"),roundText=$("roundText"),scoreLabel=$("scoreLabel"),scoreText=$("scoreText"),comboLabel=$("comboLabel"),comboText=$("comboText"),accLabel=$("accLabel"),accuracyText=$("accuracyText"),enemyLabel=$("enemyLabel"),enemyCountText=$("enemyCountText"),enemyBar=$("enemyBar"),hpLabel=$("hpLabel"),hpText=$("hpText"),hpBar=$("hpBar"),questionType=$("questionType"),difficultyText=$("difficultyText"),questionText=$("questionText"),answerInput=$("answerInput"),attackBtn=$("attackBtn"),mission=$("mission"),missionTitle=$("missionTitle"),missionText=$("missionText"),missionStartBtn=$("missionStartBtn"),drawer=$("drawer"),closeMenuBtn=$("closeMenuBtn"),drawerTitle=$("drawerTitle"),menuTabLevels=$("menuTabLevels"),menuTabAvatar=$("menuTabAvatar"),menuTabRecords=$("menuTabRecords"),menuTabSettings=$("menuTabSettings"),avatarLabel=$("avatarLabel"),avatarInfo=$("avatarInfo"),weaponLabel=$("weaponLabel"),weaponInfo=$("weaponInfo"),skillLabel=$("skillLabel"),skillInfo=$("skillInfo"),switchHeroBtn=$("switchHeroBtn"),gemProgress=$("gemProgress"),walletInfo=$("walletInfo"),levelGrid=$("levelGrid"),recordList=$("recordList"),gasUrlLabel=$("gasUrlLabel"),gasUrlInput=$("gasUrlInput"),adminTokenLabel=$("adminTokenLabel"),adminTokenInput=$("adminTokenInput"),saveSettingsBtn=$("saveSettingsBtn"),testGasBtn=$("testGasBtn"),syncRecordsBtn=$("syncRecordsBtn"),settingsStatus=$("settingsStatus"),studentProgressLabel=$("studentProgressLabel"),studentProgressList=$("studentProgressList"),progressStatus=$("progressStatus"),loadProgressBtn=$("loadProgressBtn"),exportRecordsBtn=$("exportRecordsBtn"),questionBankLabel=$("questionBankLabel"),questionPrompt=$("questionPrompt"),questionDifficulty=$("questionDifficulty"),questionMode=$("questionMode"),questionStatus=$("questionStatus"),addQuestionBtn=$("addQuestionBtn"),bulkQuestionsLabel=$("bulkQuestionsLabel"),bulkQuestionsInput=$("bulkQuestionsInput"),bulkImportBtn=$("bulkImportBtn"),loadQuestionsBtn=$("loadQuestionsBtn"),exportQuestionsBtn=$("exportQuestionsBtn"),bulkStatus=$("bulkStatus"),guideList=$("guideList"),rankList=$("rankList"),shopInfo=$("shopInfo"),shopStatus=$("shopStatus"),gearInfo=$("gearInfo"),hero=$("hero"),heroMotion=$("heroMotion"),heroWeapon=$("heroWeapon"),enemyLayer=$("enemyLayer"),effectLayer=$("effectLayer"),ladderNameBox=$("ladderNameBox"),ladderNickname=$("ladderNickname"),ladderNameStatus=$("ladderNameStatus"),submitLadderBtn=$("submitLadderBtn"),checkLadderNameBtn=$("checkLadderNameBtn"),academyAudio=$("academyAudio");
     const heroGear=$("heroGear");
+    const accountAdminId=$("accountAdminId"),accountAdminName=$("accountAdminName"),accountAdminPassword=$("accountAdminPassword"),accountAdminStatus=$("accountAdminStatus"),loadAccountsBtn=$("loadAccountsBtn"),saveAccountBtn=$("saveAccountBtn"),clearAccountBtn=$("clearAccountBtn"),accountAdminList=$("accountAdminList"),accountAdminStatusText=$("accountAdminStatusText"),questionAdminSearch=$("questionAdminSearch"),questionAdminStage=$("questionAdminStage"),questionAdminStatus=$("questionAdminStatus");
     const BATTLE_LINE_Y=62;
     const heroNormal={x:50,y:58}, heroBoss={x:32,y:58}, bossPos={x:68,y:BATTLE_LINE_Y};
     const bossLabState={levelIndex:0,power:2,weapon:"ice"};
@@ -393,7 +406,7 @@
      const state={profile:loadAccountProfile("50101"),config:load(CONFIG,{gasUrl:"",adminToken:""}),records:loadAccountRecords("50101"),ladderRecords:load(LADDER_STORE,[]),auth:loadAccountAuth("50101"),questions:[],levelIndex:0,enemies:[],current:null,bossMode:false,bossHp:0,maxBossHp:3,bossPhase:1,bossPhaseHits:0,bossPhaseStartedAt:0,bossAttackAt:0,bossAttackPending:false,bossAttackCount:0,hp:100,score:0,combo:0,correct:0,attempts:0,tick:null,startedAt:Date.now(),waveIndex:0,waves:[],cleared:0,practiceTotal:0,qaShotPending:false,ladderRun:null};
      const qaMode=new URLSearchParams(location.search).get("qa")==="full";
     const visualQaMode=new URLSearchParams(location.search).get("qa")==="visual";
-    state.questionAdminRows=[];state.questionEditingId="";
+    state.questionAdminRows=[];state.questionEditingId="";state.accountAdminRows=[];
     let pendingLadderRecord=null;
     let pendingStageSettlement=null;
     let stageSettlementBusy=false;
@@ -1002,10 +1015,109 @@
           });
         }
       };
+      const originalQuestionAdminRender = renderQuestionAdminList;
+      renderQuestionAdminList = () => {
+        const rows = state.questionAdminRows || [];
+        const stage = questionAdminStage?.value || "";
+        const status = questionAdminStatus?.value || "";
+        const search = String(questionAdminSearch?.value || "").trim().toLowerCase();
+        const filtered = rows.filter(row => {
+          const matchesStage = !stage || String(row.stage || "") === stage;
+          const matchesStatus = !status || (status === "disabled" ? row.enabled === false : row.enabled !== false);
+          const haystack = [row.id,row.prompt,row.answer,row.display,row.tags].map(value => String(value || "").toLowerCase()).join(" ");
+          return matchesStage && matchesStatus && (!search || haystack.includes(search));
+        });
+        originalQuestionAdminRender();
+        const box = $("questionAdminList");
+        if (!box) return;
+        box.innerHTML = filtered.length ? filtered.map(q => `<div class="summary-card"><strong>${esc(q.id || "")}｜${esc(q.prompt || "")}</strong><span>${q.enabled === false ? "已停用" : "啟用中"}｜第 ${Number(q.stage) || "?"} 關｜波次 ${Number(q.wave) || 0}｜難度 ${Number(q.difficulty) || 1}</span><div class="two"><button class="btn" type="button" data-question-edit="${esc(q.id || "")}">編輯</button><button class="btn" type="button" data-question-toggle="${esc(q.id || "")}" data-question-enabled="${q.enabled === false ? "false" : "true"}">${q.enabled === false ? "重新啟用" : "停用"}</button><button class="btn" type="button" data-question-delete="${esc(q.id || "")}">刪除</button></div></div>`).join("") : `<p class="note">沒有符合篩選條件的題目。</p>`;
+        box.querySelectorAll("[data-question-edit]").forEach(button => {
+          button.onclick = () => {
+            const row = rows.find(q => q.id === button.dataset.questionEdit);
+            if (!row) return;
+            state.questionEditingId = row.id;
+            questionMode.value = row.mode || "en";
+            questionPrompt.value = row.prompt || "";
+            questionAnswer.value = row.answer || row.prompt || "";
+            questionDisplay.value = row.display || row.prompt || "";
+            questionWave.value = String(Number(row.wave) || 0);
+            questionLaneKey.value = row.laneKey || "";
+            questionDifficulty.value = String(Number(row.difficulty) || 1);
+            addQuestionBtn.textContent = "儲存編輯";
+            questionStatus.textContent = `正在編輯 ${row.id}`;
+          };
+        });
+        box.querySelectorAll("[data-question-toggle]").forEach(button => {
+          button.onclick = () => toggleQuestionAdmin(button.dataset.questionToggle, button.dataset.questionEnabled !== "true");
+        });
+        box.querySelectorAll("[data-question-delete]").forEach(button => {
+          button.onclick = () => deleteQuestionAdmin(button.dataset.questionDelete);
+        });
+        questionStatus.textContent = `顯示 ${filtered.length} / ${rows.length} 題（含停用題目）`;
+      };
+      function resetAccountAdmin() {
+        accountAdminId.value = "";
+        accountAdminName.value = "";
+        accountAdminPassword.value = "";
+        accountAdminStatus.value = "active";
+        accountAdminStatusText.textContent = "";
+      }
+      function renderAccountAdminList() {
+        const rows = state.accountAdminRows || [];
+        accountAdminList.innerHTML = rows.length ? rows.map(row => `<div class="summary-card"><strong>${esc(row.accountId)}｜${esc(row.displayName || row.accountId)}</strong><span>${row.status === "disabled" ? "已停用" : "啟用中"}｜班級 ${esc(row.classCode)}｜座號 ${esc(row.seatNo)}</span><button class="btn" type="button" data-account-edit="${esc(row.accountId)}">載入編輯</button></div>`).join("") : '<p class="note">尚未載入學生帳號。</p>';
+        accountAdminList.querySelectorAll("[data-account-edit]").forEach(button => {
+          button.onclick = () => {
+            const row = rows.find(item => item.accountId === button.dataset.accountEdit);
+            if (!row) return;
+            accountAdminId.value = row.accountId || "";
+            accountAdminName.value = row.displayName || "";
+            accountAdminPassword.value = "";
+            accountAdminStatus.value = row.status === "disabled" ? "disabled" : "active";
+            accountAdminStatusText.textContent = `正在編輯 ${row.accountId}`;
+          };
+        });
+      }
+      async function loadAccountsAdmin() {
+        if (!state.config.gasUrl) { accountAdminStatusText.textContent = T.gasMissing; return; }
+        if (!state.config.adminToken) { accountAdminStatusText.textContent = "請先輸入管理密碼。"; return; }
+        accountAdminStatusText.textContent = "帳號載入中…";
+        try {
+          const res = await gasGet("accounts", { token: state.config.adminToken, limit: 500 });
+          if (!res.ok) throw new Error(res.error || "讀取帳號失敗");
+          state.accountAdminRows = Array.isArray(res.accounts) ? res.accounts : [];
+          renderAccountAdminList();
+          accountAdminStatusText.textContent = `已載入 ${state.accountAdminRows.length} 個學生帳號`;
+        } catch (error) { accountAdminStatusText.textContent = error.message; }
+      }
+      async function saveAccountAdmin() {
+        const id = String(accountAdminId.value || "").trim();
+        const password = String(accountAdminPassword.value || "").trim();
+        if (!/^\d{5}$/.test(id)) { accountAdminStatusText.textContent = "帳號必須是五碼班級與座號。"; return; }
+        if (password && !/^\d{5}$/.test(password)) { accountAdminStatusText.textContent = "新密碼必須是五碼數字。"; return; }
+        if (!state.config.gasUrl) { accountAdminStatusText.textContent = T.gasMissing; return; }
+        if (!state.config.adminToken) { accountAdminStatusText.textContent = "請先輸入管理密碼。"; return; }
+        const account = { accountId: id, displayName: String(accountAdminName.value || id).trim() || id, status: accountAdminStatus.value === "disabled" ? "disabled" : "active" };
+        if (password) account.password = password;
+        accountAdminStatusText.textContent = "帳號儲存中…";
+        try {
+          const res = await gasPost({ action: "adminUpsertAccount", token: state.config.adminToken, account });
+          if (!res.ok) throw new Error(res.error || "帳號儲存失敗");
+          await loadAccountsAdmin();
+          accountAdminStatusText.textContent = `帳號 ${id} 已儲存。`;
+          accountAdminPassword.value = "";
+        } catch (error) { accountAdminStatusText.textContent = error.message; }
+      }
       startBtn.onclick = start;
       $("addQuestionBtn").onclick = saveQuestionAdmin;
       $("loadQuestionAdminBtn").onclick = loadQuestionAdmin;
       $("cancelQuestionEditBtn").onclick = resetQuestionEditor;
+      loadAccountsBtn.onclick = loadAccountsAdmin;
+      saveAccountBtn.onclick = saveAccountAdmin;
+      clearAccountBtn.onclick = resetAccountAdmin;
+      questionAdminSearch.oninput = renderQuestionAdminList;
+      questionAdminStage.onchange = renderQuestionAdminList;
+      questionAdminStatus.onchange = renderQuestionAdminList;
+      renderAccountAdminList();
       renderQuestionAdminList();
       menu();
     })();

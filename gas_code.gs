@@ -170,6 +170,14 @@ function doGet(e) {
       });
     }
 
+    if (action === "accounts") {
+      verifyAdmin_(e.parameter.token);
+      return json_({
+        ok: true,
+        accounts: getAccounts_(Number(e.parameter.limit || 300))
+      });
+    }
+
     return json_({ ok: false, error: "Unknown action." });
   } catch (error) {
     return json_({ ok: false, error: error.message });
@@ -1136,6 +1144,28 @@ function getStudents_(limit) {
   return rows.slice(0, Math.min(Math.max(limit || 100, 1), 300));
 }
 
+function getAccounts_(limit) {
+  const sheet = getSheet_(SHEETS.accounts);
+  const values = sheet.getDataRange().getValues();
+  if (values.length <= 1) return [];
+  const headers = values[0];
+  const rows = values.slice(1).map(function(row) {
+    const record = {};
+    headers.forEach(function(header, index) { record[header] = row[index]; });
+    return {
+      accountId: clean_(record.accountId, 5),
+      classCode: clean_(record.classCode, 3),
+      seatNo: clean_(record.seatNo, 2),
+      displayName: clean_(record.displayName, 40),
+      status: String(record.status || "active").toLowerCase() === "disabled" ? "disabled" : "active",
+      createdAt: record.createdAt || "",
+      updatedAt: record.updatedAt || ""
+    };
+  }).filter(function(account) { return /^\d{5}$/.test(account.accountId); });
+  rows.sort(function(a, b) { return a.accountId.localeCompare(b.accountId); });
+  return rows.slice(0, Math.min(Math.max(limit || 300, 1), 500));
+}
+
 function addQuestion_(question, createdBy) {
   const sheet = getSheet_(SHEETS.questions);
   const now = new Date().toISOString();
@@ -1197,6 +1227,10 @@ function updateQuestion_(id, question, updatedBy) {
     if (!prompt || !answer) throw new Error("Question prompt and answer are required.");
     const now = new Date().toISOString();
     const currentVersion = Math.max(1, number_(current.version) || 1);
+    const expectedVersion = question.expectedVersion === undefined ? question.version : question.expectedVersion;
+    if (expectedVersion !== undefined && expectedVersion !== null && String(expectedVersion).trim() !== "" && Number(expectedVersion) !== currentVersion) {
+      throw new Error("Question changed. Reload before editing.");
+    }
     const safe = {
       id: clean_(current.id),
       createdAt: current.createdAt || now,

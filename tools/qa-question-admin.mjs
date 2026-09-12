@@ -54,6 +54,14 @@ try {
   await page.locator("#loadQuestionAdminBtn").click();
   await page.waitForFunction(() => document.querySelectorAll("#questionAdminList [data-question-edit]").length === 2);
   assert.equal(await page.locator("#questionAdminList .summary-card").count(), 2);
+  await page.locator("#questionAdminSearch").fill("停用");
+  await page.waitForFunction(() => document.querySelectorAll("#questionAdminList [data-question-edit]").length === 1);
+  assert.equal(await page.locator('[data-question-edit="q-disabled"]').count(), 1);
+  await page.locator("#questionAdminSearch").fill("");
+  await page.locator("#questionAdminStatus").selectOption("active");
+  await page.waitForFunction(() => document.querySelectorAll("#questionAdminList [data-question-edit]").length === 1);
+  assert.equal(await page.locator('[data-question-edit="q-active"]').count(), 1);
+  await page.locator("#questionAdminStatus").selectOption("");
   await page.locator('[data-question-edit="q-active"]').click();
   assert.equal(await page.locator("#addQuestionBtn").textContent(), "儲存編輯");
   await page.locator("#questionPrompt").fill("I can type fast.");

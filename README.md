@@ -64,6 +64,7 @@
 - `node tools/qa-game.mjs http://127.0.0.1:8767`：加上本機伺服器頁面與素材 HTTP 檢查。
 - `node tools/qa-question-contract.mjs`：檢查題庫 schema v1、英文／中文關卡分流與 GAS 題庫欄位契約。
 - `node tools/qa-question-admin.mjs http://127.0.0.1:8767`：以隔離 Chrome 驗證教師題庫列表、編輯、儲存、啟用／停用、軟刪除與清除編輯流程。
+- `node tools/qa-account-admin.mjs http://127.0.0.1:8767`：以隔離 Chrome 驗證教師讀取學生帳號、重設密碼／狀態與清除編輯流程。
 - `node tools/qa-ime-input.mjs http://127.0.0.1:8767`：以隔離 Chrome 驗證 IME 組字中不誤攻擊、組字完成後 Enter 才結算，以及 legacy `keyCode=229` 防護。
 - `node tools/qa-progress-gate.mjs http://127.0.0.1:8767`：檢查前端依序解鎖、雲端通關延遲時的進度鎖定、失敗提示、同事件重試後解鎖，以及重新登入後恢復未同步通關紀錄。
 - `node tools/qa-boss-phase-pools.mjs http://127.0.0.1:8767`：逐關檢查八個主線 Boss 的三階段題型，以及第 7、8 關教師題庫的 wave／難度分流。
