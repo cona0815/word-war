@@ -33,9 +33,10 @@ const PROFILE_HEADERS = [
   "coins",
   "gemsJson",
   "weapon",
-  "gear",
-  "inventoryJson",
-  "updatedAt"
+ "gear",
+ "inventoryJson",
+  "updatedAt",
+  "settlementEventsJson"
 ];
 
 const SESSION_HEADERS = [
@@ -93,7 +94,7 @@ const LEADERBOARD_HEADERS = [
   "durationMs", "achievedAt", "moderationStatus"
 ];
 const NAME_BLOCKLIST_HEADERS = ["pattern", "type", "enabled", "note"];
-const SETTLEMENT_HEADERS = ["eventId", "accountId", "stage", "reward", "xpGain", "createdAt"];
+const SETTLEMENT_HEADERS = ["eventId", "accountId", "stage", "reward", "xpGain", "createdAt", "status", "itemRunId"];
 const DEFAULT_NAME_BLOCKLIST = ["幹", "屌", "操", "他媽", "媽的", "白癡", "智障", "fuck", "shit", "bitch", "asshole"];
 
 const RECORD_HEADERS = [
@@ -255,6 +256,21 @@ function doPost(e) {
       return json_({ ok: true, question });
     }
 
+    if (action === "listQuestions") {
+      verifyAdmin_(payload.token);
+      return json_({ ok: true, questions: getQuestions_(true) });
+    }
+
+    if (action === "updateQuestion") {
+      verifyAdmin_(payload.token);
+      return json_({ ok: true, question: updateQuestion_(payload.id, payload.question || {}, payload.updatedBy || "admin") });
+    }
+
+    if (action === "setQuestionEnabled") {
+      verifyAdmin_(payload.token);
+      return json_({ ok: true, question: setQuestionEnabled_(payload.id, payload.enabled) });
+    }
+
     if (action === "deleteQuestion") {
       verifyAdmin_(payload.token);
       deleteQuestion_(payload.id);
@@ -385,6 +401,7 @@ function revokeSession_(token) {
 
 function getProfile_(accountId) {
   const identity = parseAccount_(accountId);
+  ensureSheet_(SHEETS.profiles, PROFILE_HEADERS);
   const row = findRow_(SHEETS.profiles, "accountId", identity.accountId);
   if (!row) {
     const profile = defaultProfile_(identity.accountId);
@@ -421,6 +438,7 @@ function saveProgress_(accountId, input, expectedVersion) {
       weapon: inventory.weapons.indexOf(requestedWeapon) >= 0 ? requestedWeapon : current.weapon,
       gear: inventory.gear.indexOf(requestedGear) >= 0 ? requestedGear : current.gear,
       inventoryJson: JSON.stringify(inventory),
+      settlementEventsJson: JSON.stringify(normalizeSettlementEvents_(current.settlementEvents)),
       updatedAt: new Date().toISOString()
     };
 
@@ -448,6 +466,7 @@ function defaultProfile_(accountId) {
     weapon: "starlight",
     gear: "focus",
     inventoryJson: JSON.stringify(defaultInventory_()),
+    settlementEventsJson: "[]",
     updatedAt: new Date().toISOString()
   };
 }
@@ -464,6 +483,7 @@ function profileFromRow_(record, accountId) {
     weapon: ["starlight", "ice", "fire", "thunder", "shadow"].indexOf(record.weapon) >= 0 ? record.weapon : "starlight",
     gear: ["focus", "guardian", "combo", "crown"].indexOf(record.gear) >= 0 ? record.gear : "focus",
     inventory: parseInventory_(record.inventoryJson),
+    settlementEvents: normalizeSettlementEvents_(record.settlementEventsJson),
     updatedAt: clean_(record.updatedAt)
   };
 }
@@ -581,6 +601,7 @@ function persistProfile_(accountId, profile) {
     weapon: inventory.weapons.indexOf(profile.weapon) >= 0 ? profile.weapon : "starlight",
     gear: inventory.gear.indexOf(profile.gear) >= 0 ? profile.gear : "focus",
     inventoryJson: JSON.stringify(inventory),
+    settlementEventsJson: JSON.stringify(normalizeSettlementEvents_(profile.settlementEvents)),
     updatedAt: profile.updatedAt || new Date().toISOString()
   };
   const row = findRow_(SHEETS.profiles, "accountId", identity.accountId);
@@ -629,6 +650,32 @@ function purchase_(accountId, itemId, expectedVersion) {
   }
 }
 
+function applySettlementReward_(current, stage, reward, xpGain, eventId) {
+  const gems = normalizeGems_(current.gems);
+  gems[stage - 1] = true;
+  let level = Math.max(1, current.level);
+  let xp = Math.max(0, current.xp) + Math.max(0, number_(xpGain));
+  while (level < 10 && xp >= level * 300) {
+    xp -= level * 300;
+    level += 1;
+  }
+  current.gems = gems;
+  current.level = level;
+  current.xp = xp;
+  current.coins = Math.max(0, current.coins) + Math.max(0, number_(reward));
+  current.settlementEvents = rememberSettlementEvent_(current.settlementEvents, eventId);
+  current.version += 1;
+  current.updatedAt = new Date().toISOString();
+  return current;
+}
+
+function updateSettlementStatus_(eventId, status) {
+  const row = findRow_(SHEETS.settlements, "eventId", eventId);
+  if (!row) throw new Error("Settlement record is missing.");
+  const index = SETTLEMENT_HEADERS.indexOf("status");
+  row.sheet.getRange(row.rowNumber, index + 1).setValue(clean_(status, 20));
+}
+
 function finishStage_(accountId, payload) {
   const stage = Math.floor(number_(payload.stage));
   const eventId = clean_(payload.eventId, 100);
@@ -641,11 +688,27 @@ function finishStage_(accountId, payload) {
   const lock = LockService.getScriptLock();
   lock.waitLock(5000);
   try {
+    ensureSheet_(SHEETS.settlements, SETTLEMENT_HEADERS);
     const current = getProfile_(accountId);
     const previous = findRow_(SHEETS.settlements, "eventId", eventId);
     if (previous) {
       if (String(previous.record.accountId) !== String(accountId)) throw new Error("Settlement event belongs to another account.");
-      return current;
+      if (String(previous.record.status || "").toLowerCase() !== "pending") return current;
+      if (normalizeSettlementEvents_(current.settlementEvents).indexOf(eventId) >= 0) {
+        updateSettlementStatus_(eventId, "applied");
+        return current;
+      }
+      const pendingReward = Math.max(0, number_(previous.record.reward));
+      const pendingXpGain = Math.max(0, number_(previous.record.xpGain));
+      const pendingStage = Math.floor(number_(previous.record.stage));
+      if (pendingStage !== stage) throw new Error("Settlement event stage mismatch.");
+      const pendingInventory = parseInventory_(current.inventory);
+      const pendingItemRunId = clean_(previous.record.itemRunId, 100);
+      if (pendingItemRunId && pendingInventory.itemRun?.id === pendingItemRunId && !pendingInventory.itemRun.closed) pendingInventory.itemRun.closed = true;
+      current.inventory = pendingInventory;
+      const recovered = persistProfile_(accountId, applySettlementReward_(current, stage, pendingReward, pendingXpGain, eventId));
+      updateSettlementStatus_(eventId, "applied");
+      return recovered;
     }
     if (correct < STAGE_MIN_CORRECT[stage]) {
       throw new Error("Stage completion did not include enough correct answers.");
@@ -663,23 +726,10 @@ function finishStage_(accountId, payload) {
     if (validRun) itemRun.closed = true;
     current.inventory = inventory;
     const xpGain = 70 + stage * 25 + Math.min(correct, 250);
-    let level = Math.max(1, current.level);
-    let xp = Math.max(0, current.xp) + xpGain;
-    while (level < 10 && xp >= level * 300) {
-      xp -= level * 300;
-      level += 1;
-    }
-    gems[stage - 1] = true;
-    current.gems = gems;
-    current.level = level;
-    current.xp = xp;
-    current.coins += reward;
-    current.version += 1;
-    current.updatedAt = new Date().toISOString();
-    const saved = persistProfile_(accountId, current);
-    getSheet_(SHEETS.settlements).appendRow(SETTLEMENT_HEADERS.map(function(header) {
-      return { eventId: eventId, accountId: accountId, stage: stage, reward: reward, xpGain: xpGain, createdAt: current.updatedAt }[header];
-    }));
+    const settlement = { eventId: eventId, accountId: accountId, stage: stage, reward: reward, xpGain: xpGain, createdAt: new Date().toISOString(), status: "pending", itemRunId: validRun ? itemRun.id : "" };
+    getSheet_(SHEETS.settlements).appendRow(SETTLEMENT_HEADERS.map(function(header) { return settlement[header] || ""; }));
+    const saved = persistProfile_(accountId, applySettlementReward_(current, stage, reward, xpGain, eventId));
+    updateSettlementStatus_(eventId, "applied");
     return saved;
   } finally {
     lock.releaseLock();
@@ -860,6 +910,22 @@ function normalizeGems_(value) {
   return Array.isArray(gems) ? gems.slice(0, 8).map(function(item) { return item === true; }) : [];
 }
 
+function normalizeSettlementEvents_(value) {
+  let events = value;
+  if (typeof value === "string") {
+    try { events = JSON.parse(value); } catch (error) { events = []; }
+  }
+  if (!Array.isArray(events)) return [];
+  return events.map(function(eventId) { return clean_(eventId, 100); }).filter(Boolean).slice(-50);
+}
+
+function rememberSettlementEvent_(events, eventId) {
+  const safe = normalizeSettlementEvents_(events);
+  const value = clean_(eventId, 100);
+  if (value && safe.indexOf(value) < 0) safe.push(value);
+  return safe.slice(-50);
+}
+
 function findRow_(sheetName, key, value) {
   const sheet = getSheet_(sheetName);
   const values = sheet.getDataRange().getValues();
@@ -966,7 +1032,14 @@ function getLeaderboard_(mode, limit) {
   });
 }
 
-function getQuestions_() {
+function difficultyValue_(value) {
+  const text = String(value == null ? "" : value).toLowerCase().trim();
+  const aliases = { easy: 1, basic: 1, "簡單": 1, "簡易": 1, normal: 2, medium: 2, "普通": 2, "一般": 2, hard: 4, challenge: 4, challenging: 4, "困難": 4, "挑戰": 4 };
+  if (Object.prototype.hasOwnProperty.call(aliases, text)) return aliases[text];
+  return Math.min(Math.max(number_(value) || 1, 1), 5);
+}
+
+function getQuestions_(includeDisabled) {
   const sheet = getSheet_(SHEETS.questions);
   const values = sheet.getDataRange().getValues();
   if (values.length <= 1) return [];
@@ -979,7 +1052,7 @@ function getQuestions_() {
     });
     return question;
   }).filter(function(question) {
-    return question.enabled === true || String(question.enabled).toUpperCase() === "TRUE";
+    return includeDisabled || question.enabled === true || String(question.enabled).toUpperCase() === "TRUE";
   }).map(function(question) {
     const mode = question.mode === "en" || question.mode === "zh" ? question.mode : "";
     const stage = number_(question.stage) || (mode === "en" ? 7 : mode === "zh" ? 8 : 0);
@@ -994,9 +1067,9 @@ function getQuestions_() {
       display: cleanQuestionText_(question.display || question.prompt, 800),
       laneKey: clean_(question.laneKey || ""),
       zone: clean_(question.zone),
-      difficulty: Number(question.difficulty || 1),
+      difficulty: difficultyValue_(question.difficulty),
       tags: clean_(question.tags || ""),
-      enabled: true,
+      enabled: question.enabled === true || String(question.enabled).toUpperCase() === "TRUE",
       source: clean_(question.source || "gas"),
       license: clean_(question.license || "teacher-authored"),
       version: Number(question.version || 1)
@@ -1081,7 +1154,7 @@ function addQuestion_(question, createdBy) {
     display: cleanQuestionText_(question.display || question.prompt, 800),
     laneKey: clean_(question.laneKey || ""),
     zone: clean_(question.zone || "classroom"),
-    difficulty: Math.min(Math.max(number_(question.difficulty) || 1, 1), 5),
+    difficulty: difficultyValue_(question.difficulty),
     enabled: true,
     createdBy: clean_(createdBy || "admin"),
     stage: stage,
@@ -1101,6 +1174,57 @@ function addQuestion_(question, createdBy) {
   }));
 
   return safe;
+}
+
+function updateQuestion_(id, question, updatedBy) {
+  if (!id) throw new Error("Question id is required.");
+  const sheet = getSheet_(SHEETS.questions);
+  const values = sheet.getDataRange().getValues();
+  if (values.length <= 1) throw new Error("Question not found.");
+
+  const idIndex = QUESTION_HEADERS.indexOf("id");
+  for (var row = 1; row < values.length; row += 1) {
+    if (String(values[row][idIndex]) !== String(id)) continue;
+    const current = {};
+    QUESTION_HEADERS.forEach(function(header, index) { current[header] = values[row][index]; });
+    const mode = question.mode === undefined ? current.mode : question.mode;
+    const stage = number_(question.stage === undefined ? current.stage : question.stage) || (mode === "en" ? 7 : mode === "zh" ? 8 : 0);
+    if ((mode !== "en" && mode !== "zh") || (stage !== 7 && stage !== 8)) {
+      throw new Error("Question mode must be en or zh and stage must be 7 or 8.");
+    }
+    const prompt = cleanQuestionText_(question.prompt === undefined ? current.prompt : question.prompt, 800);
+    const answer = cleanQuestionText_(question.answer === undefined ? current.answer || prompt : question.answer, 800);
+    if (!prompt || !answer) throw new Error("Question prompt and answer are required.");
+    const now = new Date().toISOString();
+    const currentVersion = Math.max(1, number_(current.version) || 1);
+    const safe = {
+      id: clean_(current.id),
+      createdAt: current.createdAt || now,
+      updatedAt: now,
+      mode: mode,
+      prompt: prompt,
+      answer: answer,
+      zone: clean_(question.zone === undefined ? current.zone || "classroom" : question.zone),
+      difficulty: difficultyValue_(question.difficulty === undefined ? current.difficulty : question.difficulty),
+      enabled: question.enabled === undefined ? (current.enabled === true || String(current.enabled).toUpperCase() === "TRUE") : (question.enabled === true || String(question.enabled).toUpperCase() === "TRUE"),
+      createdBy: clean_(current.createdBy || updatedBy || "admin"),
+      stage: stage,
+      wave: Math.min(Math.max(number_(question.wave === undefined ? current.wave : question.wave), 0), 4),
+      display: cleanQuestionText_(question.display === undefined ? current.display || prompt : question.display, 800),
+      laneKey: clean_(question.laneKey === undefined ? current.laneKey || "" : question.laneKey),
+      tags: clean_(Array.isArray(question.tags) ? question.tags.join(",") : question.tags === undefined ? current.tags || "teacher-bank" : question.tags, 300),
+      source: clean_(question.source === undefined ? current.source || "teacher-authored" : question.source),
+      license: clean_(question.license === undefined ? current.license || "teacher-confirmed" : question.license),
+      version: currentVersion + 1
+    };
+    sheet.getRange(row + 1, 1, 1, QUESTION_HEADERS.length).setValues([QUESTION_HEADERS.map(function(header) { return safe[header]; })]);
+    return safe;
+  }
+  throw new Error("Question not found.");
+}
+
+function setQuestionEnabled_(id, enabled) {
+  return updateQuestion_(id, { enabled: enabled === true || String(enabled).toUpperCase() === "TRUE" }, "admin");
 }
 
 function deleteQuestion_(id) {

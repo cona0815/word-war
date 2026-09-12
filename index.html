@@ -238,9 +238,14 @@
         <strong id="questionBankLabel"></strong>
         <label><span>模式</span><select id="questionMode"><option value="en">英文</option><option value="zh">中文</option></select></label>
         <label><span>題目</span><textarea id="questionPrompt"></textarea></label>
+        <label><span>答案</span><textarea id="questionAnswer"></textarea></label>
+        <label><span>顯示文字</span><textarea id="questionDisplay"></textarea></label>
+        <div class="two"><label><span>指定波次</span><input id="questionWave" type="number" min="0" max="4" value="0"></label><label><span>鍵位 laneKey</span><input id="questionLaneKey" type="text" maxlength="80"></label></div>
         <label><span>難度</span><input id="questionDifficulty" type="number" min="1" max="5" value="1"></label>
         <button id="addQuestionBtn" class="btn primary" style="width:100%"></button>
+        <div class="two"><button id="loadQuestionAdminBtn" class="btn" type="button">讀取管理題庫</button><button id="cancelQuestionEditBtn" class="btn" type="button">清除編輯</button></div>
         <p id="questionStatus" class="status"></p>
+        <div id="questionAdminList" class="summary-list"></div>
         <label><span id="bulkQuestionsLabel"></span><textarea id="bulkQuestionsInput" class="bulk"></textarea></label>
         <div class="two">
           <button id="bulkImportBtn" class="btn primary"></button>
@@ -387,7 +392,8 @@
     function bossMaxHp(lv){const stage=Number(lv?.id)||1,profileLevel=Math.max(1,Number(state.profile.level)||1);return 72+stage*9+Math.max(0,profileLevel-1)*4}
      const state={profile:loadAccountProfile("50101"),config:load(CONFIG,{gasUrl:"",adminToken:""}),records:loadAccountRecords("50101"),ladderRecords:load(LADDER_STORE,[]),auth:loadAccountAuth("50101"),questions:[],levelIndex:0,enemies:[],current:null,bossMode:false,bossHp:0,maxBossHp:3,bossPhase:1,bossPhaseHits:0,bossPhaseStartedAt:0,bossAttackAt:0,bossAttackPending:false,bossAttackCount:0,hp:100,score:0,combo:0,correct:0,attempts:0,tick:null,startedAt:Date.now(),waveIndex:0,waves:[],cleared:0,practiceTotal:0,qaShotPending:false,ladderRun:null};
      const qaMode=new URLSearchParams(location.search).get("qa")==="full";
-     const visualQaMode=new URLSearchParams(location.search).get("qa")==="visual";
+    const visualQaMode=new URLSearchParams(location.search).get("qa")==="visual";
+    state.questionAdminRows=[];state.questionEditingId="";
     let pendingLadderRecord=null;
     let pendingStageSettlement=null;
     let stageSettlementBusy=false;
@@ -830,6 +836,39 @@
     let profileSyncChain=Promise.resolve();
     function queueProfileSync(){profileSyncChain=profileSyncChain.then(()=>syncProfile()).catch(err=>console.warn("[Word War] profile sync",err));return profileSyncChain}
     async function loadRemoteQuestions(){if(!state.config.gasUrl)return[];const res=await gasGet("questions");if(res.ok){state.questions=normalizeQuestionList(res.questions||[]);return state.questions}throw new Error(res.error||"Questions error")}
+    function resetQuestionEditor(){state.questionEditingId="";$("questionMode").value="en";$("questionPrompt").value="";$("questionAnswer").value="";$("questionDisplay").value="";$("questionWave").value="0";$("questionLaneKey").value="";$("questionDifficulty").value="1";$("addQuestionBtn").textContent=T.addQuestion;$("questionStatus").textContent=""}
+    function renderQuestionAdminList(){
+      const box=$("questionAdminList");
+      if(!box)return;
+      const rows=state.questionAdminRows||[];
+      box.innerHTML=rows.length?rows.map(q=>`<div class="summary-card"><strong>${esc(q.id||"")}｜${esc(q.prompt||"")}</strong><span>${q.enabled===false?"已停用":"啟用中"}｜第 ${Number(q.stage)||"?"} 關｜波次 ${Number(q.wave)||0}｜難度 ${Number(q.difficulty)||1}</span><div class="two"><button class="btn" type="button" data-question-edit="${esc(q.id||"")}">編輯</button><button class="btn" type="button" data-question-toggle="${esc(q.id||"")}" data-question-enabled="${q.enabled===false?"false":"true"}">${q.enabled===false?"重新啟用":"停用"}</button><button class="btn" type="button" data-question-delete="${esc(q.id||"")}">刪除</button></div></div>`).join(""):"<p class=\"note\">尚未載入管理題庫。</p>";
+      box.querySelectorAll("[data-question-edit]").forEach(button=>{
+        button.onclick=()=>{
+          const row=rows.find(q=>q.id===button.dataset.questionEdit);
+          if(!row)return;
+          state.questionEditingId=row.id;
+          $("questionMode").value=row.mode||"en";
+          $("questionPrompt").value=row.prompt||"";
+          $("questionAnswer").value=row.answer||row.prompt||"";
+          $("questionDisplay").value=row.display||row.prompt||"";
+          $("questionWave").value=String(Number(row.wave)||0);
+          $("questionLaneKey").value=row.laneKey||"";
+          $("questionDifficulty").value=String(Number(row.difficulty)||1);
+          $("addQuestionBtn").textContent="儲存編輯";
+          $("questionStatus").textContent=`正在編輯 ${row.id}`;
+        };
+      });
+      box.querySelectorAll("[data-question-toggle]").forEach(button=>{
+        button.onclick=()=>toggleQuestionAdmin(button.dataset.questionToggle,button.dataset.questionEnabled!=="true");
+      });
+      box.querySelectorAll("[data-question-delete]").forEach(button=>{
+        button.onclick=()=>deleteQuestionAdmin(button.dataset.questionDelete);
+      });
+    }
+    async function loadQuestionAdmin(){const status=$("questionStatus");if(!state.config.gasUrl){status.textContent=T.gasMissing;return}if(!state.config.adminToken){status.textContent="請先輸入管理密碼。";return}status.textContent="題庫載入中…";try{const res=await gasPost({action:"listQuestions",token:state.config.adminToken});if(!res.ok)throw new Error(res.error||"題庫載入失敗");state.questionAdminRows=Array.isArray(res.questions)?res.questions:[];state.questions=normalizeQuestionList(state.questionAdminRows);renderQuestionAdminList();status.textContent=`已載入 ${state.questionAdminRows.length} 題（含停用題目）`}catch(error){status.textContent=error.message}}
+    async function saveQuestionAdmin(){const status=$("questionStatus"),editing=Boolean(state.questionEditingId),mode=$("questionMode").value,prompt=normalizeQuestionText($("questionPrompt").value),answer=normalizeQuestionText($("questionAnswer").value||prompt),display=normalizeQuestionText($("questionDisplay").value||prompt);if(!prompt||!answer){status.textContent="題目與答案不能空白。";return}if(!state.config.gasUrl){status.textContent=T.gasMissing;return}if(!state.config.adminToken){status.textContent="請先輸入管理密碼。";return}const existing=(state.questionAdminRows||[]).find(row=>row.id===state.questionEditingId),question={stage:mode==="en"?7:8,mode,prompt,answer,display,difficulty:difficultyValue($("questionDifficulty").value),wave:Math.max(0,Math.min(4,Number($("questionWave").value)||0)),laneKey:normalizeQuestionText($("questionLaneKey").value),zone:existing?.zone||"teacher-bank",tags:existing?.tags||["teacher-bank"],source:existing?.source||"teacher-authored",license:existing?.license||"teacher-confirmed",enabled:existing?.enabled!==false,version:Number(existing?.version)||1};status.textContent=editing?"題目更新中…":"題目新增中…";try{const payload=editing?{action:"updateQuestion",token:state.config.adminToken,id:state.questionEditingId,updatedBy:state.profile.account||"admin",question}:{action:"addQuestion",token:state.config.adminToken,createdBy:state.profile.account||"admin",question};const res=await gasPost(payload);if(!res.ok)throw new Error(res.error||"題目儲存失敗");await loadQuestionAdmin();resetQuestionEditor();status.textContent=editing?"題目已更新。":"題目已新增。"}catch(error){status.textContent=error.message}}
+    async function toggleQuestionAdmin(id,enabled){if(!id)return;const status=$("questionStatus");status.textContent=enabled?"題目啟用中…":"題目停用中…";try{const res=await gasPost({action:"setQuestionEnabled",token:state.config.adminToken,id,enabled});if(!res.ok)throw new Error(res.error||"題目狀態更新失敗");await loadQuestionAdmin()}catch(error){status.textContent=error.message}}
+    async function deleteQuestionAdmin(id){if(!id)return;if(!window.confirm("刪除後會停用這題，確定要繼續嗎？"))return;const status=$("questionStatus");status.textContent="題目刪除中…";try{const res=await gasPost({action:"deleteQuestion",token:state.config.adminToken,id});if(!res.ok)throw new Error(res.error||"題目刪除失敗");await loadQuestionAdmin()}catch(error){status.textContent=error.message}}
     async function syncOneRecord(record){if(!state.config.gasUrl||record.synced)return;const res=await gasPost({action:"saveRecord",record});if(res.ok){record.synced=true;save(STORE,state.records)}}
     async function syncRecords(){settingsStatus.textContent="同步中…";for(const r of state.records){try{await syncOneRecord(r)}catch(err){settingsStatus.textContent=err.message;return}}settingsStatus.textContent=T.syncOk}
     async function testGas(){settingsStatus.textContent="測試中…";try{const res=await gasGet("ping");if(res.ok)await loadRemoteQuestions();settingsStatus.textContent=res.ok?`${T.gasOk} | \u984c\u5eab ${state.questions.length}`:T.gasFail}catch(err){settingsStatus.textContent=T.gasFail+": "+err.message}}
@@ -964,6 +1003,10 @@
         }
       };
       startBtn.onclick = start;
+      $("addQuestionBtn").onclick = saveQuestionAdmin;
+      $("loadQuestionAdminBtn").onclick = loadQuestionAdmin;
+      $("cancelQuestionEditBtn").onclick = resetQuestionEditor;
+      renderQuestionAdminList();
       menu();
     })();
   </script>

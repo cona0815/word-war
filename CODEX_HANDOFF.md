@@ -1,13 +1,23 @@
 # Word War Handoff
 
+## 2026-09-13 教師題庫管理 CRUD 與啟停
+
+- `index.html` 新增管理題庫清單與編輯器：可載入第 7／8 關問題目，編輯 prompt、answer、display、wave、difficulty、laneKey，儲存後重新載入；可停用、重新啟用與軟刪除，清除編輯會恢復新增狀態。
+- `gas_code.gs` 新增受管理密碼保護的 `listQuestions`、`updateQuestion`、`setQuestionEnabled`；`getQuestions_(true)` 回傳含停用題目，更新保留建立欄位並遞增版本，刪除仍是停用而非物理刪除。
+- `tools/qa-question-admin.mjs` 以隔離 Chrome 驗證登入、管理清單、編輯儲存與清除；`tools/qa-gas-contract.mjs` 驗證新增／列出／更新／停用／重新啟用／軟刪除；`qa-question-contract` 已更新管理契約。
+- 驗證：`qa-question-admin` PASS；`qa-question-contract` 54/54；`qa-gas-contract` 0 failures（含兩種跨表中斷重試）；`qa-game` 122/122；`qa-boss-phase-pools` PASS；`qa-progress-gate` PASS；前端 inline `node --check` 通過。尚未 push。
+- 尚未完成：教師帳號建立／重設頁、批次題庫篩選與版本衝突提示、原生中文 IME、最新線上 GAS 部署驗收與 37 套施法素材。
+- 下一個最安全任務：驗收原生中文 IME 與 Ctrl 熱鍵的實機輸入，維持每題一次結算與第 4 關無音標規則。
+
+
 ## 2026-09-13 教師題庫驅動第 7、8 關四波
 
 - `teacherWaveSets()` 現在讓第 7、8 關一般小怪使用教師題庫的 `wave`；若未提供完整 1～4 波，則依 easy／normal／hard（含簡單／普通／挑戰）建立四波 fallback。Boss 與一般小怪共用正規化後題目資料。
 - `difficultyValue()` 已將文字難度轉為 1～5，避免匯入的 `normal`、`hard` 或中文難度被錯當成 easy。既有內建題與無題庫時的四波不變。
 - `tools/qa-boss-phase-pools.mjs` 增加明確 wave 與難度 fallback 測試；`qa-question-contract` 增加題庫波次契約。
 - 驗證：`qa-boss-phase-pools` PASS；`qa-game` 110/110；`qa-question-contract` 51/51；`node --check` 與 `git diff --check` 通過。尚未 push。
-- 尚未完成：教師完整編輯／啟停介面、跨表同步中斷恢復、原生中文 IME、最新線上 GAS 部署驗收與 37 套施法素材。
-- 下一個最安全任務：補教師題庫編輯／啟停流程，先完成前端管理介面與 GAS `update/delete/enable` 的整合 QA。
+- 尚未完成：跨表同步中斷恢復、原生中文 IME、最新線上 GAS 部署驗收與 37 套施法素材；教師帳號與批次題庫管理仍待補。
+- 下一個最安全任務：補跨表同步中斷恢復的資料一致性測試，維持教師題庫 wave／difficulty 分流與權限邊界。
 
 ## 2026-09-13 主線 Boss 三階段題池
 

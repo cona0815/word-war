@@ -33,6 +33,9 @@ check("GAS 回傳題目含 laneKey", /laneKey: clean_\(question\.laneKey/.test(g
 check("GAS 回傳題目含授權欄位", /license: clean_\(question\.license/.test(gas));
 check("GAS 清理題目文字的 Unicode 與控制字元", /function cleanQuestionText_\(value, maxLength\)/.test(gas) && /normalize\(\"NFC\"\)/.test(gas) && /replace\(\/\[\\u0000-\\u001f\\u007f\]\/g/.test(gas));
 
+check("GAS 題庫管理支援列出、編輯與啟停", /action === \"listQuestions\"/.test(gas) && /function updateQuestion_\(id, question, updatedBy\)/.test(gas) && /function setQuestionEnabled_\(id, enabled\)/.test(gas) && /getQuestions_\(true\)/.test(gas));
+check("前端題庫管理支援列表、編輯、啟停與重置", /function loadQuestionAdmin\(\)/.test(html) && /function saveQuestionAdmin\(\)/.test(html) && /setQuestionEnabled/.test(html) && /questionAdminList/.test(html) && /function resetQuestionEditor\(\)/.test(html));
+check("GAS 跨表結算具 pending 與 event marker 恢復", gas.includes('"settlementEventsJson"') && gas.includes('status: "pending"') && /function updateSettlementStatus_\(eventId, status\)/.test(gas) && /normalizeSettlementEvents_/.test(gas));
 check("GAS 建立 Accounts、Profiles、Sessions 三張表", /ensureSheet_\(SHEETS\.accounts, ACCOUNT_HEADERS\)/.test(gas) && /ensureSheet_\(SHEETS\.profiles, PROFILE_HEADERS\)/.test(gas) && /ensureSheet_\(SHEETS\.sessions, SESSION_HEADERS\)/.test(gas));
 check("GAS 帳號格式固定五碼", /function parseAccount_\(value\)/.test(gas) && /\/\^\\d\{5\}\$\//.test(gas));
 check("GAS 登入會建立工作階段", /action === "login"/.test(gas) && /createSession_\(identity\.accountId\)/.test(gas));

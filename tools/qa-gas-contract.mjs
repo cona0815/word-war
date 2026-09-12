@@ -150,6 +150,14 @@ function get(action, params = {}) {
   return JSON.parse(output.getContent());
 }
 
+function settlementRecord(eventId) {
+  const sheet = spreadsheet.getSheetByName("StageSettlements");
+  const headers = sheet?.values?.[0] || [];
+  const row = (sheet?.values || []).slice(1).find(values => String(values[headers.indexOf("eventId")]) === String(eventId));
+  if (!row) return null;
+  return Object.fromEntries(headers.map((header, index) => [header, row[index]]));
+}
+
 function expectError(name, payload, pattern) {
   const result = post(payload);
   check(name, !result.ok && pattern.test(String(result.error || "")), result.error);
@@ -166,6 +174,22 @@ expectError("錯誤密碼被拒絕", { action: "login", account: "50101", passwo
 expectError("未登入不能載入存檔", { action: "loadProfile" }, /Session is required/);
 
 const token = login.sessionToken;
+const addedQuestion = post({ action: "addQuestion", token: "contract-test-admin", createdBy: "teacher", question: { stage: 7, mode: "en", prompt: "QA edit one.", answer: "QA edit one.", difficulty: "hard", wave: 1, tags: ["qa"] } });
+check("管理者可新增題目並正規化文字難度", addedQuestion.ok && addedQuestion.question.id && addedQuestion.question.difficulty === 4 && addedQuestion.question.wave === 1);
+const questionId = addedQuestion.question.id;
+const listedQuestions = post({ action: "listQuestions", token: "contract-test-admin" });
+check("管理者可讀取含停用題目的題庫", listedQuestions.ok && listedQuestions.questions.some(question => question.id === questionId && question.enabled === true));
+const updatedQuestion = post({ action: "updateQuestion", token: "contract-test-admin", id: questionId, updatedBy: "teacher", question: { prompt: "QA edit two.", answer: "QA edit two.", display: "QA display two.", difficulty: "normal", wave: 3, laneKey: "qa-lane" } });
+check("管理者可編輯題目與波次", updatedQuestion.ok && updatedQuestion.question.prompt === "QA edit two." && updatedQuestion.question.difficulty === 2 && updatedQuestion.question.wave === 3 && updatedQuestion.question.version === 2);
+const disabledQuestion = post({ action: "setQuestionEnabled", token: "contract-test-admin", id: questionId, enabled: false });
+const activeQuestionsAfterDisable = get("questions");
+check("管理者可停用題目且學生題庫不再載入", disabledQuestion.ok && disabledQuestion.question.enabled === false && !activeQuestionsAfterDisable.questions.some(question => question.id === questionId));
+const listedDisabled = post({ action: "listQuestions", token: "contract-test-admin" });
+check("停用題目仍保留供管理者重新啟用", listedDisabled.ok && listedDisabled.questions.some(question => question.id === questionId && question.enabled === false));
+const reenabledQuestion = post({ action: "setQuestionEnabled", token: "contract-test-admin", id: questionId, enabled: true });
+check("管理者可重新啟用題目", reenabledQuestion.ok && reenabledQuestion.question.enabled === true && get("questions").questions.some(question => question.id === questionId));
+const deletedQuestion = post({ action: "deleteQuestion", token: "contract-test-admin", id: questionId });
+check("管理者刪除題目使用停用語義", deletedQuestion.ok && !get("questions").questions.some(question => question.id === questionId));
 let profile = post({ action: "loadProfile", sessionToken: token }).profile;
 check("登入後可載入初始存檔", profile.version === 1 && profile.level === 1 && profile.weapon === "starlight");
 const synced = post({ action: "saveProgress", sessionToken: token, expectedVersion: profile.version, profile: { hero: "female", level: 10, coins: 99999, weapon: "shadow", gear: "crown" } });
@@ -183,6 +207,29 @@ for (let stage = 1; stage <= 8; stage += 1) {
 }
 const duplicate = post({ action: "finishStage", sessionToken: token, eventId: "stage-event-8", stage: 8, result: "win", correct: minimumCorrect[8], attempts: minimumCorrect[8] + 2, durationSec: 180, maxCombo: 10 });
 check("同一關卡結算事件不可重複領獎", duplicate.ok && duplicate.profile.version === settledVersions[7]);
+const recoveryAdmin = post({ action: "adminUpsertAccount", token: "contract-test-admin", account: { accountId: "50202", displayName: "跨表中斷測試" } });
+const recoveryLogin = post({ action: "login", account: "50202", password: "50202" });
+const recoveryPayload = { action: "finishStage", sessionToken: recoveryLogin.sessionToken, eventId: "cross-table-before-profile", stage: 1, result: "win", correct: 76, attempts: 76, durationSec: 180, maxCombo: 0 };
+const originalPersist = context.persistProfile_;
+context.persistProfile_ = () => { throw new Error("simulated profile write interruption"); };
+const beforeProfileFailure = post(recoveryPayload);
+context.persistProfile_ = originalPersist;
+const beforeProfileRecord = settlementRecord(recoveryPayload.eventId);
+const beforeProfileState = post({ action: "loadProfile", sessionToken: recoveryLogin.sessionToken }).profile;
+check("跨表中斷在 Profile 前會留下待處理結算", !beforeProfileFailure.ok && beforeProfileRecord?.status === "pending" && !beforeProfileState.gems?.[0]);
+const beforeProfileRetry = post(recoveryPayload);
+const beforeProfileDuplicate = post(recoveryPayload);
+check("Profile 前中斷重試只套用一次獎勵", beforeProfileRetry.ok && beforeProfileRetry.profile.gems[0] === true && beforeProfileDuplicate.profile.version === beforeProfileRetry.profile.version && settlementRecord(recoveryPayload.eventId)?.status === "applied");
+const responseRecoveryAdmin = post({ action: "adminUpsertAccount", token: "contract-test-admin", account: { accountId: "50303", displayName: "回覆中斷測試" } });
+const responseRecoveryLogin = post({ action: "login", account: "50303", password: "50303" });
+const responseRecoveryPayload = { action: "finishStage", sessionToken: responseRecoveryLogin.sessionToken, eventId: "cross-table-before-status", stage: 1, result: "win", correct: 76, attempts: 76, durationSec: 180, maxCombo: 0 };
+const originalStatus = context.updateSettlementStatus_;
+context.updateSettlementStatus_ = () => { throw new Error("simulated settlement status interruption"); };
+const beforeStatusFailure = post(responseRecoveryPayload);
+context.updateSettlementStatus_ = originalStatus;
+const beforeStatusState = post({ action: "loadProfile", sessionToken: responseRecoveryLogin.sessionToken }).profile;
+const beforeStatusRetry = post(responseRecoveryPayload);
+check("跨表中斷在結算狀態前重試不重複發獎", !beforeStatusFailure.ok && beforeStatusState.gems[0] === true && beforeStatusRetry.ok && beforeStatusRetry.profile.version === beforeStatusState.version && settlementRecord(responseRecoveryPayload.eventId)?.status === "applied");
 expectError("不足最低題數不能結算", { action: "finishStage", sessionToken: token, eventId: "under-minimum", stage: 1, result: "win", correct: 0, attempts: 0, durationSec: 180 }, /enough correct/);
 
 const prepared = context.persistProfile_("50101", { ...profile, level: 10, coins: 10000, version: profile.version + 1 });
