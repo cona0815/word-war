@@ -80,6 +80,8 @@ check("前端主線依前一顆寶石解鎖", /function unlocked\(i\)\{if\(qaMod
 check("鎖定關卡按鈕不可操作", /aria-disabled/.test(html) && /card\.disabled = !available/.test(html));
 check("雲端通關先等待確認再套用存檔", /const cloudSettlement =/.test(html) && /Object\.assign\(state\.profile, before\)/.test(html) && /雲端存檔已完成/.test(html));
 check("雲端通關失敗保留同一事件重試", /pendingStageSettlement=\{record,error:error\.message\}/.test(html) && /重試雲端同步/.test(html));
+check("重新登入會掃描未同步通關", /function pendingStageRecords\(\)/.test(html) && /function recoverPendingStageSettlements\(\)/.test(html) && /record\.synced!==true/.test(html));
+check("未同步通關恢復沿用原 eventId", /settleStage\(record\)/.test(html) && /startBtn\.onclick=start/.test(html) && /originalStart/.test(html));
 check("任務開始按鈕有明確事件入口", /id="missionStartBtn"[^>]+type="button"/.test(html) && /onclick="handleMissionStart\(\)"/.test(html) && /function handleMissionStart/.test(html) && /missionStartBtn\.onclick=handleMissionStart/.test(html) && !/__WORD_WAR_START_MISSION__/.test(html));
 check("角色裝備有獨立視覺層", /id="heroGear"/.test(html) && /heroGear\.dataset\.gear=key/.test(html) && /\.hero-gear\[data-gear="guardian"\]/.test(html));
 check("整合武器不會疊加舊武器圖層", /\.hero-weapon\{display:none\}/.test(html) && /heroWeapon\.style\.display="none"/.test(html));

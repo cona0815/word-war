@@ -92,7 +92,40 @@ try {
   });
   assert.equal(switched.pending, null, "switching accounts clears the old pending settlement");
   assert.equal(switched.account, "88088");
-  console.log("PASS sequential stage gate and visible settlement retry flow");
+
+  const reloadPage = await browser.newPage();
+  const reloadProfile = { account: "99099", version: 1, hero: "male", level: 1, xp: 0, coins: 0, gems: [], weapon: "starlight", gear: "focus", inventory: { weapons: ["starlight"], gear: ["focus"], items: {} } };
+  const reloadRecord = { eventId: "reload-stage-1", account: "99099", stage: 1, result: "win", correct: 12, attempts: 12, accuracy: 100, durationSec: 20, maxCombo: 5, synced: false, createdAt: "2026-09-13T00:00:00.000Z" };
+  await reloadPage.addInitScript(value => {
+    localStorage.clear();
+    localStorage.setItem("word-war-core-profile:99099", JSON.stringify(value.profile));
+    localStorage.setItem("word-war-core-records:99099", JSON.stringify([value.record]));
+    localStorage.setItem("word-war-core-config", JSON.stringify({ gasUrl: "https://qa.invalid/recover", adminToken: "" }));
+    window.fetch = async (input, options = {}) => {
+      const url = String(input?.url || input || "");
+      let body = {};
+      try { body = JSON.parse(options.body || "{}"); } catch {}
+      if (body.action === "login") return { ok: true, json: async () => ({ ok: true, sessionToken: "recover-session", expiresAt: "", profile: { ...value.profile } }) };
+      if (body.action === "finishStage") {
+        window.__recoveryEventId = body.eventId;
+        return { ok: true, json: async () => ({ ok: true, profile: { ...value.profile, gems: [true], version: 2 } }) };
+      }
+      if (url.includes("action=questions")) return { ok: true, json: async () => ({ ok: true, questions: [] }) };
+      return { ok: true, json: async () => ({ ok: true }) };
+    };
+  }, { profile: reloadProfile, record: reloadRecord });
+  await reloadPage.goto(`${baseUrl}/index.html`);
+  await reloadPage.locator("#accountInput").fill("99099");
+  await reloadPage.locator("#passwordInput").fill("99099");
+  await reloadPage.locator("#startBtn").click();
+  await reloadPage.waitForFunction(() => state.records[0]?.synced === true && state.profile.gems?.[0] === true && window.__recoveryEventId === "reload-stage-1");
+  const reloadRecovered = await reloadPage.evaluate(() => ({ synced: state.records[0]?.synced, gems: state.profile.gems, eventId: window.__recoveryEventId, pending: pendingStageSettlement }));
+  assert.equal(reloadRecovered.synced, true, "reload recovery marks the original record synced");
+  assert.deepEqual(reloadRecovered.gems, [true], "reload recovery applies the cloud gem reward");
+  assert.equal(reloadRecovered.eventId, "reload-stage-1", "reload recovery reuses the original eventId");
+  assert.equal(reloadRecovered.pending, null, "reload recovery clears pending settlement");
+  await reloadPage.close();
+  console.log("PASS sequential stage gate, visible retry, and reload recovery flow");
 } finally {
   await browser.close();
 }

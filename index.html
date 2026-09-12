@@ -712,6 +712,35 @@
         missionStartBtn.disabled=true;
         await settleStage(pending.record);
       }
+      function pendingStageRecords(){
+        return (state.records||[]).filter(record=>record&&record.result==="win"&&record.eventId&&Number(record.stage)>=1&&Number(record.stage)<=8&&record.synced!==true&&(!record.account||record.account===state.profile.account)).sort((a,b)=>Number(a.stage)-Number(b.stage)||String(a.createdAt||"").localeCompare(String(b.createdAt||"")));
+      }
+      async function recoverPendingStageSettlements(){
+        if(!state.config.gasUrl||!state.auth?.sessionToken)return {attempted:0,recovered:0};
+        const records=pendingStageRecords();
+        if(!records.length)return {attempted:0,recovered:0};
+        const originalLevel=state.levelIndex;
+        stageSettlementBusy=true;
+        mission.classList.remove("hidden");
+        missionTitle.textContent="正在恢復雲端存檔…";
+        missionText.textContent=`找到 ${records.length} 筆尚未確認的通關紀錄，正在依序重試。`;
+        missionStartBtn.disabled=true;
+        missionStartBtn.textContent="同步中…";
+        let recovered=0;
+        for(const record of records){
+          if(record.account&&record.account!==state.profile.account)continue;
+          state.levelIndex=Math.max(0,Number(record.stage)-1);
+          const result=await settleStage(record);
+          if(!result.ok)break;
+          recovered++;
+        }
+        if(!pendingStageSettlement){
+          stageSettlementBusy=false;
+          state.levelIndex=originalLevel;
+          menu();
+        }
+        return {attempted:records.length,recovered};
+      }
       async function startBattle(){
         if(battleStartPending||state.running)return;
         battleStartPending=true;
@@ -891,6 +920,20 @@
         stageSettlementBusy = false;
         return originalSwitchAccount(...args);
       };
+      const originalStart = start;
+      start = async (...args) => {
+        await originalStart(...args);
+        if (state.config.gasUrl && state.auth?.sessionToken) {
+          recoverPendingStageSettlements().catch(error => {
+            stageSettlementBusy = false;
+            missionTitle.textContent = '雲端存檔恢復失敗';
+            missionText.textContent = error.message;
+            missionStartBtn.disabled = false;
+            missionStartBtn.textContent = '重試雲端同步';
+          });
+        }
+      };
+      startBtn.onclick = start;
       menu();
     })();
   </script>

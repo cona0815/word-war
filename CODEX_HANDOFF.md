@@ -1,13 +1,21 @@
 # Word War Handoff
 
+## 2026-09-13 重新登入恢復未同步通關
+
+- 新增 `pendingStageRecords()` 與 `recoverPendingStageSettlements()`：登入後掃描目前帳號本機 `Records` 中尚未同步的前八關勝利紀錄，依關卡順序呼叫既有 `settleStage()`，沿用原 `eventId`，成功後才套用 GAS Profile、標記 `synced` 並恢復後續解鎖。
+- 新增登入流程包裝與 `qa-progress-gate` reload case；若恢復失敗，畫面保留「重試雲端同步」狀態，不讓學生跳過待確認關卡。既有手動重試與換帳號清除 pending 行為維持不變。
+- 驗證：`qa-progress-gate` PASS（含重新登入恢復）；`qa-game` 108/108；`qa-question-contract` 49/49；`qa-gas-contract` 0 failures；`node --check tools/qa-progress-gate.mjs` 與 `git diff --check` 通過。
+- 尚未完成：跨表寫入中斷恢復、多數主線 Boss 題池分流、原生中文 IME、線上 GAS 最新部署驗收。未 push。
+- 下一個最安全任務：補主線 Boss 分階段題池，先從第 1、2、3、5、6、7、8 關建立明確 phase pool 與行為 QA，不改八景教學順序。
+
 ## 2026-09-13 依序解鎖與雲端通關重試
 
 - 完成前端／GAS 進度閘門一致化：第 1 關預設開放；第 2～8 關需前一關寶石；大橋堂需八顆寶石。鎖定卡片會 disabled 並標示 `aria-disabled`；`qa=full` 保留逐關測試旁路。
 - 雲端主線通關改為先保留本機 Profile 的等級、XP、金幣與寶石，等待 `finishStage` 回覆後才套用 GAS Profile；同一 eventId 可在畫面按「重試雲端同步」。失敗會顯示錯誤，下一關維持鎖定；成功後標記場次 synced 並更新解鎖。
 - 新增 `tools/qa-progress-gate.mjs`，瀏覽器驗證空 Profile、取得第一顆寶石、待同步鎖定、雲端拒絕提示、同 eventId 重試與成功後解鎖。
 - 驗證：`qa-progress-gate` PASS；`qa-game` 106/106；`qa-question-contract` 49/49；`qa-gas-contract` 0 failures；`qa-physical-input` 90 組 PASS；`qa-battle-interface` PASS；`qa-spawn-clearance` 880/880；`qa-ladder-floors` 兩層五階段 PASS；`git diff --check` 通過。
-- 尚未完成：重新載入後自動恢復未同步結算、多數主線 Boss 題池分流、原生中文 IME、線上 GAS 最新部署驗收。未 push。
-- 下一個最安全任務：讓未同步 `Records` 在重新登入／載入 Profile 後可辨識並以原 eventId 重試，再補主線 Boss 分階段題池。
+- 當時尚未完成的重新載入恢復已在上方里程碑補上；多數主線 Boss 題池分流、原生中文 IME、線上 GAS 最新部署驗收仍待處理。未 push。
+- 下一個最安全任務：補主線 Boss 分階段題池，維持各關卡的教育內容邊界。
 
 ## 2026-09-12 進度盤點與詳細規格表
 
