@@ -35,10 +35,13 @@ try {
   await page.locator('[data-menu-tab="settings"]').click();
   await page.locator("#loadProgressBtn").click();
   await page.waitForFunction(() => document.querySelectorAll("#studentProgressList .summary-card").length === 2);
+  assert.match(await page.locator("#studentProgressSummary").textContent(), /班級 501 摘要/);
+  assert.match(await page.locator("#studentProgressSummary").textContent(), /phrases:學校/);
   assert.match(await page.locator("#studentProgressList").textContent(), /逐關最佳/);
   assert.match(await page.locator("#studentProgressList").textContent(), /常錯 phrases:學校/);
   await page.locator("#progressClassFilter").fill("501");
   await page.waitForFunction(() => document.querySelectorAll("#studentProgressList .summary-card").length === 1);
+  assert.equal(await page.locator("#studentProgressSummary .summary-card").count(), 1);
   await page.locator("#progressStageFilter").selectOption("6");
   assert.match(await page.locator("#studentProgressList").textContent(), /50101/);
   const downloadPromise = page.waitForEvent("download");

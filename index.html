@@ -231,6 +231,7 @@
           <button id="exportRecordsBtn" class="btn"></button>
         </div>
         <button id="exportStudentProgressBtn" class="btn" type="button" style="width:100%">匯出目前學生報表</button>
+        <div id="studentProgressSummary" class="summary-list"></div>
         <div id="studentProgressList" class="summary-list"></div>
         <p id="progressStatus" class="status"></p>
         <hr style="width:100%;border:0;border-top:1px solid rgba(101,239,255,.18)">
@@ -370,7 +371,7 @@
     const loginScreen=$("loginScreen"),gameScreen=$("gameScreen"),loginAccount=$("loginAccount"),loginGuide=$("loginGuide"),loginRank=$("loginRank"),subtitle=$("subtitle"),tabAccount=$("tabAccount"),tabGuide=$("tabGuide"),tabRank=$("tabRank"),accountLabel=$("accountLabel"),passwordLabel=$("passwordLabel"),accountInput=$("accountInput"),passwordInput=$("passwordInput"),maleBtn=$("maleBtn"),femaleBtn=$("femaleBtn"),startBtn=$("startBtn"),openGuideBtn=$("openGuideBtn"),openRankBtn=$("openRankBtn"),menuBtn=$("menuBtn"),levelTitle=$("levelTitle"),roundText=$("roundText"),scoreLabel=$("scoreLabel"),scoreText=$("scoreText"),comboLabel=$("comboLabel"),comboText=$("comboText"),accLabel=$("accLabel"),accuracyText=$("accuracyText"),enemyLabel=$("enemyLabel"),enemyCountText=$("enemyCountText"),enemyBar=$("enemyBar"),hpLabel=$("hpLabel"),hpText=$("hpText"),hpBar=$("hpBar"),questionType=$("questionType"),difficultyText=$("difficultyText"),questionText=$("questionText"),answerInput=$("answerInput"),attackBtn=$("attackBtn"),mission=$("mission"),missionTitle=$("missionTitle"),missionText=$("missionText"),missionStartBtn=$("missionStartBtn"),drawer=$("drawer"),closeMenuBtn=$("closeMenuBtn"),drawerTitle=$("drawerTitle"),menuTabLevels=$("menuTabLevels"),menuTabAvatar=$("menuTabAvatar"),menuTabRecords=$("menuTabRecords"),menuTabSettings=$("menuTabSettings"),avatarLabel=$("avatarLabel"),avatarInfo=$("avatarInfo"),weaponLabel=$("weaponLabel"),weaponInfo=$("weaponInfo"),skillLabel=$("skillLabel"),skillInfo=$("skillInfo"),switchHeroBtn=$("switchHeroBtn"),gemProgress=$("gemProgress"),walletInfo=$("walletInfo"),levelGrid=$("levelGrid"),recordList=$("recordList"),gasUrlLabel=$("gasUrlLabel"),gasUrlInput=$("gasUrlInput"),adminTokenLabel=$("adminTokenLabel"),adminTokenInput=$("adminTokenInput"),saveSettingsBtn=$("saveSettingsBtn"),testGasBtn=$("testGasBtn"),syncRecordsBtn=$("syncRecordsBtn"),settingsStatus=$("settingsStatus"),studentProgressLabel=$("studentProgressLabel"),studentProgressList=$("studentProgressList"),progressStatus=$("progressStatus"),loadProgressBtn=$("loadProgressBtn"),exportRecordsBtn=$("exportRecordsBtn"),questionBankLabel=$("questionBankLabel"),questionPrompt=$("questionPrompt"),questionDifficulty=$("questionDifficulty"),questionMode=$("questionMode"),questionStatus=$("questionStatus"),addQuestionBtn=$("addQuestionBtn"),bulkQuestionsLabel=$("bulkQuestionsLabel"),bulkQuestionsInput=$("bulkQuestionsInput"),bulkImportBtn=$("bulkImportBtn"),loadQuestionsBtn=$("loadQuestionsBtn"),exportQuestionsBtn=$("exportQuestionsBtn"),bulkStatus=$("bulkStatus"),guideList=$("guideList"),rankList=$("rankList"),shopInfo=$("shopInfo"),shopStatus=$("shopStatus"),gearInfo=$("gearInfo"),hero=$("hero"),heroMotion=$("heroMotion"),heroWeapon=$("heroWeapon"),enemyLayer=$("enemyLayer"),effectLayer=$("effectLayer"),ladderNameBox=$("ladderNameBox"),ladderNickname=$("ladderNickname"),ladderNameStatus=$("ladderNameStatus"),submitLadderBtn=$("submitLadderBtn"),checkLadderNameBtn=$("checkLadderNameBtn"),academyAudio=$("academyAudio");
     const heroGear=$("heroGear");
     const accountAdminId=$("accountAdminId"),accountAdminName=$("accountAdminName"),accountAdminPassword=$("accountAdminPassword"),accountAdminStatus=$("accountAdminStatus"),loadAccountsBtn=$("loadAccountsBtn"),saveAccountBtn=$("saveAccountBtn"),clearAccountBtn=$("clearAccountBtn"),accountAdminList=$("accountAdminList"),accountAdminStatusText=$("accountAdminStatusText"),questionAdminSearch=$("questionAdminSearch"),questionAdminStage=$("questionAdminStage"),questionAdminStatus=$("questionAdminStatus");
-    const progressClassFilter=$("progressClassFilter"),progressStageFilter=$("progressStageFilter");
+    const progressClassFilter=$("progressClassFilter"),progressStageFilter=$("progressStageFilter"),studentProgressSummary=$("studentProgressSummary");
     const exportStudentProgressBtn=$("exportStudentProgressBtn");
     const BATTLE_LINE_Y=62;
     const heroNormal={x:50,y:58}, heroBoss={x:50,y:58}, bossPos={x:68,y:BATTLE_LINE_Y};
@@ -1105,9 +1106,33 @@
         const minimumStage = Number(progressStageFilter?.value || 0);
         return state.studentProgressRows.filter(row => (!classCode || String(row.className || "") === classCode) && Number(row.bestStage || 0) >= minimumStage);
       };
+      const renderProgressAggregate = rows => {
+        if (!studentProgressSummary) return;
+        const groups = new Map();
+        rows.forEach(row => {
+          const className = String(row.className || "未分班");
+          const group = groups.get(className) || { className, count: 0, bestStage: 0, accuracy: 0, gems: 0, errors: {} };
+          group.count += 1;
+          group.bestStage += Number(row.bestStage || 0);
+          group.accuracy += Number(row.accuracy || 0);
+          group.gems += Number(row.gems || 0);
+          (row.topErrors || []).forEach(error => {
+            const key = String(error.key || "").trim();
+            if (key) group.errors[key] = (group.errors[key] || 0) + (Number(error.count) || 0);
+          });
+          groups.set(className, group);
+        });
+        const cards = [...groups.values()].sort((a, b) => a.className.localeCompare(b.className)).map(group => {
+          const topErrors = Object.entries(group.errors).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5);
+          const errorText = topErrors.length ? topErrors.map(([key, count]) => `${esc(key)} ×${count}`).join("、") : "尚無錯誤分類紀錄";
+          return `<div class="summary-card"><strong>班級 ${esc(group.className)} 摘要</strong><span>${group.count} 位學生｜平均最高關卡 ${Math.round(group.bestStage / group.count * 10) / 10}｜平均正確率 ${Math.round(group.accuracy / group.count)}%｜寶石 ${group.gems}/${group.count * 8}</span><span>目前載入資料常錯：${errorText}</span></div>`;
+        });
+        studentProgressSummary.innerHTML = cards.length ? cards.join("") : `<p class="note">目前篩選沒有班級摘要。</p>`;
+      };
       renderStudentProgress = (rows, source) => {
         state.studentProgressRows = Array.isArray(rows) ? rows : [];
         const filtered = progressRowsForView();
+        renderProgressAggregate(filtered);
         studentProgressList.innerHTML = filtered.length ? filtered.slice(0, 40).map(row => {
           const errors = Array.isArray(row.topErrors) ? row.topErrors : [];
           const errorText = errors.length ? `常錯 ${errors.map(error => `${esc(error.key)} ×${Number(error.count) || 0}`).join("、")}` : "尚無錯誤分類紀錄";
