@@ -3,6 +3,7 @@
 ## 2026-09-13 教師題目 laneKey 接入戰鬥
 
 - `index.html` 新增教師題目 laneKey 的標準別名（左／右上中下、上方、下方、中央）；只要題庫提供 `laneKey`，小怪會使用該方向座標，且同一 lane 仍維持排隊規則，未提供時保留原本首字／首注音 fallback。
+- 管理題庫欄位補上 `right-upper / bottom` placeholder，教師編輯時可直接看到標準值格式。
 - `tools/qa-question-lane.mjs` 驗證英文句與不在內建首注音表的中文句，分別使用 `right-upper` 與 `bottom`，座標、lane 分組與實際 `pos()` 均通過。
 - README／進度規格已補上 QA 與剩餘限制；本次未修改既有素材或 `hero-cast-clips.js`。
 - 尚缺垂直 UI 人工驗收、真實 Windows IME、線上 GAS 部署、高層天梯平衡、跨班級鍵位／波次熱區與 37 套施法素材。
