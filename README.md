@@ -62,6 +62,7 @@
 
 - `node tools/qa-game.mjs`：執行關卡、內容、Boss 素材與核心方向靜態 QA。
 - `node tools/qa-game.mjs http://127.0.0.1:8767`：加上本機伺服器頁面與素材 HTTP 檢查。
+- `node tools/qa-battle-ground.mjs http://127.0.0.1:8767`：以五種螢幕寬度驗證主角在小怪／Boss 戰皆水平置中、腳底對齊與 Boss UI 不出界。
 - `node tools/qa-question-contract.mjs`：檢查題庫 schema v1、英文／中文關卡分流與 GAS 題庫欄位契約。
 - `node tools/qa-question-admin.mjs http://127.0.0.1:8767`：以隔離 Chrome 驗證教師題庫列表、編輯、儲存、啟用／停用、軟刪除與清除編輯流程。
 - `node tools/qa-account-admin.mjs http://127.0.0.1:8767`：以隔離 Chrome 驗證教師讀取學生帳號、重設密碼／狀態與清除編輯流程。

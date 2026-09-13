@@ -43,8 +43,8 @@ try {
       },stage);
       assert.ok(result.difference<1,JSON.stringify(result));
       assert.equal(result.labelInBounds,true,JSON.stringify(result));
-      assert.equal(result.heroCentered,false,JSON.stringify(result));
-      assert.equal(await page.evaluate(()=>Math.abs(parseFloat(getComputedStyle(gameScreen).getPropertyValue('--hero-x'))-32)<.01&&bossPos.x===68),true,'Boss positions must be 32% and 68%');
+      assert.equal(result.heroCentered,true,JSON.stringify(result));
+      assert.equal(await page.evaluate(()=>Math.abs(parseFloat(getComputedStyle(gameScreen).getPropertyValue('--hero-x'))-50)<.01&&bossPos.x===68),true,'Hero must stay centered while Boss remains at 68%');
       assert.equal(result.bossInBounds,true,JSON.stringify(result));
       assert.equal(result.bossCoordinateMatches,true,JSON.stringify(result));
       assert.equal(result.controlsInBounds,true,JSON.stringify(result));
