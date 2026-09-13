@@ -1,0 +1,42 @@
+{
+  "rows": [
+    [
+      "male",
+      1,
+      "starlight",
+      "focus",
+      "男主角 Lv.1",
+      "星光法杖",
+      "專注水晶"
+    ],
+    [
+      "female",
+      4,
+      "ice",
+      "guardian",
+      "女主角 Lv.4",
+      "冰晶法核",
+      "守護披風"
+    ],
+    [
+      "male",
+      7,
+      "thunder",
+      "combo",
+      "男主角 Lv.7",
+      "雷鳴星槍",
+      "連擊項鍊"
+    ],
+    [
+      "female",
+      10,
+      "shadow",
+      "crown",
+      "女主角 Lv.10",
+      "暗影魔晶",
+      "勇者冠冕"
+    ]
+  ],
+  "errors": [],
+  "source": "hero-preview.html?gear=1"
+}
