@@ -1,5 +1,13 @@
 # Word War Handoff
 
+## 2026-09-13 實體鍵盤流程驗收
+
+- 在本機隔離 GM 模式以鍵盤操作驗證第 6 關「學校」詞語與 Enter 結算、第 8 關「我會打字。」中文句子與 Enter 結算；兩者均命中並更新分數／連擊，測試資料不存檔也不上傳排行榜。
+- 八顆寶石後重新開啟關卡清單，1～8 關全部顯示已取得寶石，大橋堂顯示已開放；第一次進入顯示「前往大橋堂放置寶石」，完成放置後才出現「開始最後試練」，第二次才啟動天梯。
+- Ctrl+A 清除輸入與 Ctrl+Z 取消大招就緒均以鍵盤事件驗證；並修正 `index.html` 的 `begin()`，切換關卡時會清空上一關殘留輸入。
+- `qa-physical-input` 90 組、`qa-ime-input`、`qa-daqiao-ritual` 均 PASS。這些是瀏覽器鍵盤／composition 回歸；目前 Codex 內嵌瀏覽器會攔截 Ctrl+C/V 剪貼簿快捷鍵，也沒有載入 Windows 原生中文 IME 候選列，因此 Ctrl+C/V 與原生 IME 仍需外部 Chrome／Edge 實體鍵盤驗收。
+- 下一個最安全任務：在外部 Chrome／Edge 使用 Windows 注音輸入法，實測候選字選取、標點、Ctrl+C/V 及 30 分鐘課堂流程；完成後再評估是否需要調整快捷鍵提示。
+
 ## 2026-09-13 隔離 GAS 線上端點驗收
 
 - `tools/run-gas-qa.ps1` 使用隔離 GAS Web App、測試帳號 `99099` 與 `GAS_ALLOW_MUTATION=YES` 執行 `tools/qa-gas-endpoint.mjs`；登入、存檔、消耗品、天梯、排行榜與登出共 **9/9 PASS**。

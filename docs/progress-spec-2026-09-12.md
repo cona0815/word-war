@@ -15,7 +15,7 @@
 | 主角置中 | 已接入 | 小怪戰與 Boss 戰皆水平中央；Boss 地面對齊與 320～1920 寬度驗收通過 | 垂直位置仍需依教室 UI 做人工驗收 |
 | 鍵位出怪 | 部分 | 英文首字母、注音首符號、內建中文首注音、熱鍵下方；教師題目的 `laneKey` 已接到標準八方向座標與同 lane 排隊 | 未提供 `laneKey` 且不在內建首注音表的任意中文字仍需補讀音資料 |
 | 第 4 關 | 已接入 | 拼音、聲調、標點；Boss 三階段分流 | 教室實際教學節奏驗收 |
-| 輸入 | 部分 | 注音鍵位映射、Ctrl 任務、組字事件與 keyCode 229 保護；組字完成後 Enter 才結算 | Windows 原生 IME／候選字實測 |
+| 輸入 | 部分 | 注音鍵位映射、Ctrl 任務、組字事件與 keyCode 229 保護；組字完成後 Enter 才結算；切換關卡會清空上一關輸入 | Windows 原生 IME／候選字與 Ctrl+C/V 需在外部 Chrome／Edge 實體鍵盤實測 |
 | 成長與商店 | 已接入 | Lv.1–10、XP、金幣、武器、裝備、消耗品 | 技能樹、部分裝備增傷描述與實效一致性 |
 | 消耗品 | 已接入 | 五種效果、扣庫存、伺服器收據、離場關閉 | 最新部署版本全面回歸 |
 | 天梯 | 已接入 | 真正逐層、五階段、完成層數、續關與提交；八顆寶石後先完成大橋堂放置儀式才啟動戰鬥 | 高層平衡、最新完整線上驗收 |
@@ -249,8 +249,9 @@
 | qa-question-contract | 57／57 | 本階段重跑；含題庫管理、帳號管理、版本衝突與跨表結算契約 |
 | qa-gas-contract | 0 failures | 本階段重跑；本機模擬 GAS，含題庫新增／編輯／啟停、帳號清單、版本衝突、常錯題型與反應統計摘要 |
 | qa-gas-endpoint | 9/9 PASS | 隔離 GAS Web App 與 QA 帳號 99099；結果保存於 `docs/qa-gas-live/result.txt`，不代表正式班級資料流程 |
-| qa-physical-input | 90 組與 GM 隔離通過 | 本對話上一輪；Chrome 鍵盤事件，不是真實 OS IME |
-| qa-ime-input | PASS | Chrome 合成 composition／keyCode 229 驗證組字中不誤攻擊；不取代真實 Windows IME 實機驗收 |
+| local-keyboard-smoke | 可驗範圍通過 | Codex 內嵌瀏覽器隔離 GM：第 6 關詞語／第 8 關句子 Enter、八顆寶石清單、大橋堂兩段儀式、Ctrl+A／Ctrl+Z；原生 IME 與 Ctrl+C/V 仍待外部瀏覽器 |
+| qa-physical-input | 90 組與 GM 隔離通過 | 本階段重跑；瀏覽器鍵盤事件與 GM 隔離，不是真實 OS IME；Ctrl+C/V 受目前內嵌瀏覽器剪貼簿攔截 |
+| qa-ime-input | PASS | 本階段重跑；Chrome 合成 composition／keyCode 229 驗證組字中不誤攻擊；不取代真實 Windows IME 實機驗收 |
 | qa-progress-gate | PASS | Chrome 驗證第 1 關開放、前置寶石鎖定、雲端失敗提示、同 eventId 重試、成功後解鎖，以及重新登入恢復未同步紀錄 |
 | qa-boss-phase-pools | PASS | Chrome 逐關驗證八個主線 Boss 三階段題池、第 7／8 關教師題庫 wave／文字難度分流，以及一般四波使用題庫分組 |
 | qa-question-admin | PASS | Chrome 隔離驗證教師題庫列表、搜尋／關卡／狀態篩選、編輯、儲存、啟用／停用、軟刪除與清除編輯流程 |
@@ -271,7 +272,7 @@
 | P1 | 其餘主線 Boss 題池 | **本階段完成**：1～8 關各階段只出指定類型；第 7／8 關遠端題目可按 wave 或文字難度分流 |
 | P1 | 教師題庫完整物件 | **本階段完成**：第 7／8 關一般四波與 Boss 已使用 wave、difficulty、display、answer、laneKey；前端管理列表與 GAS 編輯／啟停／軟刪除、搜尋／篩選與版本衝突提示已接入 |
 | P1 | 一般通關同步失敗 | **部分完成**：可見狀態、保留待重試 eventId、重試不重複領獎、重新登入後依序恢復；GAS pending／Profile event marker 已覆蓋跨表中斷，隔離端點 smoke 已通過，長時間斷線與正式部署仍待 |
-| P1 | 原生中文輸入驗收 | **自動防護完成、實機待驗**：composition／keyCode 229 不提前攻擊；仍需在 Windows 注音候選字流程確認國字選字、詞語、標點與句子 Enter |
+| P1 | 原生中文輸入驗收 | **自動防護完成、部分實機待驗**：本階段在隔離 GM 以鍵盤驗證中文詞語／句子 Enter 與 Ctrl+A／Ctrl+Z；仍需外部 Windows Chrome／Edge 的注音候選字、標點與 Ctrl+C/V |
 | P2 | 主角位置對齊目前規格 | **本階段完成**：小怪／Boss 戰主角皆水平 50%，Boss 腳底與 320～1920 寬度 QA 通過；垂直 UI 仍待人工驗收 |
 | P2 | 最高 Combo／學習統計 | 整場最高連擊、逐題錯誤類型、累計指標正確 |
 | P2 | 教師管理頁 | **部分完成**：題庫與帳號建立／重設／啟停、題目與學生進度篩選、班級摘要、逐關最佳／常錯／反應與錯誤 lane／波次摘要匯出已接入；完整圖表仍待補 |
