@@ -6,8 +6,8 @@
 - `gas_code.gs` 新增向後相容的 `errorStatsJson` 欄位與清理函式，`students` API 回傳每位學生的 `errorByLane`、`errorByWave`；教師學生卡、班級摘要與 TSV 匯出均顯示熱區。舊 Records 沒有此欄位時仍可讀取。
 - 未連 GAS 的本機展示模式也會從 `state.records` 彙整相同欄位，離線課堂可看到常錯題、答對反應與錯誤熱區；不會寫回學生存檔以外的資料。
 - `tools/qa-gas-contract.mjs`、`tools/qa-question-contract.mjs`、`tools/qa-progress-report.mjs` 已加入熱區契約與畫面驗收；核心遊戲、戰鬥定位、題庫 lane、IME、Boss 階段與大橋堂儀式回歸均通過。
-- 本輪提交：`ba96229`（GAS／前端錯誤熱區報表）、後續本機離線彙整修正尚待下一個 git 里程碑提交。仍需真實 Windows IME、線上 GAS 部署、高層天梯平衡、垂直 UI 人工驗收與 37 套施法素材。
-- 下一個最安全任務：完成本機離線彙整修正的 git 提交，之後在隔離 GAS／實體 Windows 鍵盤上驗收。
+- 本輪提交：`ba96229`（GAS／前端錯誤熱區報表）與 `93c3aff`（本機離線彙整對齊雲端欄位）。仍需真實 Windows IME、線上 GAS 部署、高層天梯平衡、垂直 UI 人工驗收與 37 套施法素材。
+- 下一個最安全任務：在隔離 GAS／實體 Windows 鍵盤上驗收，收集實際課堂資料後再調整平衡或擴充圖表。
 
 ## 2026-09-13 每題反應時間與 lane 統計
 
