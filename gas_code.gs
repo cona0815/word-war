@@ -115,7 +115,8 @@ const RECORD_HEADERS = [
   "stage",
   "appVersion",
   "userAgent",
-  "errorsJson"
+  "errorsJson",
+  "responseStatsJson"
 ];
 
 const QUESTION_HEADERS = [
@@ -1003,7 +1004,8 @@ function saveRecord_(record, accountId) {
     stage: number_(record.stage),
     appVersion: clean_(record.appVersion),
     userAgent: clean_(record.userAgent, 300),
-    errorsJson: JSON.stringify(normalizeErrorCounts_(record.errors))
+    errorsJson: JSON.stringify(normalizeErrorCounts_(record.errors)),
+    responseStatsJson: JSON.stringify(normalizeResponseStats_(record.responseStats))
   };
   sheet.appendRow(RECORD_HEADERS.map(function(header) {
     return safe[header];
@@ -1117,7 +1119,10 @@ function getStudents_(limit) {
       plays: 0,
       lastAt: "",
       errors: {},
-      bestStages: {}
+      bestStages: {},
+      responseMsTotal: 0,
+      responseSamples: 0,
+      responseLanes: {}
     };
 
     const stage = number_(record.stage);
@@ -1142,6 +1147,17 @@ function getStudents_(limit) {
       const count = Math.min(Math.max(number_(errors[key]), 0), 999);
       if (count) current.errors[key] = (current.errors[key] || 0) + count;
     });
+    let responseStats = [];
+    try { responseStats = JSON.parse(record.responseStatsJson || "[]"); } catch (error) { responseStats = []; }
+    normalizeResponseStats_(responseStats).forEach(function(sample) {
+      current.responseMsTotal += sample.responseMs;
+      current.responseSamples += 1;
+      const lane = sample.lane || "unknown";
+      const laneStat = current.responseLanes[lane] || { total: 0, count: 0 };
+      laneStat.total += sample.responseMs;
+      laneStat.count += 1;
+      current.responseLanes[lane] = laneStat;
+    });
     students[studentName] = current;
   });
 
@@ -1151,6 +1167,13 @@ function getStudents_(limit) {
     student.topErrors = Object.keys(student.errors || {}).map(function(errorKey) {
       return { key: errorKey, count: student.errors[errorKey] };
     }).sort(function(a, b) { return b.count - a.count || a.key.localeCompare(b.key); }).slice(0, 5);
+    student.avgResponseMs = student.responseSamples ? Math.round(student.responseMsTotal / student.responseSamples) : 0;
+    student.responseByLane = Object.keys(student.responseLanes || {}).map(function(lane) {
+      const laneStat = student.responseLanes[lane];
+      return { lane: lane, avgResponseMs: laneStat.count ? Math.round(laneStat.total / laneStat.count) : 0, samples: laneStat.count };
+    }).sort(function(a, b) { return b.samples - a.samples || a.avgResponseMs - b.avgResponseMs || a.lane.localeCompare(b.lane); }).slice(0, 8);
+    delete student.responseMsTotal;
+    delete student.responseLanes;
     delete student.errors;
     return student;
   });
@@ -1386,6 +1409,25 @@ function normalizeErrorCounts_(value) {
     if (safeKey && count) result[safeKey] = count;
   });
   return result;
+}
+
+function normalizeResponseStats_(value) {
+  let source = value;
+  if (typeof source === "string") {
+    try { source = JSON.parse(source); } catch (error) { source = []; }
+  }
+  if (!Array.isArray(source)) return [];
+  return source.slice(0, 300).map(function(item) {
+    const sample = item && typeof item === "object" ? item : {};
+    return {
+      mode: clean_(sample.mode, 40),
+      expected: clean_(sample.expected, 160),
+      lane: clean_(sample.lane, 100),
+      responseMs: Math.min(Math.max(Math.round(number_(sample.responseMs)), 1), 600000)
+    };
+  }).filter(function(sample) {
+    return sample.expected && sample.responseMs > 0;
+  });
 }
 
 function json_(data) {

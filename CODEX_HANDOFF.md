@@ -1,5 +1,13 @@
 # Word War Handoff
 
+## 2026-09-13 每題反應時間與 lane 統計
+
+- `index.html` 以題目可見時間記錄答對樣本，場次記錄新增 `responseStats`（mode／題目／lane／毫秒）；`isActive` 後開始計時，Boss 換題會重新計時，舊資料仍可正常讀取。
+- `gas_code.gs` 新增向後相容的 `responseStatsJson`，`students` API 彙整每位學生平均反應、樣本數與熱門 lane；教師報表卡片與 TSV 同步顯示。
+- `tools/qa-gas-contract.mjs` 驗證後端清理與彙整；`qa-progress-report` 驗證學生／班級摘要顯示，`qa-game` 與 inline syntax 回歸通過。
+- 反應時間只統計答對題目，尚未把錯誤題目完整映射為 lane／波次熱區；仍缺真實 Windows IME、線上 GAS 部署、高層天梯平衡與 37 套施法素材。
+- 下一個最安全任務：先做真實 Windows IME 與 30 分鐘課堂穩定性驗收，再決定是否擴充錯誤 lane／波次熱區。
+
 ## 2026-09-13 教師報表班級摘要
 
 - 設定頁學生進度在目前班級／最高關卡篩選結果上方顯示班級人數、平均最高關卡、平均正確率、寶石總數與目前載入資料的前五名常錯題型。

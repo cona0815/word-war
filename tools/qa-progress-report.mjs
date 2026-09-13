@@ -19,7 +19,7 @@ try {
       try { body = JSON.parse(options.body || "{}"); } catch {}
       if (body.action === "login") return { ok: true, json: async () => ({ ok: true, sessionToken: "qa-session", expiresAt: "", profile: { account: "99099", version: 1, hero: "male", level: 1, xp: 0, coins: 0, gems: [], weapon: "starlight", gear: "focus", inventory: { weapons: ["starlight"], gear: ["focus"], items: {} } } }) };
       if (url.includes("action=students")) return { ok: true, json: async () => ({ ok: true, students: [
-        { studentName: "50101", className: "501", seatNo: "01", bestStage: 6, gems: 6, bestScore: 920, accuracy: 96, correct: 60, attempts: 62, plays: 8, topErrors: [{ key: "phrases:學校", count: 4 }], bestStages: { "5": { score: 700, accuracy: 95 }, "6": { score: 920, accuracy: 96 } } },
+        { studentName: "50101", className: "501", seatNo: "01", bestStage: 6, gems: 6, bestScore: 920, accuracy: 96, correct: 60, attempts: 62, plays: 8, avgResponseMs: 940, responseSamples: 12, responseByLane: [{ lane: "teacher-left-mid", avgResponseMs: 880, samples: 7 }], topErrors: [{ key: "phrases:學校", count: 4 }], bestStages: { "5": { score: 700, accuracy: 95 }, "6": { score: 920, accuracy: 96 } } },
         { studentName: "50202", className: "502", seatNo: "02", bestStage: 3, gems: 3, bestScore: 410, accuracy: 88, correct: 30, attempts: 34, plays: 4, topErrors: [{ key: "zhuyin:ㄅ", count: 3 }], bestStages: { "3": { score: 410, accuracy: 88 } } }
       ] }) };
       if (url.includes("action=questions")) return { ok: true, json: async () => ({ ok: true, questions: [] }) };
@@ -37,8 +37,10 @@ try {
   await page.waitForFunction(() => document.querySelectorAll("#studentProgressList .summary-card").length === 2);
   assert.match(await page.locator("#studentProgressSummary").textContent(), /班級 501 摘要/);
   assert.match(await page.locator("#studentProgressSummary").textContent(), /phrases:學校/);
+  assert.match(await page.locator("#studentProgressSummary").textContent(), /平均反應 940 ms/);
   assert.match(await page.locator("#studentProgressList").textContent(), /逐關最佳/);
   assert.match(await page.locator("#studentProgressList").textContent(), /常錯 phrases:學校/);
+  assert.match(await page.locator("#studentProgressList").textContent(), /熱門 lane teacher-left-mid 880ms/);
   await page.locator("#progressClassFilter").fill("501");
   await page.waitForFunction(() => document.querySelectorAll("#studentProgressList .summary-card").length === 1);
   assert.equal(await page.locator("#studentProgressSummary .summary-card").count(), 1);
