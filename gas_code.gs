@@ -1423,7 +1423,7 @@ function normalizeResponseStats_(value) {
       mode: clean_(sample.mode, 40),
       expected: clean_(sample.expected, 160),
       lane: clean_(sample.lane, 100),
-      responseMs: Math.min(Math.max(Math.round(number_(sample.responseMs)), 1), 600000)
+      responseMs: Math.min(Math.max(Math.round(number_(sample.responseMs)), 0), 600000)
     };
   }).filter(function(sample) {
     return sample.expected && sample.responseMs > 0;
