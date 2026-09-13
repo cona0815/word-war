@@ -1,0 +1,10 @@
+PASS GAS ping
+PASS admin creates isolated QA account
+PASS login and account isolation
+PASS loadProfile
+PASS saveProgress server-owned progression
+PASS purchase consumable
+PASS startLadder and finishLadder
+PASS leaderboard top 50
+PASS logout revokes session
+GAS endpoint QA summary: PASS (9/9)

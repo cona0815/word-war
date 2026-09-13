@@ -74,6 +74,6 @@
 - `node tools/qa-boss-phase-pools.mjs http://127.0.0.1:8767`：逐關檢查八個主線 Boss 的三階段題型，以及第 7、8 關教師題庫的 wave／難度分流。
 - `node tools/qa-gas-contract.mjs`：在本機模擬 Apps Script 試算表，驗證登入、存檔版本、關卡結算、跨表中斷重試、最低題數、購買、天梯與暱稱過濾。
 - `node tools/qa-hero-assets.mjs`：驗證男／女各 Lv.1-Lv.10、五武器共 100 張整合 PNG 的存在、`768x648` 畫布、RGBA 透明通道、前端引用與四種道具效果預覽契約。
-- `node tools/qa-gas-endpoint.mjs`：對已部署的 GAS Web App 做線上冒煙測試；必須明確提供隔離 QA 帳號與 `GAS_ALLOW_MUTATION=YES`，不會使用預設學生帳號。
+- `node tools/qa-gas-endpoint.mjs`：對已部署的 GAS Web App 做線上冒煙測試；必須明確提供隔離 QA 帳號與 `GAS_ALLOW_MUTATION=YES`，不會使用預設學生帳號。Windows 可直接執行 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\run-gas-qa.ps1`，結果會寫入 `docs/qa-gas-live/result.txt`，wrapper 結束後會清理程序環境變數。
 
 人物升級、五種武器與四種道具外觀可使用 `http://127.0.0.1:8767/hero-preview.html?gear=1&hero-motion=1` 預覽；預覽中的道具層只呈現光環、護罩、旋轉環或冠形光印，人物與武器仍由單張整合 PNG 提供，卡片與放大預覽共用朝向校正。人物與商店外觀的瀏覽器驗收可使用 `http://127.0.0.1:8767/index.html?qa=visual`。這是僅供 QA 的隔離模式，會提供 Lv.10 與測試金幣、購買武器／裝備／消耗品，且不寫回學生存檔；正式上課不要帶 `qa=visual`。

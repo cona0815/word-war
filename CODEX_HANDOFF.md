@@ -1,13 +1,21 @@
 # Word War Handoff
 
+## 2026-09-13 隔離 GAS 線上端點驗收
+
+- `tools/run-gas-qa.ps1` 使用隔離 GAS Web App、測試帳號 `99099` 與 `GAS_ALLOW_MUTATION=YES` 執行 `tools/qa-gas-endpoint.mjs`；登入、存檔、消耗品、天梯、排行榜與登出共 **9/9 PASS**。
+- 結果已保存至 `docs/qa-gas-live/result.txt`；wrapper 結束時清理本機程序環境變數，未把管理密碼或其他秘密寫入檔案。這次只觸碰隔離測試資料，不代表正式班級資料已驗收。
+- QA 修正 `finishLadder` 斷言：排行榜保留帳號歷史最佳成績時，回傳暱稱可能是較早紀錄；現在確認回傳項目為 approved 且 floor >= 1，沒有改動執行期規則。
+- 剩餘風險：真實 Windows 中文 IME／實體鍵盤、30 分鐘課堂穩定性、高層天梯平衡、垂直 UI 人工驗收與 37 套施法素材。
+- 下一個最安全任務：在實體 Windows 鍵盤上做 IME、Ctrl 熱鍵、八景流程與大橋堂儀式人工驗收。
+
 ## 2026-09-13 錯誤鍵位／波次熱區統計
 
 - `index.html` 現在為每次答錯保存 `errorStats`（mode／題目／lane／波次／Boss 階段）；一般小怪使用第 1～4 波，Boss 使用第 5 波並保留階段，最多保留 300 筆，且不改變原本扣血與答題規則。
 - `gas_code.gs` 新增向後相容的 `errorStatsJson` 欄位與清理函式，`students` API 回傳每位學生的 `errorByLane`、`errorByWave`；教師學生卡、班級摘要與 TSV 匯出均顯示熱區。舊 Records 沒有此欄位時仍可讀取。
 - 未連 GAS 的本機展示模式也會從 `state.records` 彙整相同欄位，離線課堂可看到常錯題、答對反應與錯誤熱區；不會寫回學生存檔以外的資料。
 - `tools/qa-gas-contract.mjs`、`tools/qa-question-contract.mjs`、`tools/qa-progress-report.mjs` 已加入熱區契約與畫面驗收；核心遊戲、戰鬥定位、題庫 lane、IME、Boss 階段與大橋堂儀式回歸均通過。
-- 本輪提交：`ba96229`（GAS／前端錯誤熱區報表）與 `93c3aff`（本機離線彙整對齊雲端欄位）。仍需真實 Windows IME、線上 GAS 部署、高層天梯平衡、垂直 UI 人工驗收與 37 套施法素材。
-- 下一個最安全任務：在隔離 GAS／實體 Windows 鍵盤上驗收，收集實際課堂資料後再調整平衡或擴充圖表。
+- 本輪提交：`ba96229`（GAS／前端錯誤熱區報表）與 `93c3aff`（本機離線彙整對齊雲端欄位）；隔離 GAS 線上端點 9/9 驗收另見上方紀錄。
+- 下一個最安全任務：在實體 Windows 鍵盤上驗收，收集實際課堂資料後再調整平衡或擴充圖表。
 
 ## 2026-09-13 每題反應時間與 lane 統計
 
