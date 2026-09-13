@@ -408,7 +408,7 @@
     function bossMinCorrect(stage,phase){const rules=BOSS_MIN_CORRECT_BY_STAGE[Number(stage)]||BOSS_MIN_CORRECT_BY_STAGE[9];return rules[Math.max(1,Math.min(rules.length,Number(phase)||1))-1]}
     function bossPhaseFloor(stage,phase){if(Number(stage)===9)return Math.max(0,(5-phase)/5);if(phase===1)return .67;if(phase===2)return .34;return 0}
     function bossMaxHp(lv){const stage=Number(lv?.id)||1,profileLevel=Math.max(1,Number(state.profile.level)||1);return 72+stage*9+Math.max(0,profileLevel-1)*4}
-     const state={profile:loadAccountProfile("50101"),config:load(CONFIG,{gasUrl:"",adminToken:""}),records:loadAccountRecords("50101"),ladderRecords:load(LADDER_STORE,[]),auth:loadAccountAuth("50101"),questions:[],levelIndex:0,enemies:[],current:null,bossMode:false,bossHp:0,maxBossHp:3,bossPhase:1,bossPhaseHits:0,bossPhaseStartedAt:0,bossAttackAt:0,bossAttackPending:false,bossAttackCount:0,hp:100,score:0,combo:0,correct:0,attempts:0,tick:null,startedAt:Date.now(),waveIndex:0,waves:[],cleared:0,practiceTotal:0,qaShotPending:false,ladderRun:null,ladderRitualReady:false,responseStats:[]};
+     const state={profile:loadAccountProfile("50101"),config:load(CONFIG,{gasUrl:"",adminToken:""}),records:loadAccountRecords("50101"),ladderRecords:load(LADDER_STORE,[]),auth:loadAccountAuth("50101"),questions:[],levelIndex:0,enemies:[],current:null,bossMode:false,bossHp:0,maxBossHp:3,bossPhase:1,bossPhaseHits:0,bossPhaseStartedAt:0,bossAttackAt:0,bossAttackPending:false,bossAttackCount:0,hp:100,score:0,combo:0,correct:0,attempts:0,tick:null,startedAt:Date.now(),waveIndex:0,waves:[],cleared:0,practiceTotal:0,qaShotPending:false,ladderRun:null,ladderRitualReady:false,responseStats:[],errorStats:[]};
      const qaMode=new URLSearchParams(location.search).get("qa")==="full";
     const visualQaMode=new URLSearchParams(location.search).get("qa")==="visual";
     state.questionAdminRows=[];state.questionEditingId="";state.accountAdminRows=[];state.studentProgressRows=[];state.errorCounts={};
@@ -641,7 +641,7 @@
     function buildPractice(lv){return buildWaves(lv).flat()}
     function practiceCount(lv){if(lv.mode==="letters")return 44;if(lv.mode==="words")return 32;if(lv.mode==="zhuyin")return 36;if(lv.mode==="phonics")return 32;if(lv.mode==="chineseChar")return 28;if(lv.mode==="phrases")return 24;if(lv.mode==="sentences")return 12;if(lv.mode==="final")return 32;return 28}
     function chunk(arr,size){const rows=[];for(let i=0;i<arr.length;i+=size)rows.push(arr.slice(i,i+size));return rows}
-    function nextWave(){if(state.waveIndex>=state.waves.length){boss();hud();return}const lv=levels[state.levelIndex],words=state.waves[state.waveIndex],seen={},spawnSeen={},now=Date.now();state.enemies=words.map((word,i)=>{const lane=spawnLaneKey(word),slot=spawnSeen[lane]||0;spawnSeen[lane]=slot+1;const p=pos(lv,word,i,seen,lane);return{id:`w${state.waveIndex}-e${i}`,word,x:p.x,y:p.y,alive:true,laneKey:lane,spawnLane:lane,spawnSlot:slot,order:i,spawnAt:now+spawnDelay(lv,slot,i)}});state.waveIndex++;questionType.textContent=`${lv.type} | 第 ${state.waveIndex} / ${state.waves.length} 波`;render();pick()}
+    function nextWave(){if(state.waveIndex>=state.waves.length){boss();hud();return}const lv=levels[state.levelIndex],wave=state.waveIndex+1,words=state.waves[state.waveIndex],seen={},spawnSeen={},now=Date.now();state.enemies=words.map((word,i)=>{const lane=spawnLaneKey(word),slot=spawnSeen[lane]||0;spawnSeen[lane]=slot+1;const p=pos(lv,word,i,seen,lane);return{id:`w${state.waveIndex}-e${i}`,word,x:p.x,y:p.y,alive:true,laneKey:lane,spawnLane:lane,spawnSlot:slot,wave,order:i,spawnAt:now+spawnDelay(lv,slot,i)}});state.waveIndex++;questionType.textContent=`${lv.type} | 第 ${state.waveIndex} / ${state.waves.length} 波`;render();pick()}
     // Same-lane enemies already queue in isActive; never offset later spawns toward the hero.
     function pos(lv,w,i,seen={},lane){const p=keyPos(w);if(p){const group=lane||spawnLaneKey(w),n=seen[group]||0;seen[group]=n+1;const fixed=directionPos[w]||digitPos[String(w).toUpperCase()]||teacherLanePosition(w);const base=fixed?{x:p[0],y:p[1]}:outerFromKey(p);const o=fixed?fixedOffset(w,n):[0,0];return{x:Math.max(8,Math.min(92,base.x+o[0])),y:Math.max(10,Math.min(86,base.y+o[1]))}}const r=[[12,18],[50,10],[88,18],[92,50],[82,84],[50,89],[18,84],[8,50],[26,18],[74,18],[72,84],[28,84]];return{x:r[i%r.length][0],y:r[i%r.length][1]}}
     function fixedOffset(w,n){const a=[0,12,-12,22,-22,32,-32],b=[0,14,28,42,56,70,84],i=n%a.length;if(w===UP)return[a[i],b[i]];if(w===DOWN)return[a[i],-b[i]];if(w===LEFT)return[b[i],a[i]];if(w===RIGHT)return[-b[i],a[i]];return[[0,0],[-8,7],[8,7],[-12,14],[12,14],[0,22],[-16,20],[16,20]][n%8]}
@@ -668,7 +668,7 @@
     function poolSprite(pool,w){const list=minionPools[pool];return list&&list.length?ASSET+list[hashText(w)%list.length]:"assets/pixel-enemy-right.png"}
     function monster(lv,w){const id=keyIdentity(w);if(lv.mode==="digits")return img.digits(w);if(lv.mode==="letters")return /^[A-Z]$/.test(id)?img.letters(id):"assets/pixel-enemy-left.png";if(lv.mode==="words")return poolSprite("words",w);if(lv.mode==="zhuyin")return poolSprite("zhuyin",w);if(lv.mode==="phonics")return poolSprite("phonics",w);if(lv.mode==="chineseChar")return poolSprite("chineseChar",w);if(lv.mode==="phrases"){if(/CTRL\s*\+\s*[A-Z]/i.test(String(w)))return "assets/pixel-enemy-down.png";return poolSprite("phrases",w)}if(lv.mode==="sentences")return poolSprite("sentences",w);if(lv.mode==="final")return poolSprite("final",w);return img[lv.mode]?img[lv.mode](w):"assets/pixel-enemy-right.png"} function dist(e){const p=heroPoint();return Math.hypot(e.x-p.x,e.y-p.y)}
     function pick(){const alive=state.enemies.filter(e=>e.alive);if(!state.bossMode){state.current=null;if(!alive.length){nextWave();return}}else{state.current=state.current||alive[0]||null}render();hud()}
-      function boss(){state.bossMode=true;state.bossHp=state.maxBossHp;state.bossPhase=1;state.bossPhaseHits=0;state.bossPhaseStartedAt=Date.now();state.bossAttackCount=0;state.bossAttackPending=false;state.bossAttackAt=qaMode?Number.MAX_SAFE_INTEGER:Date.now()+9000;const lv=levels[state.levelIndex],words=bossPool(lv),word=words[Math.floor(Math.random()*words.length)];gameScreen.style.setProperty("--hero-x",heroBoss.x+"%");gameScreen.style.setProperty("--hero-y",heroBoss.y+"%");faceHeroTo(bossPos.x);enemyLayer.innerHTML=`<div class="boss active" id="bossEntity" style="--boss-x:${bossPos.x}%;--boss-y:${bossPos.y}%;--boss-face:${bossFace(state.levelIndex)};--boss-atlas:url('${ASSET}boss-safe-atlas-20260612-v3/${lv.atlas}');--boss-hp:1"><div class="boss-tag">${lv.boss}｜階段 1</div><div class="boss-hp"><span></span></div><div class="boss-command" id="bossCommand">${promptHTML(word)}</div><div class="boss-sprite"></div></div>`;state.current={word,boss:true,promptAt:Date.now()};questionText.innerHTML=promptHTML(state.current.word);hud()}
+    function boss(){state.bossMode=true;state.bossHp=state.maxBossHp;state.bossPhase=1;state.bossPhaseHits=0;state.bossPhaseStartedAt=Date.now();state.bossAttackCount=0;state.bossAttackPending=false;state.bossAttackAt=qaMode?Number.MAX_SAFE_INTEGER:Date.now()+9000;const lv=levels[state.levelIndex],words=bossPool(lv),word=words[Math.floor(Math.random()*words.length)];gameScreen.style.setProperty("--hero-x",heroBoss.x+"%");gameScreen.style.setProperty("--hero-y",heroBoss.y+"%");faceHeroTo(bossPos.x);enemyLayer.innerHTML=`<div class="boss active" id="bossEntity" style="--boss-x:${bossPos.x}%;--boss-y:${bossPos.y}%;--boss-face:${bossFace(state.levelIndex)};--boss-atlas:url('${ASSET}boss-safe-atlas-20260612-v3/${lv.atlas}');--boss-hp:1"><div class="boss-tag">${lv.boss}｜階段 1</div><div class="boss-hp"><span></span></div><div class="boss-command" id="bossCommand">${promptHTML(word)}</div><div class="boss-sprite"></div></div>`;state.current={word,boss:true,wave:5,phase:1,promptAt:Date.now()};questionText.innerHTML=promptHTML(state.current.word);hud()}
      function advanceBossPhase(){if(!state.bossMode)return;const lv=levels[state.levelIndex],ratio=state.bossHp/Math.max(1,state.maxBossHp),required=bossMinCorrect(lv.id,state.bossPhase),floor=bossPhaseFloor(lv.id,state.bossPhase);if(state.bossPhase<bossPhaseCount(lv.id)&&state.bossPhaseHits>=required&&ratio<=floor){state.bossPhase++;state.bossPhaseHits=0;state.bossPhaseStartedAt=Date.now();state.bossAttackPending=false;state.bossAttackAt=qaMode?Number.MAX_SAFE_INTEGER:Date.now()+2200;const b=$("bossEntity");if(b){const tag=b.querySelector(".boss-tag");if(tag)tag.textContent=lv.boss+"｜階段 "+state.bossPhase;b.classList.remove("boss-phase-change");void b.offsetWidth;b.classList.add("boss-phase-change");setTimeout(()=>b.classList.remove("boss-phase-change"),850)}}}
      function bossThreat(){
        document.querySelectorAll('.boss-telegraph').forEach(w=>{if(!state.bossMode||w.dataset.phase!==String(state.bossPhase))w.remove()});
@@ -1035,7 +1035,7 @@
       };
       const originalStart = start;
       const originalBeginForErrors = begin;
-      begin = (...args) => { state.errorCounts = {}; state.responseStats = []; return originalBeginForErrors(...args); };
+      begin = (...args) => { state.errorCounts = {}; state.responseStats = []; state.errorStats = []; return originalBeginForErrors(...args); };
       const originalSubmitForErrors = submit;
       submit = raw => {
         const beforeAttempts = state.attempts, beforeCorrect = state.correct;
@@ -1047,6 +1047,7 @@
         if (state.attempts === beforeAttempts + 1 && state.correct === beforeCorrect && expected) {
           const key = `${levels[state.levelIndex].mode}:${String(expected).trim()}`;
           state.errorCounts[key] = (state.errorCounts[key] || 0) + 1;
+          if (state.errorStats.length < 300) state.errorStats.push({ mode: levels[state.levelIndex].mode, expected: String(expected).trim(), lane: target?.spawnLane || (state.bossMode ? "boss" : spawnLaneKey(expected)), wave: Number(target?.wave) || (state.bossMode ? 5 : Math.max(1, state.waveIndex)), phase: state.bossMode ? Number(state.bossPhase) || 1 : 0 });
         }
         if (state.attempts === beforeAttempts + 1 && state.correct === beforeCorrect + 1 && expected && startedAt) {
           state.responseStats.push({ mode: levels[state.levelIndex].mode, expected: String(expected).trim(), lane: target?.spawnLane || spawnLaneKey(expected), responseMs: Math.min(600000, Math.max(0, Date.now() - startedAt)) });
@@ -1054,7 +1055,7 @@
         return result;
       };
       const originalMakeRecordForErrors = makeRecord;
-      makeRecord = (...args) => ({ ...originalMakeRecordForErrors(...args), errors: { ...state.errorCounts }, responseStats: [...state.responseStats] });
+      makeRecord = (...args) => ({ ...originalMakeRecordForErrors(...args), errors: { ...state.errorCounts }, errorStats: [...state.errorStats], responseStats: [...state.responseStats] });
       start = async (...args) => {
         await originalStart(...args);
         if (state.config.gasUrl && state.auth?.sessionToken) {
@@ -1117,7 +1118,7 @@
         const groups = new Map();
         rows.forEach(row => {
           const className = String(row.className || "未分班");
-          const group = groups.get(className) || { className, count: 0, bestStage: 0, accuracy: 0, gems: 0, responseMs: 0, responseSamples: 0, errors: {} };
+          const group = groups.get(className) || { className, count: 0, bestStage: 0, accuracy: 0, gems: 0, responseMs: 0, responseSamples: 0, errors: {}, errorLanes: {}, errorWaves: {} };
           group.count += 1;
           group.bestStage += Number(row.bestStage || 0);
           group.accuracy += Number(row.accuracy || 0);
@@ -1128,13 +1129,25 @@
             const key = String(error.key || "").trim();
             if (key) group.errors[key] = (group.errors[key] || 0) + (Number(error.count) || 0);
           });
+          (row.errorByLane || []).forEach(error => {
+            const lane = String(error.lane || "").trim();
+            if (lane) group.errorLanes[lane] = (group.errorLanes[lane] || 0) + (Number(error.count) || 0);
+          });
+          (row.errorByWave || []).forEach(error => {
+            const wave = Number(error.wave) || 0, phase = Number(error.phase) || 0, key = `${wave}:${phase}`;
+            const item = group.errorWaves[key] || { wave, phase, count: 0 };
+            item.count += Number(error.count) || 0;
+            group.errorWaves[key] = item;
+          });
           groups.set(className, group);
         });
         const cards = [...groups.values()].sort((a, b) => a.className.localeCompare(b.className)).map(group => {
           const topErrors = Object.entries(group.errors).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5);
           const errorText = topErrors.length ? topErrors.map(([key, count]) => `${esc(key)} ×${count}`).join("、") : "尚無錯誤分類紀錄";
+          const laneText = Object.entries(group.errorLanes).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 3).map(([lane, count]) => `${esc(lane)} ×${count}`).join("、") || "尚無錯誤 lane";
+          const waveText = Object.values(group.errorWaves).sort((a, b) => b.count - a.count || a.wave - b.wave || a.phase - b.phase).slice(0, 3).map(item => `${item.phase ? `Boss P${item.phase}` : `波次 ${item.wave}`} ×${item.count}`).join("、") || "尚無錯誤波次";
           const responseText = group.responseSamples ? `平均反應 ${Math.round(group.responseMs / group.responseSamples)} ms` : "尚無反應時間";
-          return `<div class="summary-card"><strong>班級 ${esc(group.className)} 摘要</strong><span>${group.count} 位學生｜平均最高關卡 ${Math.round(group.bestStage / group.count * 10) / 10}｜平均正確率 ${Math.round(group.accuracy / group.count)}%｜寶石 ${group.gems}/${group.count * 8}｜${responseText}</span><span>目前載入資料常錯：${errorText}</span></div>`;
+          return `<div class="summary-card"><strong>班級 ${esc(group.className)} 摘要</strong><span>${group.count} 位學生｜平均最高關卡 ${Math.round(group.bestStage / group.count * 10) / 10}｜平均正確率 ${Math.round(group.accuracy / group.count)}%｜寶石 ${group.gems}/${group.count * 8}｜${responseText}</span><span>目前載入資料常錯：${errorText}</span><span>錯誤 lane：${laneText}｜錯誤波次：${waveText}</span></div>`;
         });
         studentProgressSummary.innerHTML = cards.length ? cards.join("") : `<p class="note">目前篩選沒有班級摘要。</p>`;
       };
@@ -1148,17 +1161,21 @@
           const stageText = Object.entries(row.bestStages || {}).sort((a, b) => Number(a[0]) - Number(b[0])).map(([stage, best]) => `第${stage}關 ${Number(best.score || 0).toLocaleString()}`).join("、") || "尚無逐關最佳紀錄";
           const responseText = Number(row.responseSamples || 0) > 0 ? `平均反應 ${Number(row.avgResponseMs || 0)} ms` : "尚無反應時間";
           const laneText = Array.isArray(row.responseByLane) && row.responseByLane.length ? `｜熱門 lane ${row.responseByLane.slice(0, 2).map(lane => `${esc(lane.lane)} ${Number(lane.avgResponseMs || 0)}ms`).join("、")}` : "";
-          return `<div class="summary-card"><strong>${esc(row.className || "")} ${esc(row.seatNo || "")} ${esc(row.studentName || "")}</strong><span>最高關卡 ${row.bestStage || 0}｜寶石 ${row.gems || 0}/8｜最佳分數 ${Number(row.bestScore || 0).toLocaleString()}｜正確率 ${row.accuracy || 100}%｜完成題數 ${row.correct || 0}｜${responseText}${laneText}</span><span>逐關最佳：${stageText}</span><span>${errorText}</span></div>`;
+          const errorLaneText = Array.isArray(row.errorByLane) && row.errorByLane.length ? row.errorByLane.slice(0, 2).map(error => `${esc(error.lane)} ×${Number(error.count) || 0}`).join("、") : "尚無錯誤 lane";
+          const errorWaveText = Array.isArray(row.errorByWave) && row.errorByWave.length ? row.errorByWave.slice(0, 2).map(error => `${Number(error.phase) ? `Boss P${Number(error.phase)}` : `波次 ${Number(error.wave) || 0}`} ×${Number(error.count) || 0}`).join("、") : "尚無錯誤波次";
+          return `<div class="summary-card"><strong>${esc(row.className || "")} ${esc(row.seatNo || "")} ${esc(row.studentName || "")}</strong><span>最高關卡 ${row.bestStage || 0}｜寶石 ${row.gems || 0}/8｜最佳分數 ${Number(row.bestScore || 0).toLocaleString()}｜正確率 ${row.accuracy || 100}%｜完成題數 ${row.correct || 0}｜${responseText}${laneText}</span><span>逐關最佳：${stageText}</span><span>${errorText}</span><span>錯誤 lane：${errorLaneText}｜錯誤波次：${errorWaveText}</span></div>`;
         }).join("") : `<p class="note">${state.studentProgressRows.length ? "沒有符合篩選條件的學生。" : "尚無學生進度紀錄。"}</p>`;
         progressStatus.textContent = source ? `來源：${source}｜顯示 ${filtered.length} / ${state.studentProgressRows.length} 位學生` : "";
       };
       function exportStudentProgress() {
         const rows = progressRowsForView();
         if (!rows.length) { progressStatus.textContent = "目前沒有符合篩選條件的學生報表。"; return; }
-        const header = ["studentName", "className", "seatNo", "bestStage", "gems", "bestScore", "accuracy", "correct", "attempts", "plays", "avgResponseMs", "responseSamples", "responseByLane", "topErrors", "bestStages"];
+        const header = ["studentName", "className", "seatNo", "bestStage", "gems", "bestScore", "accuracy", "correct", "attempts", "plays", "avgResponseMs", "responseSamples", "responseByLane", "topErrors", "errorByLane", "errorByWave", "bestStages"];
         const body = rows.map(row => header.map(key => {
           if (key === "topErrors") return (row.topErrors || []).map(error => `${error.key} x${error.count}`).join(", ");
           if (key === "responseByLane") return (row.responseByLane || []).map(lane => `${lane.lane} ${lane.avgResponseMs}ms (${lane.samples})`).join(", ");
+          if (key === "errorByLane") return (row.errorByLane || []).map(error => `${error.lane} x${error.count}`).join(", ");
+          if (key === "errorByWave") return (row.errorByWave || []).map(error => `${error.phase ? `Boss P${error.phase}` : `波次 ${error.wave}`} x${error.count}`).join(", ");
           if (key === "bestStages") return Object.entries(row.bestStages || {}).map(([stage, best]) => `${stage}:${best.score}/${best.accuracy}%`).join(", ");
           return row[key] ?? "";
         }).map(value => String(value).replace(/[\t\r\n]/g, " ")).join("\t"));

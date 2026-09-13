@@ -116,7 +116,8 @@ const RECORD_HEADERS = [
   "appVersion",
   "userAgent",
   "errorsJson",
-  "responseStatsJson"
+  "responseStatsJson",
+  "errorStatsJson"
 ];
 
 const QUESTION_HEADERS = [
@@ -1005,7 +1006,8 @@ function saveRecord_(record, accountId) {
     appVersion: clean_(record.appVersion),
     userAgent: clean_(record.userAgent, 300),
     errorsJson: JSON.stringify(normalizeErrorCounts_(record.errors)),
-    responseStatsJson: JSON.stringify(normalizeResponseStats_(record.responseStats))
+    responseStatsJson: JSON.stringify(normalizeResponseStats_(record.responseStats)),
+    errorStatsJson: JSON.stringify(normalizeErrorStats_(record.errorStats))
   };
   sheet.appendRow(RECORD_HEADERS.map(function(header) {
     return safe[header];
@@ -1122,7 +1124,9 @@ function getStudents_(limit) {
       bestStages: {},
       responseMsTotal: 0,
       responseSamples: 0,
-      responseLanes: {}
+      responseLanes: {},
+      errorLanes: {},
+      errorWaves: {}
     };
 
     const stage = number_(record.stage);
@@ -1158,6 +1162,16 @@ function getStudents_(limit) {
       laneStat.count += 1;
       current.responseLanes[lane] = laneStat;
     });
+    let errorStats = [];
+    try { errorStats = JSON.parse(record.errorStatsJson || "[]"); } catch (error) { errorStats = []; }
+    normalizeErrorStats_(errorStats).forEach(function(sample) {
+      const lane = sample.lane || "unknown";
+      current.errorLanes[lane] = (current.errorLanes[lane] || 0) + 1;
+      const waveKey = String(sample.wave || 0) + ":" + String(sample.phase || 0);
+      const waveStat = current.errorWaves[waveKey] || { wave: sample.wave || 0, phase: sample.phase || 0, count: 0 };
+      waveStat.count += 1;
+      current.errorWaves[waveKey] = waveStat;
+    });
     students[studentName] = current;
   });
 
@@ -1172,8 +1186,16 @@ function getStudents_(limit) {
       const laneStat = student.responseLanes[lane];
       return { lane: lane, avgResponseMs: laneStat.count ? Math.round(laneStat.total / laneStat.count) : 0, samples: laneStat.count };
     }).sort(function(a, b) { return b.samples - a.samples || a.avgResponseMs - b.avgResponseMs || a.lane.localeCompare(b.lane); }).slice(0, 8);
+    student.errorByLane = Object.keys(student.errorLanes || {}).map(function(lane) {
+      return { lane: lane, count: student.errorLanes[lane] };
+    }).sort(function(a, b) { return b.count - a.count || a.lane.localeCompare(b.lane); }).slice(0, 8);
+    student.errorByWave = Object.keys(student.errorWaves || {}).map(function(key) {
+      return student.errorWaves[key];
+    }).sort(function(a, b) { return b.count - a.count || a.wave - b.wave || a.phase - b.phase; }).slice(0, 8);
     delete student.responseMsTotal;
     delete student.responseLanes;
+    delete student.errorLanes;
+    delete student.errorWaves;
     delete student.errors;
     return student;
   });
@@ -1409,6 +1431,26 @@ function normalizeErrorCounts_(value) {
     if (safeKey && count) result[safeKey] = count;
   });
   return result;
+}
+
+function normalizeErrorStats_(value) {
+  let source = value;
+  if (typeof source === "string") {
+    try { source = JSON.parse(source); } catch (error) { source = []; }
+  }
+  if (!Array.isArray(source)) return [];
+  return source.slice(0, 300).map(function(item) {
+    const sample = item && typeof item === "object" ? item : {};
+    return {
+      mode: clean_(sample.mode, 40),
+      expected: clean_(sample.expected, 160),
+      lane: clean_(sample.lane, 100),
+      wave: Math.min(Math.max(Math.floor(number_(sample.wave)), 0), 9),
+      phase: Math.min(Math.max(Math.floor(number_(sample.phase)), 0), 5)
+    };
+  }).filter(function(sample) {
+    return sample.expected && (sample.lane || sample.wave > 0);
+  });
 }
 
 function normalizeResponseStats_(value) {

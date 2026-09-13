@@ -1,5 +1,13 @@
 # Word War Handoff
 
+## 2026-09-13 錯誤鍵位／波次熱區統計
+
+- `index.html` 現在為每次答錯保存 `errorStats`（mode／題目／lane／波次／Boss 階段）；一般小怪使用第 1～4 波，Boss 使用第 5 波並保留階段，最多保留 300 筆，且不改變原本扣血與答題規則。
+- `gas_code.gs` 新增向後相容的 `errorStatsJson` 欄位與清理函式，`students` API 回傳每位學生的 `errorByLane`、`errorByWave`；教師學生卡、班級摘要與 TSV 匯出均顯示熱區。舊 Records 沒有此欄位時仍可讀取。
+- `tools/qa-gas-contract.mjs`、`tools/qa-question-contract.mjs`、`tools/qa-progress-report.mjs` 已加入熱區契約與畫面驗收；核心遊戲、戰鬥定位、題庫 lane、IME、Boss 階段與大橋堂儀式回歸均通過。
+- 本輪提交：`0ae16cb`（反應統計輸入清理）；熱區程式與文件待下一個 git 里程碑提交。仍需真實 Windows IME、線上 GAS 部署、高層天梯平衡、垂直 UI 人工驗收與 37 套施法素材。
+- 下一個最安全任務：完成本輪熱區變更的回歸與 git 提交，之後在隔離 GAS／實體 Windows 鍵盤上驗收。
+
 ## 2026-09-13 每題反應時間與 lane 統計
 
 - `index.html` 以題目可見時間記錄答對樣本，場次記錄新增 `responseStats`（mode／題目／lane／毫秒）；`isActive` 後開始計時，Boss 換題會重新計時，舊資料仍可正常讀取。
