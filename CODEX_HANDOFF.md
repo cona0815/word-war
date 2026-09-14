@@ -7,6 +7,7 @@
 - `netlify.toml`：Node 22＋既有精簡發布包，公開 `.pages-dist`。GitHub Pages push workflow 已取消，保留手動觸發。
 - 驗證：音樂／體驗 15 項瀏覽器檢查通過，18 段皆可解碼；遊戲靜態 111/111、題庫 60/60、inline 語法、發布包安全 fixture 通過。詳見 `docs/music-and-guest-release.md`。
 - 發布時必須用乾淨提交內容，保留工作區 `hero-cast-clips.js` 的未完修改與未追蹤素材。推送完成狀態在本次回覆記錄。
+- 乾淨 worktree `.codex-netlify-release` 已通過 Netlify 同款 build：1,156 個公開檔、808,256,326 bytes、62 組已提交施法動畫；762 個非公開／歷史檔排除。程式提交 `024d8d4`，本次發布文件提交接續其後。
 - GAS 正式帳號後端仍需另行同步；體驗不依賴 GAS。不得將 GitHub 推送成功說成已驗證 Netlify 網站。
 
 ---
