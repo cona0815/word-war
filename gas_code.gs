@@ -69,18 +69,18 @@ const SHOP_CATALOG = {
 
 const FIRST_CLEAR_COINS = [0, 120, 140, 160, 180, 210, 240, 280, 320];
 const REPEAT_CLEAR_COINS = [0, 35, 40, 45, 50, 60, 70, 80, 90];
-// A stage can only settle after all four practice waves and the Boss phases
-// have produced their minimum correct answers. The frontend uses the same
-// practice counts and Boss minimums; GAS enforces the lower bound as well.
+// Earned ultimates can defeat enemies and shorten Boss phases without counting
+// as typed answers. Keep a conservative correct-answer floor, below the normal
+// four-wave + Boss total, so legitimate ultimate-assisted clears can settle.
 const STAGE_MIN_CORRECT = Object.freeze({
-  1: 76,
-  2: 51,
-  3: 68,
-  4: 64,
-  5: 50,
-  6: 43,
-  7: 25,
-  8: 25
+  1: 44,
+  2: 32,
+  3: 36,
+  4: 32,
+  5: 28,
+  6: 24,
+  7: 32,
+  8: 24
 });
 const LADDER_SEASON_ID = "2026-S2";
 const LADDER_RUN_TTL_MS = 15 * 60 * 1000;
@@ -247,7 +247,7 @@ function doPost(e) {
 
     if (action === "finishLadder") {
       const accountId = requireSession_(payload.sessionToken);
-      return json_({ ok: true, entry: finishLadder_(accountId, payload) });
+      return json_({ ok: true, entry: finishLadder_(accountId, payload), profile: getProfile_(accountId) });
     }
 
     if (action === "adminUpsertAccount") {
@@ -666,10 +666,8 @@ function applySettlementReward_(current, stage, reward, xpGain, eventId) {
   gems[stage - 1] = true;
   let level = Math.max(1, current.level);
   let xp = Math.max(0, current.xp) + Math.max(0, number_(xpGain));
-  while (level < 10 && xp >= level * 300) {
-    xp -= level * 300;
-    level += 1;
-  }
+  // First clears unlock levels; repeats earn XP/coins without bypassing the ladder.
+  level = Math.max(level, Math.min(7, 1 + gems.filter(Boolean).length));
   current.gems = gems;
   current.level = level;
   current.xp = xp;
@@ -851,6 +849,15 @@ function finishLadder_(accountId, payload) {
     const score = Math.max(0, Math.min(scoreCap, Math.floor(number_(payload.score))));
     const durationMs = Math.max(1000, Math.min(LADDER_RUN_TTL_MS, Math.floor(number_(payload.durationMs) || 1000)));
     const finishAt = new Date(now).toISOString();
+    const profile = getProfile_(accountId);
+    const milestoneLevel = floor >= 5 ? 10 : floor >= 3 ? 9 : 8;
+    if (profile.level < milestoneLevel) {
+      profile.level = milestoneLevel;
+      profile.version += 1;
+      profile.updatedAt = finishAt;
+      // Maximum milestone is idempotent if a later run-row write needs retry.
+      persistProfile_(accountId, profile);
+    }
     const run = {};
     LADDER_RUN_HEADERS.forEach(function(header) { run[header] = runRow.record[header]; });
     Object.assign(run, { finishAt: finishAt, floor: floor, score: score, accuracy: accuracy, durationMs: durationMs, status: "submitted", nickname: checked.nickname });

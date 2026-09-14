@@ -26,7 +26,7 @@
       return;
     }
     if(event.ctrlKey||event.altKey||event.metaKey)return;
-    const phonetic=words.filter(w=>/^[\u3105-\u3129]+[ˊˇˋ˙]?$/.test(w));
+    const phonetic=words.filter(w=>/^(?:[\u3105-\u3129]+[ˊˇˋ˙]?|[ˊˇˋ˙])$/.test(w));
     const symbolOnly=words.filter(w=>/^[，。？！：、「」]+$/.test(w));
     const mapped=phonetic.length?keys[event.key.toLowerCase()]:symbolOnly.length?punctuation[event.key]:null;
     if(!mapped)return;

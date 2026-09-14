@@ -27,10 +27,23 @@
       data.energy=0;data.armed=false;
       const strength=tier();data.freezeUntil=effectNow()+2500+strength*500;
       if(state.bossMode){
-        const floor=Math.max(1,Math.floor(state.maxBossHp*bossPhaseFloor(levels[state.levelIndex].id,state.bossPhase)));
-        state.bossHp=Math.max(floor,state.bossHp-Math.round(state.maxBossHp*(.06+strength*.02)));
+        state.bossHp=Math.max(0,state.bossHp-Math.max(1,Math.round(state.maxBossHp*(.06+strength*.02))));
+        // An earned ultimate can cross a phase boundary; never heal to its floor.
+        advanceBossPhase(true);
         document.querySelector('#bossEntity')?.style.setProperty('--boss-hp',state.bossHp/state.maxBossHp);
-      }else state.enemies.filter(isActive).forEach(e=>{e.x=Math.max(7,Math.min(93,50+(e.x-50)*1.16));e.y=Math.max(9,Math.min(89,58+(e.y-58)*1.16))});
+        if(state.bossHp<=0){finish(true);return}
+        const words=bossPool(levels[state.levelIndex]);
+        if(state.current&&!state.current.pending){state.current.word=words[Math.floor(Math.random()*words.length)];state.current.promptAt=Date.now();questionText.innerHTML=promptHTML(state.current.word);const cmd=document.querySelector('#bossCommand');if(cmd)cmd.innerHTML=promptHTML(state.current.word)}
+      }else{
+        const center=heroPoint();
+        activeEnemies().filter(e=>!e.pending).forEach(e=>{
+          e.hp=Math.max(0,(e.hp??100)-(35+strength*15));
+          if(e.hp===0){e.alive=false;state.cleared++}
+          else{e.x=Math.max(7,Math.min(93,center.x+(e.x-center.x)*1.16));e.y=Math.max(9,Math.min(89,center.y+(e.y-center.y)*1.16))}
+        });
+        // Ultimate kills count as cleared enemies, never as typed answers or accuracy.
+        pick();
+      }
       const burst=document.createElement('div');burst.className=`ultimate-burst ultimate-tier-${strength}`;
       burst.style.backgroundImage=`url("${src}")`;burst.setAttribute('aria-hidden','true');gameScreen.appendChild(burst);
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -1,0 +1,7 @@
+#openingDialog{padding:0;border:1px solid #d4ad62;background:#041421;color:#fff;width:min(1280px,96vw);max-width:96vw;overflow:hidden;border-radius:16px}
+#openingDialog::backdrop{background:rgba(1,8,16,.95)}
+#openingDialog video{display:block;width:100%;max-height:80vh;object-fit:contain;background:#000}
+.opening-controls{display:flex;gap:12px;align-items:center;padding:14px 20px;flex-wrap:wrap}
+#openingStatus{margin-right:auto;color:#ffe0a0}
+#openingReplay{position:fixed;bottom:18px;left:18px;z-index:3}
+@media(max-width:600px){.opening-controls{padding:10px;gap:8px}#openingStatus{width:100%}#openingDialog video{max-height:65vh}}

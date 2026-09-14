@@ -203,11 +203,12 @@ check("saveProgress 只同步外觀不接收作弊進度", synced.ok && synced.p
 profile = synced.profile;
 expectError("版本衝突被拒絕", { action: "saveProgress", sessionToken: token, expectedVersion: 1, profile: { hero: "male" } }, /changed/);
 
-const minimumCorrect = [0, 76, 51, 68, 64, 50, 43, 25, 25];
+const minimumCorrect = [0, 44, 32, 36, 32, 28, 24, 32, 24];
 const settledVersions = [];
 for (let stage = 1; stage <= 8; stage += 1) {
   const result = post({ action: "finishStage", sessionToken: token, eventId: `stage-event-${stage}`, stage, result: "win", correct: minimumCorrect[stage], attempts: minimumCorrect[stage] + 2, durationSec: 180, maxCombo: 10 });
   check(`第 ${stage} 關可完成結算`, result.ok && result.profile.gems[stage - 1] === true);
+  check(`第 ${stage} 關依首通進度升級`,result.profile.level===Math.min(7,stage+1));
   profile = result.profile;
   settledVersions.push(profile.version);
 }
@@ -323,6 +324,16 @@ expectError("天梯 run 不可重複送出", { action: "finishLadder", sessionTo
 const leaderboard = get("leaderboard", { limit: "50" });
 check("公開排行榜只回傳可公開前 50 名", leaderboard.ok && leaderboard.records.length === 1 && leaderboard.records[0].nickname === "星光勇者");
 
+for(const floor of [1,3,5]){
+  const before=context.getProfile_("50101");
+  context.persistProfile_("50101",{...before,level:7});
+  const run=post({action:"startLadder",sessionToken:token});
+  const result=post({action:"finishLadder",sessionToken:token,runId:run.run.runId,nickname:"星光勇者",floor,correct:100,attempts:100,durationMs:120000});
+  check(`大橋堂第 ${floor} 層升級並回傳存檔`,result.ok&&result.profile.level===(floor===1?8:floor===3?9:10));
+}
+const legacy=context.getProfile_("50101");
+const preserved=context.applySettlementReward_(legacy,1,0,100000,"qa-legacy-level");
+check("舊 Lv.10 不降級且重打不改等級",preserved.level===10);
 post({ action: "logout", sessionToken: token });
 expectError("登出後 session 失效", { action: "loadProfile", sessionToken: token }, /expired|Session/);
 

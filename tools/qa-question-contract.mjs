@@ -17,11 +17,12 @@ check("前端宣告題庫 schema 版本", /QUESTION_SCHEMA_VERSION=1/.test(html)
 check("前端有題目正規化器", /function normalizeQuestion\(raw\)/.test(html));
 check("前端使用 NFC 正規化並移除控制字元", /normalize\("NFC"\)/.test(html) && html.includes('replace(/[\\u0000-\\u001f\\u007f]/g,"")'));
 check("前端限制遠端題目只能進第 7 或第 8 關", /QUESTION_STAGE_RULES=Object\.freeze\(\{7:\{mode:"en".*8:\{mode:"zh"/.test(html));
-check("前端依 stage 與 mode 分流英文題", /q\.stage===7&&q\.mode==="en"/.test(html));
-check("前端依 stage 與 mode 分流中文題", /q\.stage===8&&q\.mode==="zh"/.test(html));
+check("英文句子只供大橋堂", html.includes('CourseContent.sentencePool(state.questions,"en")'));
+check("中文句子只供大橋堂", html.includes('CourseContent.sentencePool(state.questions,"zh")'));
+
 check("前端載入遠端題目會先正規化", /state\.questions=normalizeQuestionList\(res\.questions\|\|\[\]\)/.test(html));
 check("前端將文字難度正規化為可分流數值", /function difficultyValue\(raw\)/.test(html) && /easy:1/.test(html) && /normal:2/.test(html) && /hard:4/.test(html));
-check("第 7、8 關一般波次使用教師 wave／難度", /function teacherWaveSets\(lv\)/.test(html) && /teacherSets=teacherWaveSets\(lv\)/.test(html) && /explicitWave/.test(html));
+check("主線波次不再混入教師句子", html.includes('function teacherWaveSets(){return null}') && html.includes('CourseContent.apply(levels)'));
 check("匯出欄位包含 laneKey 與授權資訊", /"laneKey".*"source".*"license".*"version"/.test(html));
 
 for (const header of ["stage", "wave", "display", "laneKey", "tags", "source", "license", "version"]) {

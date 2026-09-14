@@ -10,7 +10,13 @@
   const originalFinish=finish;
   finish=win=>{
     if(!isLadder(levels[state.levelIndex]))return originalFinish(win);
-    if(win)cleared=floor;
+    if(win){
+      cleared=floor;
+      if(!state.config.gasUrl){
+        state.profile.level=Math.max(state.profile.level,floor>=5?10:floor>=3?9:8);
+        saveProfile();
+      }
+    }
     if(!win&&!cleared){next.hidden=true;return originalFinish(false)}
     originalFinish(true);
     if(!win)window.Consumables?.reset();
@@ -18,6 +24,7 @@
     missionTitle.textContent=win?`第 ${cleared} 層完成`:'天梯挑戰結束';
     missionStartBtn.textContent='重新挑戰第 1 層';
     missionText.textContent=`最高完成第 ${cleared} 層｜分數 ${state.score}｜正確率 ${Math.round(state.correct/Math.max(1,state.attempts)*100)}%`;
+    missionText.textContent+=state.config.gasUrl?'\n送出有效天梯成績後，雲端確認 Lv.8／9／10 里程碑。':`\n角色 Lv.${state.profile.level}｜第 1、3、5 層解鎖 Lv.8、9、10。`;
     next.textContent=`挑戰第 ${floor+1} 層`;
     next.hidden=!win||floor>=99;next.disabled=false;
   };
@@ -32,7 +39,10 @@
     ladderNameBox.classList.add('hidden');mission.classList.add('hidden');
     state.hp=Math.min(100,state.hp+20);state.running=true;state.outcome=null;
     state.maxBossHp=Math.round(bossMaxHp(levels[8])*(1+Math.min(2,(floor-1)*.08)));
-    boss();clearInterval(state.tick);state.tick=setInterval(loop,120);hud();answerInput.focus();
+    activeHeroCastClip=null;hero.classList.remove('pose-sheet','wide-pose');
+    hero.style.setProperty('--hero-atlas',`url("${versionedHeroAsset(integratedHeroAssets[state.profile.hero][state.profile.level][state.profile.weapon])}")`);
+    hero.style.setProperty('--hero-bg-size','100% 100%');hero.style.setProperty('--hero-bg-position','center bottom');
+    prepareBattleVisuals();boss();clearInterval(state.tick);state.tick=setInterval(loop,120);hud();answerInput.focus();
   };
   const originalSubmit=submitLadder;
   submitLadder=async()=>{

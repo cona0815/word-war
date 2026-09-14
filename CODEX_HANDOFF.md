@@ -1,3 +1,18 @@
+# 2026-09-14｜八景基礎化、大招傷害、成長里程碑與影片開場
+
+- 使用者確認保留八景八關，主線無句子；第七關英文單字、第八關中文詞語。採建議：主線上限 Lv.7，第 1～6 關首次各升一級；第七八關給寶石獎勵。大橋堂第 1／3／5 層解鎖 Lv.8／9／10，舊高等級不降級。
+- `course-content.js`：擴充八关題庫、單聲調、逐關移動速度、出怪間隔與 2／3／4 隻上限。大橋堂使用老師原 stage 7／8 英中句子分類；只選簡單短句，保留舊題庫資料。
+- `index.html`、`typing-input.js`、`ultimate.js/css`、`ladder-battle.js`：小兵 HP、大招實傷與 Boss 階段穿越、首通升級及天梯外觀更新。`gas_code.gs`：同等里程碑、防重送保留、有效天梯送分回傳 profile；最低題数允許大招助攻。
+- `opening.js/css`、`assets/word-war-opening.mp4`：使用者影片完整 12.7 秒，H.264/AAC 720p 約 3 MB；首訪靜音播放／略過／重播／失敗退路。原 G 槽影片未覆寫。潔牙專案登記路徑目前不可讀，未假稱已參考其程式。
+- `docs/suno-battle-prompts.md`：使用者選擇描述詞交付，共六組（三戰鬥、三小魔王），尚無 Suno 音檔。
+- `docs/course-update-2026-09-14.md` 是本次完整規格及出怪節奏表，取代舊第七八關句子與 XP 升級規則；README 已同步。
+- 驗證：`node tools/qa-course-refresh.mjs` 23 項通過（含完整八關大招通關、天梯五層、影片真實解碼、合成 IME/熱鍵事件）；`qa-game.mjs` 111/111；`qa-question-contract.mjs` 60/60；`qa-gas-contract.mjs` 85 項通過；inline 腳本語法通過。證據 `docs/qa-course-refresh.json` 及開場／戰鬥截圖。
+- 所有本次瀏覽器測試使用隔離資料並阻擋外網；GAS 為本機 mock。尚未更新正式站或隔離 GAS 部署，也未驗證實體 Windows IME 候選窗。前後端部署需一起更新。
+- 原有 `hero-cast-clips.js` 修改與大量未追蹤素材保留，未加入本次提交。
+- 下一個最安全任務：部署到隔離測試站與隔離 GAS，驗證跨裝置等級保存，再用 Windows 注音與實體鍵盤做課堂難度驗收。
+
+---
+
 ## 2026-09-13 第七張角色成長宣傳圖
 
 - 新增 docs/promo-six/07-growth-annotated.png，實際試衣間四種等級／男女角色／武器／裝備局部截圖拼版，附標籤與文案。保留來源截圖及擷取工具。

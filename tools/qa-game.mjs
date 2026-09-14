@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import vm from "node:vm";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -14,9 +15,13 @@ function check(name, condition, detail = "") {
   if (!condition) failures.push(`${name}${detail ? `: ${detail}` : ""}`);
 }
 
-const stageLines = html.match(/^\s*\{id:\d+,zone:C\(.*$/gm) || [];
-const stageIds = stageLines.map(line => Number(line.match(/\{id:(\d+)/)?.[1]));
-const stageById = new Map(stageLines.map(line => [Number(line.match(/\{id:(\d+)/)?.[1]), line]));
+const courseContext={C:(...h)=>String.fromCodePoint(...h.map(v=>parseInt(v,16))),zi:[],zm:[],zf:[],UP:'上',DOWN:'下',LEFT:'左',RIGHT:'右'};
+vm.runInNewContext(fs.readFileSync(path.join(root,'course-content.js'),'utf8'),courseContext);
+const levels=vm.runInNewContext('('+html.match(/const levels=(\[[\s\S]*?\n    \]);/)[1]+')',courseContext);
+courseContext.CourseContent.apply(levels);
+const stageLines=levels.map(l=>JSON.stringify(l).replace(/"(\w+)":/g,'$1:')+' '+l.waveSets.map(w=>w.join('')).join(' ')+' '+l.waveSets.map(w=>w.join(' ')).join(' '));
+const stageIds=levels.map(l=>l.id);
+const stageById=new Map(stageLines.map((line,i)=>[levels[i].id,line]));
 const expectedIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 check("關卡數量為 9", stageLines.length === expectedIds.length, String(stageLines.length));
@@ -33,11 +38,11 @@ const requiredContent = {
   1: ["mode:\"letters\"", "ASDF", "JKL", "QWERZXCV", "UIOPNM"],
   2: ["mode:\"words\"", "an is it up", "cat dog sun pen", "book desk fish bird"],
   3: ["mode:\"zhuyin\"", "ㄅ", "ㄧ", "ㄚ"],
-  4: ["mode:\"phonics\"", "ㄅㄚ", "ㄇㄚˊ", "，", "！", "「"],
+  4: ["mode:\"phonics\"", "ˊ", "ˇ", "，", "！", "「"],
   5: ["mode:\"chineseChar\"", "人", "學", "大", "橋"],
   6: ["mode:\"phrases\"", "學校", "圖書館", "Ctrl+C", "Ctrl+V", "Ctrl+Z", "Ctrl+A"],
-  7: ["mode:\"sentences\"", "I am happy.", "Accuracy is more important than speed."],
-  8: ["mode:\"sentences\"", "我會打字。", "不可以隨意點擊不明連結。"],
+  7: ["mode:\"words\"", "rabbit", "pencil"],
+  8: ["mode:\"phrases\"", "大橋國小", "圖書館"],
   9: ["mode:\"final\"", "I am happy.", "我會打字。", "複製 Ctrl+C"]
 };
 
@@ -47,7 +52,7 @@ for (const [idText, tokens] of Object.entries(requiredContent)) {
 }
 
 const stage4 = stageById.get(4) || "";
-check("第 4 關包含拼音與聲調進程", ["ㄅㄚ","ㄓㄨ","ㄅㄚˋ"].every(word=>stage4.includes(word)));
+check("第 4 關只練單聲調與標點", levels[3].words.every(w=>w.length===1)&&["ˊ","ˇ","ˋ","˙"].every(w=>levels[3].words.includes(w)));
 
 const atlasDir = path.join(root, "assets", "generated", "boss-safe-atlas-20260612-v3");
 const expectedAtlases = {
@@ -83,8 +88,9 @@ check("雲端通關先等待確認再套用存檔", /const cloudSettlement =/.te
 check("雲端通關失敗保留同一事件重試", /pendingStageSettlement=\{record,error:error\.message\}/.test(html) && /重試雲端同步/.test(html));
 check("重新登入會掃描未同步通關", /function pendingStageRecords\(\)/.test(html) && /function recoverPendingStageSettlements\(\)/.test(html) && /record\.synced!==true/.test(html));
 check("未同步通關恢復沿用原 eventId", /settleStage\(record\)/.test(html) && /startBtn\.onclick=start/.test(html) && /originalStart/.test(html));
-check("主線 Boss 依三階段教學題池出題", /BOSS_PHASE_WAVES=Object\.freeze/.test(html) && /const groups=BOSS_PHASE_WAVES\[lv\.id\]\?\.\[phase-1\]/.test(html) && /lv\.id===7\|\|lv\.id===8/.test(html));
-check("教師題庫 wave／難度驅動第 7、8 關四波", /function teacherWaveSets\(lv\)/.test(html) && /teacherSets=teacherWaveSets\(lv\)/.test(html) && /explicitWave/.test(html));
+check("主線 Boss 依三階段教學題池出題", /BOSS_PHASE_WAVES=Object\.freeze/.test(html) && /const groups=BOSS_PHASE_WAVES\[lv\.id\]\?\.\[phase-1\]/.test(html));
+check("教師句子題庫只驅動大橋堂", html.includes('CourseContent.sentencePool(state.questions,"en")') && html.includes('CourseContent.sentencePool(state.questions,"zh")') && html.includes('function teacherWaveSets(){return null}'));
+
 check("任務開始按鈕有明確事件入口", /id="missionStartBtn"[^>]+type="button"/.test(html) && /onclick="handleMissionStart\(\)"/.test(html) && /function handleMissionStart/.test(html) && /missionStartBtn\.onclick=handleMissionStart/.test(html) && !/__WORD_WAR_START_MISSION__/.test(html));
 check("角色裝備有獨立視覺層", /id="heroGear"/.test(html) && /heroGear\.dataset\.gear=key/.test(html) && /\.hero-gear\[data-gear="guardian"\]/.test(html));
 check("整合武器不會疊加舊武器圖層", /\.hero-weapon\{display:none\}/.test(html) && /heroWeapon\.style\.display="none"/.test(html));
