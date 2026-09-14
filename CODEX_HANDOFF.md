@@ -4,7 +4,7 @@
 - 六首使用者提供的 MP3 裁成十八段，合计約 6.55 MB；`assets/music/manifest.json` 管理場景配樂，`docs/music-cuts.json` 保留來源與時間。原音檔未改動。
 - `battle-music.js/css`：單一播放器、三段洗牌不連續重複、Boss 切曲、選單／結算／背景分頁暫停、靜音與音量偏好。
 - `guest-play.js` 與登入按鈕：免帳密直接開始第一關。guest 只保留記憶體進度，封鎖遊戲存檔寫入與 GAS POST；正式帳號、設定不變，選單可退出體驗。
-- `netlify.toml`：Node 22＋既有精簡發布包，公開 `.pages-dist`。GitHub Pages push workflow 已取消，保留手動觸發。
+- `netlify.toml`：Node 22＋既有精簡發布包，公開 `.pages-dist`。原 GitHub 遠端沒有 Actions；目前憑證缺少 workflow 權限，故移除尚未發布的 Pages workflow，僅用 Netlify 發布。
 - 驗證：音樂／體驗 15 項瀏覽器檢查通過，18 段皆可解碼；遊戲靜態 111/111、題庫 60/60、inline 語法、發布包安全 fixture 通過。詳見 `docs/music-and-guest-release.md`。
 - 發布時必須用乾淨提交內容，保留工作區 `hero-cast-clips.js` 的未完修改與未追蹤素材。推送完成狀態在本次回覆記錄。
 - 乾淨 worktree `.codex-netlify-release` 已通過 Netlify 同款 build：1,156 個公開檔、808,256,326 bytes、62 組已提交施法動畫；762 個非公開／歷史檔排除。程式提交 `024d8d4`，本次發布文件提交接續其後。

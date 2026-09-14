@@ -6,7 +6,7 @@
 
 六首使用者提供的魔法配樂已裁為十八段。第 1～3／4～6／7～8 與大橋堂各用對應戰鬥、Boss 音樂，三段洗牌輪替、不連續重複；選單／結算／背景分頁暫停，音量及靜音偏好保存於本機。裁切時間見 `docs/music-cuts.json`。
 
-GitHub `main` 交給 Netlify 自動部署。`netlify.toml` 使用 Node 22，執行安全檢查與精簡打包，發布 `.pages-dist`；不將 GAS 程式、管理文件或私密設定放入公開網站。GitHub Pages 工作流程保留手動觸發，取消 push 自動觸發。
+GitHub `main` 交給 Netlify 自動部署。`netlify.toml` 使用 Node 22，執行安全檢查與精簡打包，發布 `.pages-dist`；不將 GAS 程式、管理文件或私密設定放入公開網站。本次不包含 GitHub Actions 工作流程，發布由 Netlify 處理。
 
 GAS 帳號後端不是 Netlify 函式，需另行更新 Apps Script；免帳號體驗不依賴 GAS。本次只推送 GitHub，不代操作 Netlify 或更新 GAS 部署。
 
