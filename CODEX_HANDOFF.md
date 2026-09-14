@@ -1,3 +1,14 @@
+# 2026-09-14｜試玩回饋：Boss 退位、攻擊回應、小兵與自由選關
+
+- 依使用者箭頭要求：Boss 戰主角 x=32%，Boss 保持 68%，腳底對齊；小兵戰仍 x=50%。此新要求覆蓋先前 Boss 主角固定中央的規格。
+- Boss 作答施法時間縮為原來 65%，光彈飛行 200ms；第一關實測約 379ms 命中。Boss 第一次反擊倒數由 9 秒改為 5 秒，仍保留預警。
+- 全部 42 個小兵來源皆存在於 Git 且能解碼。新增 `minion-sprites.js`：解碼完成才顯示原圖，失敗顯示內嵌替代小兵，題目仍可作答。
+- 體驗版 `unlocked` 全開，不偽造寶石；任選八景與大橋堂。第一關 Lv.1，後面依關卡配級，大橋堂直接 Lv.8 可玩。正式帳號等級與解鎖保留。
+- 驗證：`qa-feedback-fixes.mjs` 12 項通過（含模擬 404）；`qa-battle-ground.mjs` 五種尺寸×九關共45項；遊戲靜態111/111與 inline 語法通過。證據 `docs/qa-feedback-fixes.json`、`docs/qa-feedback-boss.png`。
+- 下一步：推送 GitHub main 交由 Netlify 自動部署，讓學生回測站位及速度。原未完 `hero-cast-clips.js` 修改不納入。
+
+---
+
 # 2026-09-14｜十八段配樂、免帳號體驗與 GitHub / Netlify
 
 - 最新授權：完成程式並推 GitHub `main`，由使用者既有 Netlify 自動部署；不另做 GitHub Pages 或 GAS 發布。

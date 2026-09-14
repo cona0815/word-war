@@ -166,7 +166,7 @@
           <button id="openRankBtn" class="btn"></button>
         </div>
         <button id="guestStartBtn" class="btn guest-start" type="button">先體驗，不用帳號｜直接開始玩</button>
-        <p class="note guest-note">免註冊，從第一關開始。體驗進度只在這次遊戲中保留。</p>
+        <p class="note guest-note">免註冊，從 Lv.1 開始；選單可任選關卡。體驗進度不保存。</p>
       </div>
       <div id="loginGuide" class="panel hidden"><ol id="guideList" class="list"></ol></div>
       <div id="loginRank" class="panel hidden"><div id="rankList"></div></div>
@@ -378,7 +378,7 @@
     const progressClassFilter=$("progressClassFilter"),progressStageFilter=$("progressStageFilter"),studentProgressSummary=$("studentProgressSummary");
     const exportStudentProgressBtn=$("exportStudentProgressBtn");
     const BATTLE_LINE_Y=62;
-    const heroNormal={x:50,y:58}, heroBoss={x:50,y:58}, bossPos={x:68,y:BATTLE_LINE_Y};
+    const heroNormal={x:50,y:58}, heroBoss={x:32,y:58}, bossPos={x:68,y:BATTLE_LINE_Y};
     const bossLabState={levelIndex:0,power:2,weapon:"ice"};
     const bossWeapons={ice:{name:"冰晶法核",desc:"藍色光球，節奏清楚，適合低年級辨識。",color:"#65efff"},fire:{name:"烈焰戰輪",desc:"紅橘爆發，攻擊感更強，適合中段關卡。",color:"#ff7b4d"},thunder:{name:"雷鳴星槍",desc:"金色高速光波，高等 Boss 使用更有壓迫感。",color:"#ffe66d"},shadow:{name:"暗影魔晶",desc:"紫色追蹤能量，適合最後試練與天梯副本。",color:"#b06cff"}};
     const playerWeapons={
@@ -598,7 +598,8 @@
       hero.classList.remove("motion-hidden","casting");
     }
     function startHeroMotion(){
-      if(heroCastAnimation?.playState==="running")return activeHeroCastClip?Math.max(0,activeHeroCastClip.release-(heroCastAnimation.currentTime||0)):0;
+      const motionScale=state.bossMode?.65:1;
+      if(heroCastAnimation?.playState==="running")return activeHeroCastClip?Math.max(0,activeHeroCastClip.release*motionScale-(heroCastAnimation.currentTime||0)):0;
       if(qaMode||window.matchMedia("(prefers-reduced-motion: reduce)").matches||!hero.animate)return 0;
       if(activeHeroCastClip){
         const animation=hero.animate([
@@ -609,10 +610,10 @@
           {backgroundPosition:"80% 0",offset:.65,easing:"steps(1,end)"},
           {backgroundPosition:"100% 0",offset:.82,easing:"steps(1,end)"},
           {backgroundPosition:"0% 0",offset:1}
-        ],{duration:activeHeroCastClip.duration,easing:"linear"});
+        ],{duration:activeHeroCastClip.duration*motionScale,easing:"linear"});
         heroCastAnimation=animation;
         animation.onfinish=()=>{if(heroCastAnimation===animation)heroCastAnimation=null};
-        return activeHeroCastClip.release;
+        return activeHeroCastClip.release*motionScale;
       }
       const direction=Number(heroMotion.style.getPropertyValue("--hero-face"))||1;
       const animation=hero.animate([
@@ -621,10 +622,10 @@
         {translate:`${direction*18}px 0px`,rotate:`${direction*10}deg`,offset:.45},
         {translate:`${direction*8}px 0px`,rotate:`${direction*3}deg`,offset:.68},
         {translate:"0px 0px",rotate:"0deg"}
-      ],{duration:650,easing:"ease-in-out"});
+      ],{duration:650*motionScale,easing:"ease-in-out"});
       heroCastAnimation=animation;
       animation.onfinish=()=>{if(heroCastAnimation===animation)heroCastAnimation=null};
-      return 290;
+      return 290*motionScale;
     }
     function setup(){const lv=levels[state.levelIndex];gameScreen.style.setProperty("--stage-bg",`url("${ASSET}${lv.bg}")`);gameScreen.style.setProperty("--stage-size",lv.bgSize||"cover");gameScreen.style.setProperty("--stage-pos",lv.bgPos||"center center");gameScreen.style.setProperty("--stage-scale",lv.bgScale||"1");gameScreen.style.setProperty("--hero-x",heroNormal.x+"%");gameScreen.style.setProperty("--hero-y",heroNormal.y+"%");hero.style.setProperty("--hero-face","1");heroWeapon.style.setProperty("--hero-face","1");const heroLevel=Number(state.profile.level)||1,heroSet=integratedHeroAssets[state.profile.hero]?.[heroLevel]||integratedWeaponSet(state.profile.hero,heroLevel),weaponKey=heroSet[state.profile.weapon]?state.profile.weapon:"starlight",heroImage=versionedHeroAsset(heroSet[weaponKey]);state.profile.weapon=weaponKey;saveProfile();hero.classList.add("integrated");hero.style.setProperty("--hero-atlas",`url("${heroImage}")`);hero.style.setProperty("--hero-bg-size","100% 100%");hero.style.setProperty("--hero-bg-position","center bottom");heroWeapon.style.display="none";levelTitle.textContent=`${lv.zone} | ${lv.title}`;roundText.textContent=stageProgress(lv);questionType.textContent=lv.type;difficultyText.textContent=stageLevelLabel(lv);enemyLayer.innerHTML="";effectLayer.innerHTML="";hud()}
     const setupWithFacing=setup;
@@ -678,7 +679,7 @@
     function poolSprite(pool,w){const list=minionPools[pool];return list&&list.length?ASSET+list[hashText(w)%list.length]:"assets/pixel-enemy-right.png"}
     function monster(lv,w){const id=keyIdentity(w);if(lv.mode==="digits")return img.digits(w);if(lv.mode==="letters")return /^[A-Z]$/.test(id)?img.letters(id):"assets/pixel-enemy-left.png";if(lv.mode==="words")return poolSprite("words",w);if(lv.mode==="zhuyin")return poolSprite("zhuyin",w);if(lv.mode==="phonics")return poolSprite("phonics",w);if(lv.mode==="chineseChar")return poolSprite("chineseChar",w);if(lv.mode==="phrases"){if(/CTRL\s*\+\s*[A-Z]/i.test(String(w)))return "assets/pixel-enemy-down.png";return poolSprite("phrases",w)}if(lv.mode==="sentences")return poolSprite("sentences",w);if(lv.mode==="final")return poolSprite("final",w);return img[lv.mode]?img[lv.mode](w):"assets/pixel-enemy-right.png"} function dist(e){const p=heroPoint();return Math.hypot(e.x-p.x,e.y-p.y)}
     function pick(){const alive=state.enemies.filter(e=>e.alive);if(!state.bossMode){state.current=null;if(!alive.length){nextWave();return}}else{state.current=state.current||alive[0]||null}render();hud()}
-    function boss(){state.bossMode=true;state.bossHp=state.maxBossHp;state.bossPhase=1;state.bossPhaseHits=0;state.bossPhaseStartedAt=Date.now();state.bossAttackCount=0;state.bossAttackPending=false;state.bossAttackAt=qaMode?Number.MAX_SAFE_INTEGER:Date.now()+9000;const lv=levels[state.levelIndex],words=bossPool(lv),word=words[Math.floor(Math.random()*words.length)];gameScreen.style.setProperty("--hero-x",heroBoss.x+"%");gameScreen.style.setProperty("--hero-y",heroBoss.y+"%");faceHeroTo(bossPos.x);enemyLayer.innerHTML=`<div class="boss active" id="bossEntity" style="--boss-x:${bossPos.x}%;--boss-y:${bossPos.y}%;--boss-face:${bossFace(state.levelIndex)};--boss-atlas:url('${ASSET}boss-safe-atlas-20260612-v3/${lv.atlas}');--boss-hp:1"><div class="boss-tag">${lv.boss}｜階段 1</div><div class="boss-hp"><span></span></div><div class="boss-command" id="bossCommand">${promptHTML(word)}</div><div class="boss-sprite"></div></div>`;state.current={word,boss:true,wave:5,phase:1,promptAt:Date.now()};questionText.innerHTML=promptHTML(state.current.word);hud()}
+    function boss(){state.bossMode=true;state.bossHp=state.maxBossHp;state.bossPhase=1;state.bossPhaseHits=0;state.bossPhaseStartedAt=Date.now();state.bossAttackCount=0;state.bossAttackPending=false;state.bossAttackAt=qaMode?Number.MAX_SAFE_INTEGER:Date.now()+5000;const lv=levels[state.levelIndex],words=bossPool(lv),word=words[Math.floor(Math.random()*words.length)];gameScreen.style.setProperty("--hero-x",heroBoss.x+"%");gameScreen.style.setProperty("--hero-y",heroBoss.y+"%");faceHeroTo(bossPos.x);enemyLayer.innerHTML=`<div class="boss active" id="bossEntity" style="--boss-x:${bossPos.x}%;--boss-y:${bossPos.y}%;--boss-face:${bossFace(state.levelIndex)};--boss-atlas:url('${ASSET}boss-safe-atlas-20260612-v3/${lv.atlas}');--boss-hp:1"><div class="boss-tag">${lv.boss}｜階段 1</div><div class="boss-hp"><span></span></div><div class="boss-command" id="bossCommand">${promptHTML(word)}</div><div class="boss-sprite"></div></div>`;state.current={word,boss:true,wave:5,phase:1,promptAt:Date.now()};questionText.innerHTML=promptHTML(state.current.word);hud()}
      function advanceBossPhase(force=false){if(!state.bossMode)return;const lv=levels[state.levelIndex],ratio=state.bossHp/Math.max(1,state.maxBossHp),required=bossMinCorrect(lv.id,state.bossPhase),floor=bossPhaseFloor(lv.id,state.bossPhase);if(state.bossPhase<bossPhaseCount(lv.id)&&(force||state.bossPhaseHits>=required)&&state.bossHp<=Math.floor(state.maxBossHp*floor)){state.bossPhase++;state.bossPhaseHits=0;state.bossPhaseStartedAt=Date.now();state.bossAttackPending=false;state.bossAttackAt=qaMode?Number.MAX_SAFE_INTEGER:Date.now()+2200;const b=$("bossEntity");if(b){const tag=b.querySelector(".boss-tag");if(tag)tag.textContent=lv.boss+"｜階段 "+state.bossPhase;b.classList.remove("boss-phase-change");void b.offsetWidth;b.classList.add("boss-phase-change");setTimeout(()=>b.classList.remove("boss-phase-change"),850)}}}
      function bossThreat(){
        document.querySelectorAll('.boss-telegraph').forEach(w=>{if(!state.bossMode||w.dataset.phase!==String(state.bossPhase))w.remove()});
@@ -729,6 +730,7 @@
       const tx=target.boss?bossPos.x:target.x,ty=target.boss?bossPos.y:target.y;
       faceHeroTo(tx);
       const releaseDelay=startHeroMotion(),generation=battleVisualGeneration,h=heroPoint(),style=attackStyle();
+      if(target.boss&&!qaMode){style.time=.20;style.impactTime=.24}
       if(qaMode)state.qaShotPending=true;
       const release=()=>{
         if(generation!==battleVisualGeneration||!state.running)return;
@@ -1273,6 +1275,7 @@
   <link rel="stylesheet" href="battle-music.css">
   <script src="battle-music.js"></script>
   <script src="guest-play.js"></script>
+  <script src="minion-sprites.js"></script>
 </body>
 </html>
 

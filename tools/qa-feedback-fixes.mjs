@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {createRequire} from 'node:module';
+const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'C:/Users/cona0/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright');
+const browser=await chromium.launch({channel:'chrome',headless:true});
+const base=process.argv[2]||'http://127.0.0.1:8767/';const results=[];
+const check=(name,ok)=>{assert.ok(ok,name);results.push(name);console.log('PASS '+name)};
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.route('https://**/*',r=>r.abort());await page.addInitScript(()=>sessionStorage.setItem('word-war-opening-v1','seen'));
+ await page.goto(base);await page.locator('#guestStartBtn').click();await page.waitForFunction(()=>state.running);
+ check('體驗第一關確實是 Lv.1',await page.evaluate(()=>state.profile.level===1));
+ await page.locator('#menuBtn').click();
+ check('體驗九個場景全部可選',await page.locator('#levelGrid button:not([disabled])').count()===9);
+ await page.locator('#levelGrid [data-level="6"]').click();check('體驗第七關配 Lv.7',await page.evaluate(()=>state.levelIndex===6&&state.profile.level===7));
+ await page.evaluate(()=>begin(0));check('回到第一關從 Lv.1 起步',await page.evaluate(()=>state.profile.level===1));
+ const sources=await page.evaluate(()=>[...new Set(levels.flatMap(l=>l.words.map(w=>MinionSprites.source(l,w))))]);
+ const tracked=new Set(execFileSync('git',['ls-files'],{encoding:'utf8'}).trim().split(/\r?\n/));
+ const missing=sources.filter(s=>!tracked.has(s));console.log('missing sprites',JSON.stringify(missing));
+ check('所有小兵路徑大小寫與 Git 發布檔一致',missing.length===0);
+ const invalid=await page.evaluate(async sources=>(await Promise.all(sources.map(async src=>{const image=new Image();image.src=src;try{await image.decode();return null}catch{return src}}))).filter(Boolean),sources);
+ check('所有小兵原圖皆可解碼',invalid.length===0);
+ await page.evaluate(async()=>{await startBattle();clearInterval(state.tick);boss();await prepareBattleVisuals();await BattleGround.align()});
+ check('Boss 戰主角在32%、Boss在68%，拉開站位',await page.evaluate(()=>Math.abs(heroPoint().x-32)<.01&&bossPos.x===68));
+ const response=await page.evaluate(async()=>{const start=performance.now(),hp=state.bossHp;submit(state.current.word);while(state.bossHp===hp&&performance.now()-start<2000)await new Promise(r=>setTimeout(r,10));return{ms:performance.now()-start,hit:state.bossHp<hp}});
+ check('第一關答對後550毫秒內命中',response.hit&&response.ms<550);
+ await page.screenshot({path:'docs/qa-feedback-boss.png'});
+ check('Boss首次反擊倒數改為五秒',await page.evaluate(()=>{boss();return state.bossAttackAt-Date.now()<=5000}));
+ await page.evaluate(()=>{begin(8)});check('體驗天梯不要求八寶石',await page.evaluate(()=>state.ladderRitualReady&&state.profile.level===8&&gemCount()===0));
+ const failure=await browser.newPage();await failure.addInitScript(()=>sessionStorage.setItem('word-war-opening-v1','seen'));await failure.route('**/letter-monster-A.png',r=>r.fulfill({status:404,body:''}));
+ await failure.goto(base);await failure.locator('#guestStartBtn').click();await failure.waitForFunction(()=>state.running);
+ await failure.evaluate(()=>{state.enemies=[{word:'A',alive:true,hp:100,x:15,y:40,order:0,activeAt:Date.now(),spawnLane:'test'}];render()});
+ await failure.waitForTimeout(250);
+ check('缺圖時顯示可解碼替代小兵，不出破圖',await failure.evaluate(async()=>{render();const img=enemyLayer.querySelector('.enemy img');await img.decode();return img.src.startsWith('data:image/svg+xml,')&&img.naturalWidth>0}));
+ await failure.close();check('無 JavaScript 錯誤',errors.length===0);
+ fs.writeFileSync('docs/qa-feedback-fixes.json',JSON.stringify({passed:results.length,results,response,spriteCount:sources.length},null,2));
+}finally{await browser.close()}
