@@ -1,3 +1,16 @@
+# 2026-09-14｜十八段配樂、免帳號體驗與 GitHub / Netlify
+
+- 最新授權：完成程式並推 GitHub `main`，由使用者既有 Netlify 自動部署；不另做 GitHub Pages 或 GAS 發布。
+- 六首使用者提供的 MP3 裁成十八段，合计約 6.55 MB；`assets/music/manifest.json` 管理場景配樂，`docs/music-cuts.json` 保留來源與時間。原音檔未改動。
+- `battle-music.js/css`：單一播放器、三段洗牌不連續重複、Boss 切曲、選單／結算／背景分頁暫停、靜音與音量偏好。
+- `guest-play.js` 與登入按鈕：免帳密直接開始第一關。guest 只保留記憶體進度，封鎖遊戲存檔寫入與 GAS POST；正式帳號、設定不變，選單可退出體驗。
+- `netlify.toml`：Node 22＋既有精簡發布包，公開 `.pages-dist`。GitHub Pages push workflow 已取消，保留手動觸發。
+- 驗證：音樂／體驗 15 項瀏覽器檢查通過，18 段皆可解碼；遊戲靜態 111/111、題庫 60/60、inline 語法、發布包安全 fixture 通過。詳見 `docs/music-and-guest-release.md`。
+- 發布時必須用乾淨提交內容，保留工作區 `hero-cast-clips.js` 的未完修改與未追蹤素材。推送完成狀態在本次回覆記錄。
+- GAS 正式帳號後端仍需另行同步；體驗不依賴 GAS。不得將 GitHub 推送成功說成已驗證 Netlify 網站。
+
+---
+
 # 2026-09-14｜八景基礎化、大招傷害、成長里程碑與影片開場
 
 - 使用者確認保留八景八關，主線無句子；第七關英文單字、第八關中文詞語。採建議：主線上限 Lv.7，第 1～6 關首次各升一級；第七八關給寶石獎勵。大橋堂第 1／3／5 層解鎖 Lv.8／9／10，舊高等級不降級。

@@ -165,6 +165,8 @@
           <button id="openGuideBtn" class="btn"></button>
           <button id="openRankBtn" class="btn"></button>
         </div>
+        <button id="guestStartBtn" class="btn guest-start" type="button">先體驗，不用帳號｜直接開始玩</button>
+        <p class="note guest-note">免註冊，從第一關開始。體驗進度只在這次遊戲中保留。</p>
       </div>
       <div id="loginGuide" class="panel hidden"><ol id="guideList" class="list"></ol></div>
       <div id="loginRank" class="panel hidden"><div id="rankList"></div></div>
@@ -423,7 +425,7 @@
     state.profile.gear=state.profile.gear||"focus";
     heroGear.dataset.gear=state.profile.gear;
     function load(k,f){try{return JSON.parse(localStorage.getItem(k))||f}catch{return f}} function save(k,v){if((qaMode||visualQaMode)&&(k===PROFILE||k===STORE||k===LADDER_STORE||k.startsWith(PROFILE+":")||k.startsWith(STORE+":")))return;const scoped=k===PROFILE?profileStorageKey(state?.profile?.account):k===STORE?recordsStorageKey(state?.profile?.account):k;localStorage.setItem(scoped,JSON.stringify(v))}
-    function accountValue(account){const id=String(account||"").trim();return /^\d{5}$/.test(id)?id:"50101"}
+    function accountValue(account){const id=String(account||"").trim();return id==="guest"||/^\d{5}$/.test(id)?id:"50101"}
     function profileStorageKey(account){return PROFILE+":"+accountValue(account)}
     function recordsStorageKey(account){return STORE+":"+accountValue(account)}
     function authStorageKey(account){return AUTH+":"+accountValue(account)}
@@ -1268,6 +1270,9 @@
   </script>
   <link rel="stylesheet" href="opening.css">
   <script src="opening.js"></script>
+  <link rel="stylesheet" href="battle-music.css">
+  <script src="battle-music.js"></script>
+  <script src="guest-play.js"></script>
 </body>
 </html>
 

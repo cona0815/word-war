@@ -1,0 +1,74 @@
+[
+  {
+    "group": "battle-early",
+    "source": "一般戰鬥｜校園初戰.mp3",
+    "sha256": "aa977f626bb3fd92bfe122aab8b4490b066130ec540f0ef3671f1a78fcb28a5f",
+    "sourceDuration": 119.52,
+    "starts": [
+      4,
+      43,
+      79
+    ],
+    "clipDuration": 24.0
+  },
+  {
+    "group": "battle-mid",
+    "source": "一般戰鬥｜雙星魔法巡邏.mp3",
+    "sha256": "5485e0c4a24548ed76664fe0608bd743d36f954538be449ea924a8e04d918f18",
+    "sourceDuration": 177.16,
+    "starts": [
+      32,
+      81,
+      139
+    ],
+    "clipDuration": 24.0
+  },
+  {
+    "group": "battle-late",
+    "source": "般戰鬥｜八景守護衝刺.mp3",
+    "sha256": "2bc9efcead34017a05257f22a4bad020745653d13b31ab23cf80be76d6820e6c",
+    "sourceDuration": 122.28,
+    "starts": [
+      16,
+      42,
+      87
+    ],
+    "clipDuration": 24.0
+  },
+  {
+    "group": "boss-early",
+    "source": "小魔王戰｜寶石守衛甦醒.mp3",
+    "sha256": "cad936ddd85436f18de51f9e995b404261f3b5921671eaaebdd69a8e0ef6f61f",
+    "sourceDuration": 153.4,
+    "starts": [
+      27,
+      78,
+      128
+    ],
+    "clipDuration": 24.0
+  },
+  {
+    "group": "boss-mid",
+    "source": "符文反擊.mp3",
+    "sha256": "62b738b0eed52c6095ad8357b7024780ca556ecabf77c76f058e36b9337cbf82",
+    "sourceDuration": 62.16,
+    "starts": [
+      1,
+      20,
+      42
+    ],
+    "clipDuration": 19
+  },
+  {
+    "group": "boss-late",
+    "source": "小魔王戰｜八景寶石決戰.mp3",
+    "sha256": "3345d1e09734a57aea1c141fb6e0bba7fc100efad717714f51a093bdeb2a5720",
+    "sourceDuration": 66.4,
+    "starts": [
+      1,
+      22,
+      44
+    ],
+    "clipDuration": 21
+  }
+]

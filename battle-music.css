@@ -1,0 +1,7 @@
+#battleMusicToggle{position:absolute;right:96px;top:14px;z-index:45;padding:8px 10px;font-size:13px;min-height:40px}
+.music-settings{display:grid;gap:10px;padding:12px;margin-bottom:18px;border:1px solid #5b9ca2;border-radius:8px;background:#092332}
+.music-settings label{display:flex;align-items:center;gap:12px}.music-settings input{flex:1;min-width:80px}
+.guest-start{display:block;width:100%;margin-top:14px;background:#184b52!important;border:1px solid #7ef2da!important;color:#fff!important;font-weight:800}
+.guest-note{text-align:center;font-size:12px}.guest-exit{width:100%;margin-bottom:10px}
+.guest-mode #menuSettings>*:not(.music-settings){display:none!important}
+@media(max-width:600px){#battleMusicToggle{right:74px;top:10px;font-size:11px;padding:6px;min-height:36px}}

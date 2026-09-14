@@ -1,0 +1,16 @@
+[build]
+  command = "node tools/qa-pages-package.mjs && node tools/build-pages.mjs"
+  publish = ".pages-dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[headers]]
+  for = "/assets/music/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

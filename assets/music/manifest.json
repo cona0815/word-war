@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "groups": {
+    "battle-early": [
+      {
+        "src": "assets/music/battle-early-01.mp3",
+        "duration": 24.0,
+        "label": "一般戰鬥｜校園初戰・段落 1"
+      },
+      {
+        "src": "assets/music/battle-early-02.mp3",
+        "duration": 24.0,
+        "label": "一般戰鬥｜校園初戰・段落 2"
+      },
+      {
+        "src": "assets/music/battle-early-03.mp3",
+        "duration": 24.0,
+        "label": "一般戰鬥｜校園初戰・段落 3"
+      }
+    ],
+    "battle-mid": [
+      {
+        "src": "assets/music/battle-mid-01.mp3",
+        "duration": 24.0,
+        "label": "一般戰鬥｜雙星魔法巡邏・段落 1"
+      },
+      {
+        "src": "assets/music/battle-mid-02.mp3",
+        "duration": 24.0,
+        "label": "一般戰鬥｜雙星魔法巡邏・段落 2"
+      },
+      {
+        "src": "assets/music/battle-mid-03.mp3",
+        "duration": 24.0,
+        "label": "一般戰鬥｜雙星魔法巡邏・段落 3"
+      }
+    ],
+    "battle-late": [
+      {
+        "src": "assets/music/battle-late-01.mp3",
+        "duration": 24.0,
+        "label": "般戰鬥｜八景守護衝刺・段落 1"
+      },
+      {
+        "src": "assets/music/battle-late-02.mp3",
+        "duration": 24.0,
+        "label": "般戰鬥｜八景守護衝刺・段落 2"
+      },
+      {
+        "src": "assets/music/battle-late-03.mp3",
+        "duration": 24.0,
+        "label": "般戰鬥｜八景守護衝刺・段落 3"
+      }
+    ],
+    "boss-early": [
+      {
+        "src": "assets/music/boss-early-01.mp3",
+        "duration": 24.0,
+        "label": "小魔王戰｜寶石守衛甦醒・段落 1"
+      },
+      {
+        "src": "assets/music/boss-early-02.mp3",
+        "duration": 24.0,
+        "label": "小魔王戰｜寶石守衛甦醒・段落 2"
+      },
+      {
+        "src": "assets/music/boss-early-03.mp3",
+        "duration": 24.0,
+        "label": "小魔王戰｜寶石守衛甦醒・段落 3"
+      }
+    ],
+    "boss-mid": [
+      {
+        "src": "assets/music/boss-mid-01.mp3",
+        "duration": 19,
+        "label": "符文反擊・段落 1"
+      },
+      {
+        "src": "assets/music/boss-mid-02.mp3",
+        "duration": 19,
+        "label": "符文反擊・段落 2"
+      },
+      {
+        "src": "assets/music/boss-mid-03.mp3",
+        "duration": 19,
+        "label": "符文反擊・段落 3"
+      }
+    ],
+    "boss-late": [
+      {
+        "src": "assets/music/boss-late-01.mp3",
+        "duration": 21,
+        "label": "小魔王戰｜八景寶石決戰・段落 1"
+      },
+      {
+        "src": "assets/music/boss-late-02.mp3",
+        "duration": 21,
+        "label": "小魔王戰｜八景寶石決戰・段落 2"
+      },
+      {
+        "src": "assets/music/boss-late-03.mp3",
+        "duration": 21,
+        "label": "小魔王戰｜八景寶石決戰・段落 3"
+      }
+    ]
+  }
+}

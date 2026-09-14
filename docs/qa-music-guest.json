@@ -1,0 +1,94 @@
+{
+  "passed": 15,
+  "results": [
+    "登入帳號下方有免帳號體驗入口",
+    "不用輸入帳密直接開始第一關",
+    "一般戰鬥播放初戰音樂",
+    "三段輪替不連續重複",
+    "Boss 登場自動切換小魔王音樂",
+    "靜音會暫停音樂",
+    "開啟選單暫停配樂",
+    "體驗設定只顯示音樂，不露出管理者表單",
+    "音量可調整並保存偏好",
+    "通關畫面停止音樂",
+    "體驗未改正式帳號／設定／紀錄",
+    "體驗不呼叫外部 GAS",
+    "六首各三段，共十八段",
+    "十八段 MP3 都可被瀏覽器解碼",
+    "無 JavaScript 錯誤"
+  ],
+  "decoded": [
+    {
+      "src": "assets/music/battle-early-01.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/battle-early-02.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/battle-early-03.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/battle-mid-01.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/battle-mid-02.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/battle-mid-03.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/battle-late-01.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/battle-late-02.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/battle-late-03.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/boss-early-01.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/boss-early-02.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/boss-early-03.mp3",
+      "duration": 24
+    },
+    {
+      "src": "assets/music/boss-mid-01.mp3",
+      "duration": 19
+    },
+    {
+      "src": "assets/music/boss-mid-02.mp3",
+      "duration": 19
+    },
+    {
+      "src": "assets/music/boss-mid-03.mp3",
+      "duration": 18.96
+    },
+    {
+      "src": "assets/music/boss-late-01.mp3",
+      "duration": 21
+    },
+    {
+      "src": "assets/music/boss-late-02.mp3",
+      "duration": 21
+    },
+    {
+      "src": "assets/music/boss-late-03.mp3",
+      "duration": 21
+    }
+  ]
+}
