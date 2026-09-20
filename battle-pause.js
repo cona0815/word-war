@@ -12,15 +12,15 @@ function battleTimeout(callback, delay) {
 }
 (() => {
   const button = document.createElement('button');
-  button.id = 'pauseGameBtn'; button.className = 'btn'; button.textContent = '⏸ 暫停遊戲';
-  button.style.cssText = 'width:100%;margin-bottom:12px';
-  drawerTitle.after(button);
+  button.id = 'pauseGameBtn'; button.className = 'btn'; button.textContent = '⏸ 暫停';
+  button.setAttribute('aria-label', '暫停遊戲');
+  gameScreen.append(button);
   const dialog = document.createElement('dialog');
   dialog.id = 'pauseGameDialog';
   dialog.innerHTML = '<h2>遊戲已暫停</h2><p>準備好後，按下繼續遊戲。</p><button class="btn primary" autofocus>▶ 繼續遊戲</button>';
   document.body.append(dialog);
   const style = document.createElement('style');
-  style.textContent = '#pauseGameDialog{color:#fff;background:#102c40;border:2px solid #e4c363;border-radius:16px;padding:32px;text-align:center;max-width:85vw}#pauseGameDialog::backdrop{background:#001321b8}';
+  style.textContent = '#pauseGameBtn{position:fixed;z-index:50;top:70px;right:14px;width:82px;height:48px;padding:4px;color:var(--ink);background:rgba(5,20,30,.9);box-shadow:0 5px 14px rgba(0,0,0,.28)}#pauseGameBtn:disabled{display:none}#pauseGameDialog{color:#fff;background:#102c40;border:2px solid #e4c363;border-radius:16px;padding:32px;text-align:center;max-width:85vw}#pauseGameDialog::backdrop{background:#001321b8}';
   document.head.append(style);
   let pausedAt = 0, animations = [];
   function resume() {
