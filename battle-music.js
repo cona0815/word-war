@@ -16,7 +16,7 @@
   function save(){try{localStorage.setItem(storage,JSON.stringify(settings))}catch{}}
   function paint(){toggle.textContent=settings.enabled?'♫ 音樂':'♫ 靜音';toggle.setAttribute('aria-label',settings.enabled?'關閉背景音樂':'開啟背景音樂');toggle.setAttribute('aria-pressed',String(settings.enabled));status.textContent=failed?'音樂載入失敗，可按下一段重試。':blocked?'瀏覽器暫停了音樂，請按音樂按鈕開啟。':!settings.enabled?'背景音樂已靜音。':audio.dataset.label||'戰鬥開始後播放；每首輪替三段亮點。'}
   function group(){const stage=levels[state.levelIndex]?.id||1;return `${state.bossMode?'boss':'battle'}-${stage<=3?'early':stage<=6?'mid':'late'}`}
-  function allowed(){return settings.enabled&&state.running&&!document.hidden&&!gameScreen.classList.contains('hidden')&&mission.classList.contains('hidden')&&!drawer.classList.contains('open')&&!document.querySelector('#openingDialog')?.open}
+  function allowed(){return settings.enabled&&state.running&&!state.paused&&!document.hidden&&!gameScreen.classList.contains('hidden')&&mission.classList.contains('hidden')&&!drawer.classList.contains('open')&&!document.querySelector('#openingDialog')?.open}
   function choose(key){
     let queue=queues.get(key)||[];
     if(!queue.length){queue=(manifest?.groups[key]||[]).slice();for(let i=queue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[queue[i],queue[j]]=[queue[j],queue[i]]}if(queue.length>1&&queue[0].src===lastTrack)[queue[0],queue[1]]=[queue[1],queue[0]]}
@@ -48,3 +48,4 @@
   window.BattleMusic=Object.freeze({inspect:()=>({group:context,track:lastTrack,playing:!audio.paused,enabled:settings.enabled,volume:audio.volume,blocked,failed}),next});
   paint();
 })();
+

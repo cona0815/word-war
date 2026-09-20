@@ -1,3 +1,11 @@
+## 2026-09-20：玩家暫停遊戲
+
+- 右上選單新增暫停遊戲；對話框按繼續或 Esc 恢復。
+- 凍結主迴圈、戰鬥回呼、動畫、道具效果與配樂；恢復時平移出怪／Boss／作答與遊玩計時，不改伺服器期限。
+- 修改：index.html、battle-pause.js、battle-music.js、tools/qa-pause.mjs、README.md。
+- 驗證：inline scripts parse；qa-pause 通過小兵停止、禁止作答、恢復、飛行攻擊凍結及恢復、Esc、無 JS 錯誤。
+- 未驗證：Netlify 部署結果；下一步為部署後學生端試用。
+
 # 2026-09-14｜試玩回饋：Boss 退位、攻擊回應、小兵與自由選關
 
 - 依使用者箭頭要求：Boss 戰主角 x=32%，Boss 保持 68%，腳底對齊；小兵戰仍 x=50%。此新要求覆蓋先前 Boss 主角固定中央的規格。
