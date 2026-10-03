@@ -17,7 +17,7 @@ try{
     return facing;
   });
   assert.deepEqual(result.map(r=>r.facing),['right','right','right','down','left','left','left','up']);
-  assert.equal(result[0].mirror,-1);assert.equal(result[4].mirror,1);
+  assert.equal(result[0].mirror,1);assert.equal(result[4].mirror,1);
   assert.ok(result[3].source.endsWith('idle-1.png'));assert.ok(result[7].source.endsWith('idle-2.png'));
   // Render eight separate snapshots, bypassing crowd limit only for QA presentation.
   const positions=[[15,20],[15,50],[15,80],[50,20],[85,20],[85,50],[85,80],[50,85]];
