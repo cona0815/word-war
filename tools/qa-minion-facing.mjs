@@ -13,6 +13,7 @@ try{
     const points=[[15,20],[15,50],[15,80],[50,20],[85,20],[85,50],[85,80],[50,85]],source='assets/generated/letter-monster-Q.png';
     const facing=points.map(([x,y])=>MinionFacing.resolve({x,y},source));
     await Promise.all(Object.values(MinionFacing.directions).map(async src=>{const image=new Image();image.src=src;await image.decode()}));
+    for(const name of Object.keys(MinionFacing.families))for(const [x,y] of points){const view=MinionFacing.resolve({x,y},`assets/generated/${name}.png`);if(view.mirror!==1)throw new Error('Directional art mirrored');const image=new Image();image.src=view.source;await image.decode();}
     return facing;
   });
   assert.deepEqual(result.map(r=>r.facing),['right','right','right','down','left','left','left','up']);

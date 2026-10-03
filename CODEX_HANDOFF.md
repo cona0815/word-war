@@ -1645,3 +1645,11 @@ Polish HUD spacing and continue replacing temporary minion/boss assets in batche
 ### 下一個最安全任務
 
 - 由下一個模型使用老師提供的隔離 GAS 專案與測試試算表，設定臨時環境變數後執行 `node tools/qa-gas-endpoint.mjs`；通過後才考慮正式部署與學生裝置實測，並清除或封存測試帳號資料。
+## 2026-10-03：方向素材第二批、最高連擊與暫停熱鍵
+
+- 三個新家族（冰晶、星星、石像）各有正面／背面／左右側身 256px 透明圖；對應五個來源（digit 1/3/4、letter E/G）。未覆寫原圖，解碼失敗沿用替代小兵。
+- battle-combo.js 保留每局最高連擊；答錯只清當前連擊，紀錄頁可見最高值，雲端重送使用當時紀錄快照。新局歸零，本機獎勵以最高值計算。GAS Records 新增 maxCombo 欄位程式，尚未部署 GAS。
+- 暫停中停用數字道具快捷鍵；README 修正技能樹尚未實作的說明。
+- 驗證：qa-best-combo、qa-minion-facing、qa-pause 通過；qa-game 111/111、題庫 60/60、GAS mock 0 failures。新增方向圖逐張解碼與人工目視檢查。
+- 尚未完成：其餘小兵家族的全方向圖、技能樹能力、實體 Windows 注音與課堂验收。不能將已完成五個來源視為全部 42 個來源完成。
+- 保留 hero-cast-clips.js 與原未追蹤素材。下一步：分批補齊其他家族並做部署後課堂試用；GAS 正式升版仍需隔離驗證。

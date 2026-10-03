@@ -117,7 +117,8 @@ const RECORD_HEADERS = [
   "userAgent",
   "errorsJson",
   "responseStatsJson",
-  "errorStatsJson"
+  "errorStatsJson",
+  "maxCombo"
 ];
 
 const QUESTION_HEADERS = [
@@ -1014,7 +1015,8 @@ function saveRecord_(record, accountId) {
     userAgent: clean_(record.userAgent, 300),
     errorsJson: JSON.stringify(normalizeErrorCounts_(record.errors)),
     responseStatsJson: JSON.stringify(normalizeResponseStats_(record.responseStats)),
-    errorStatsJson: JSON.stringify(normalizeErrorStats_(record.errorStats))
+    errorStatsJson: JSON.stringify(normalizeErrorStats_(record.errorStats)),
+    maxCombo: Math.min(Math.max(0, Math.floor(number_(record.maxCombo))), Math.max(0, Math.floor(number_(record.correct))))
   };
   sheet.appendRow(RECORD_HEADERS.map(function(header) {
     return safe[header];

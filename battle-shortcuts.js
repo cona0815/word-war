@@ -15,7 +15,7 @@
     button.title+=`（快捷鍵 ${i+1}）`;
   });
   function available(event){
-    if(!state.running||!mission.classList.contains('hidden')||drawer.classList.contains('open')||document.querySelector('#gmPanel')?.open)return false;
+    if(!state.running||state.paused||!mission.classList.contains('hidden')||drawer.classList.contains('open')||document.querySelector('#gmPanel')?.open)return false;
     if(event.isComposing||composing||event.keyCode===229||event.ctrlKey||event.altKey||event.metaKey||event.shiftKey)return false;
     if(isEditingTarget(event.target)&&event.target!==answerInput)return false;
     // Chinese lessons and the mixed ladder must retain native IME number selection.

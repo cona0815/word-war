@@ -9,6 +9,7 @@ try {
  const desktopPosition=await page.locator('#pauseGameBtn').evaluate(button=>({parent:button.parentElement.id,position:getComputedStyle(button).position,top:button.getBoundingClientRect().top,right:innerWidth-button.getBoundingClientRect().right}));
  assert.deepEqual(desktopPosition,{parent:'gameScreen',position:'fixed',top:70,right:14});
  await page.locator('#pauseGameBtn').click();
+ const shortcutClicks=await page.evaluate(()=>{let clicks=0;document.getElementById('battleItems').addEventListener('click',()=>clicks++);document.dispatchEvent(new KeyboardEvent('keydown',{key:'1',bubbles:true}));return clicks});assert.equal(shortcutClicks,0);
  const before=await page.evaluate(()=>JSON.stringify({enemies:state.enemies,hp:state.hp,correct:state.correct}));
  await page.waitForTimeout(1200);assert.equal(await page.evaluate(()=>JSON.stringify({enemies:state.enemies,hp:state.hp,correct:state.correct})),before);
  await page.evaluate(()=>submit(state.current?.word||'A'));assert.equal(await page.evaluate(()=>JSON.stringify({enemies:state.enemies,hp:state.hp,correct:state.correct})),before);

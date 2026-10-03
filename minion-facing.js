@@ -2,11 +2,15 @@
 (() => {
   const directory='assets/generated/minion-directions-v1/';
   const directions={down:directory+'idle-1.png',up:directory+'idle-2.png',left:directory+'idle-3.png',right:directory+'idle-4.png'};
+  const families={'digit-monster-1':'digit-monster-1','digit-monster-3':'digit-monster-3','letter-monster-E':'digit-monster-3','digit-monster-4':'digit-monster-4','letter-monster-G':'digit-monster-4'};
+  const frames={down:1,up:2,left:3,right:4};
   // Reviewed side profiles in docs/minion-source-review.png. Other originals are frontal.
   const profiles=new Map(['letter-monster-Q.png','letter-monster-X.png','letter-monster-Y.png','letter-monster-Z.png','zhuyin-initial-j.png','zhuyin-initial-sh.png','zhuyin-medial-yu.png'].map(name=>[name,'left']));
   const directionalSources=new Map([['assets/pixel-enemy-left.png','left'],['assets/pixel-enemy-right.png','right']]);
   function resolve(enemy,source){
     const target=heroPoint(),dx=target.x-enemy.x,dy=target.y-enemy.y;
+    const family=families[source.split('/').pop().replace(/\.png$/,'')];
+    if(family){const facing=Math.abs(dx)<8&&Math.abs(dy)>2?(dy>0?'down':'up'):(dx>=0?'right':'left');return {facing,source:`assets/generated/minion-views-v1/${family}/idle-${frames[facing]}.png`,mirror:1,originalFacing:'directional'};}
     // A narrow central column uses true front/back poses. Diagonal lanes keep their family.
     if(Math.abs(dx)<8&&Math.abs(dy)>2){const facing=dy>0?'down':'up';return {facing,source:directions[facing],mirror:1,originalFacing:'directional'};}
     const facing=dx>=0?'right':'left';
@@ -28,5 +32,5 @@
     });
     return result;
   };
-  window.MinionFacing=Object.freeze({resolve,directions,profiles:Object.freeze(Object.fromEntries(profiles))});
+  window.MinionFacing=Object.freeze({resolve,directions,families:Object.freeze(families),profiles:Object.freeze(Object.fromEntries(profiles))});
 })();
