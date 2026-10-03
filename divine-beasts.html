@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>四大神獸｜施法預覽</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#071924;color:#e8f8ff;font-family:system-ui,sans-serif}main{max-width:1250px;margin:auto;padding:20px}h1{font-size:26px;color:#ffe39b}.controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}button,select{background:#103348;color:#fff;border:1px solid #63d9ed;border-radius:8px;padding:10px;font:inherit}button:disabled{opacity:.5}.arena{position:relative;height:min(66vw,600px);min-height:410px;border:1px solid #57768b;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at bottom,#27626a,#102c43 65%)}#beast{position:absolute;width:38%;height:auto;left:57%;top:29%;image-rendering:pixelated}.target{position:absolute;width:13%;height:21%;display:flex;align-items:center;flex-direction:column;cursor:pointer}.target img{height:78%;max-width:100%;object-fit:contain;image-rendering:pixelated;transform:scaleX(-1)}.target.selected{filter:drop-shadow(0 0 8px #ffee87)}.target span{font-size:12px;background:#061822cc;border-radius:5px;padding:2px 5px}#effects{position:absolute;inset:0;pointer-events:none}#status{min-height:30px;color:#8deeff}a{color:#7ae9ff}.note{color:#aec9d6;font-size:14px}
+</style>
+<main><h1>四大神獸｜小招・大招</h1><p>神獸在右側，角色在左側。點選角色後發射魔法；飛行命中後才扣血。</p>
+<div class="controls"><select id="beastSelect" aria-label="選擇神獸"></select><select id="partySize" aria-label="角色人數"><option value="1">單人</option><option value="8">八人站位預覽</option></select><button id="small">放小招</button><button id="ultimate">放大招</button><button id="pause">暫停</button><button id="reset">重置生命</button></div>
+<p id="status" role="status">素材載入中…</p><div class="arena" id="arena"><img id="beast" alt="神獸"><div id="targets"></div><div id="effects"></div></div>
+<p class="note">八人為本機站位與命中測試，尚未連線。大招預覽命中指定角色；未來可由戰鬥系統傳入範圍內目標。八景主線玩法保持原設定。</p><p><a href="index.html">回到 Word War</a></p></main>
+<script src="divine-beasts-data.js"></script><script src="spell-flight.js"></script><script src="divine-beasts-preview.js"></script>
+</html>
