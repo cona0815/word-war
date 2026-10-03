@@ -1,0 +1,5 @@
+Built-in ImageGen, referenced assets/generated/letter-monster-A.png.
+Four directional views of one blue crowned rune slime, exact 2x2 layout:
+top left front/down, top right back/up with no eyes or mouth, bottom left left profile, bottom right right profile.
+Pixel-inspired fantasy RPG art; same identity, stable feet and scale; central 65% safe area; pure #FF00FF background; no text, arrows, grid or detached effects.
+Processor: generate2dsprite.py process --target creature --mode idle --rows 2 --cols 2 --cell-size 256 --fit-scale 0.8 --align feet --shared-scale --component-mode largest --reject-edge-touch.

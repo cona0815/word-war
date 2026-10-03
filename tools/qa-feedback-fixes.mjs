@@ -28,7 +28,7 @@ try{
  await page.screenshot({path:'docs/qa-feedback-boss.png'});
  check('Boss首次反擊倒數改為五秒',await page.evaluate(()=>{boss();return state.bossAttackAt-Date.now()<=5000}));
  await page.evaluate(()=>{begin(8)});check('體驗天梯不要求八寶石',await page.evaluate(()=>state.ladderRitualReady&&state.profile.level===8&&gemCount()===0));
- const failure=await browser.newPage();await failure.addInitScript(()=>sessionStorage.setItem('word-war-opening-v1','seen'));await failure.route('**/letter-monster-A.png',r=>r.fulfill({status:404,body:''}));
+ const failure=await browser.newPage();await failure.addInitScript(()=>sessionStorage.setItem('word-war-opening-v1','seen'));await failure.route(url=>/\/(?:letter-monster-A|idle-4)\.png$/.test(url.pathname),r=>r.fulfill({status:404,body:''}));
  await failure.goto(base);await failure.locator('#guestStartBtn').click();await failure.waitForFunction(()=>state.running);
  await failure.evaluate(()=>{state.enemies=[{word:'A',alive:true,hp:100,x:15,y:40,order:0,activeAt:Date.now(),spawnLane:'test'}];render()});
  await failure.waitForTimeout(250);
